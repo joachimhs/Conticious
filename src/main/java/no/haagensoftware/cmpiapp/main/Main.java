@@ -1,4 +1,4 @@
-package no.haagensoftware.cmpiapi.main;
+package no.haagensoftware.cmpiapp.main;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -25,7 +25,7 @@ public class Main {
             b.option(ChannelOption.SO_BACKLOG, 1024);
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new HttpHelloWorldServerInitializer());
+                    .childHandler(new CmpiAppPipelineInitializer());
 
             Channel ch = b.bind(port).sync().channel();
             ch.closeFuture().sync();

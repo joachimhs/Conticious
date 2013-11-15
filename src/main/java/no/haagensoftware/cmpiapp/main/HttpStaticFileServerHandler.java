@@ -1,4 +1,4 @@
-package no.haagensoftware.cmpiapi.main;
+package no.haagensoftware.cmpiapp.main;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
