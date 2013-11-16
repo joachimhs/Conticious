@@ -20,8 +20,17 @@ public class SubCategoryHandler extends ContenticeGenericHandler {
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
         logger.info("reading SubCategoryHandler and writing contents to buffer");
-        writeContentsToBuffer(channelHandlerContext, "Channel SubCategoryHandler Response", "text/plain; charset=UTF-8");
 
+        String category = null;
+        String subcategory = null;
+
+        logger.info("parameterMap: " + getParameterMap());
+        if (getParameterMap() != null) {
+            category = getParameterMap().get("category");
+            subcategory = getParameterMap().get("subcategory");
+        }
+
+        writeContentsToBuffer(channelHandlerContext, "Channel SubCategoryHandler Response: " + category + " : " + subcategory, "text/plain; charset=UTF-8");
         channelHandlerContext.fireChannelRead(fullHttpRequest);
     }
 }

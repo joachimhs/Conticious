@@ -32,7 +32,7 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
         this.urlResolver.addUrlPattern("/categories", CategoriesHandler.class);
         this.urlResolver.addUrlPattern("/categories/{category}", CategoryHandler.class);
         this.urlResolver.addUrlPattern("/categories/{category}/subcategories", SubCategoriesHandler.class);
-        this.urlResolver.addUrlPattern("/categories/{category}/subcategories/home", SubCategoryHandler.class);
+        this.urlResolver.addUrlPattern("/categories/{category}/subcategories/{subcategory}", SubCategoryHandler.class);
 
         //Load plugins and add URLs to urlResolver
     }
