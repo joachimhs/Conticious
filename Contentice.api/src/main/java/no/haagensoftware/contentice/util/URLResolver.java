@@ -2,7 +2,6 @@ package no.haagensoftware.contentice.util;
 
 import io.netty.channel.ChannelHandler;
 import no.haagensoftware.contentice.data.URLData;
-import no.haagensoftware.contentice.handler.ContenticeGenericHandler;
 
 import java.util.HashMap;
 import java.util.Map;

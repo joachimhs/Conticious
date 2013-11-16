@@ -1,12 +1,9 @@
 package no.haagensoftware.contentice.util;
 
 import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.FullHttpRequest;
 import junit.framework.Assert;
 import no.haagensoftware.contentice.data.URLData;
-import no.haagensoftware.contentice.handler.ContenticeGenericHandler;
+
 import org.junit.Before;
 import org.junit.Test;
 

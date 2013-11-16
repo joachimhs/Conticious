@@ -1,15 +1,9 @@
-package no.haagensoftware.contentice.handler;
+package no.haagensoftware.contentice.handlers;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpResponse;
 
 import java.util.logging.Logger;
-
-import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
-import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 /**
  * Created with IntelliJ IDEA.

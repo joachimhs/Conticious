@@ -1,4 +1,4 @@
-package no.haagensoftware.contentice.handler;
+package no.haagensoftware.contentice.handlers;
 
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
@@ -11,6 +11,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
+import no.haagensoftware.contentice.plugin.StoragePluginService;
 import no.haagensoftware.contentice.spi.StoragePlugin;
 import org.apache.log4j.Logger;
 
@@ -43,6 +44,10 @@ public class ContenticeGenericHandler extends SimpleChannelInboundHandler<FullHt
 
     public String getUri(FullHttpRequest fullHttpRequest) {
         return fullHttpRequest.getUri();
+    }
+
+    public StoragePlugin getStorage() {
+        return StoragePluginService.getInstance().getStoragePluginWithName("FileSystemStoragePlugin");
     }
 
     public String getCookieValue(FullHttpRequest fullHttpRequest, String cookieName) {

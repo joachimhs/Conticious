@@ -3,16 +3,10 @@ package no.haagensoftware.contentice.handlers;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpRequest;
 import no.haagensoftware.contentice.data.URLData;
-import no.haagensoftware.contentice.handler.ContenticeGenericHandler;
-import no.haagensoftware.contentice.handler.NotFoundHandler;
 import no.haagensoftware.contentice.util.URLResolver;
 
-import java.util.Map;
 import java.util.logging.Logger;
 
 /**

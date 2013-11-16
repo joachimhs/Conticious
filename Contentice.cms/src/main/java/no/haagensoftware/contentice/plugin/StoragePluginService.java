@@ -2,7 +2,9 @@ package no.haagensoftware.contentice.plugin;
 
 import no.haagensoftware.contentice.spi.StoragePlugin;
 
+import java.util.Iterator;
 import java.util.ServiceLoader;
+import java.util.logging.Logger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -12,6 +14,7 @@ import java.util.ServiceLoader;
  * To change this template use File | Settings | File Templates.
  */
 public class StoragePluginService {
+    private static final Logger logger = Logger.getLogger(StoragePluginService.class.getName());
     private static StoragePluginService pluginService = null;
     private ServiceLoader<StoragePlugin> loader;
 
@@ -30,7 +33,9 @@ public class StoragePluginService {
     public StoragePlugin getStoragePluginWithName(String storagePluginName) {
         StoragePlugin returnPlugin = null;
 
-        for (StoragePlugin plugin : loader) {
+        Iterator<StoragePlugin> iterator = loader.iterator();
+        while (iterator.hasNext()) {
+            StoragePlugin plugin = iterator.next();
             if (plugin.getStoragePluginName().equals(storagePluginName)) {
                 returnPlugin = plugin;
                 break;

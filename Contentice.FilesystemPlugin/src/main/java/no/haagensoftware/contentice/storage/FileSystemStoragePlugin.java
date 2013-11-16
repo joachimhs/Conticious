@@ -18,6 +18,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -27,6 +28,7 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class FileSystemStoragePlugin extends StoragePlugin {
+    private static final Logger logger = Logger.getLogger(FileSystemStoragePlugin.class.getName());
     private String documentsDirectory;
 
     @Override
@@ -36,6 +38,7 @@ public class FileSystemStoragePlugin extends StoragePlugin {
 
     public FileSystemStoragePlugin() {
         String docDirectory = System.getProperty("no.haagensoftware.contentice.storage.file.documentsDirectory");
+
         if (docDirectory == null) {
             throw new RuntimeException("no.haagensoftware.contentice.storage.file.documentsDirectory is not set. Configure in Contentice's config.properties file");
         } else {
