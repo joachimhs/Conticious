@@ -1,5 +1,6 @@
 package no.haagensoftware.contentice.util;
 
+import io.netty.channel.ChannelHandler;
 import no.haagensoftware.contentice.data.URLData;
 
 import java.util.HashMap;
@@ -13,24 +14,24 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public class URLResolver {
-    private Map<String, String> urlMap;
+    private Map<String, ChannelHandler> urlMap;
 
     public URLResolver() {
         urlMap = new HashMap<>();
-        urlMap.put("/categories", "Categories");
-        urlMap.put("/categories/{category}", "Category");
-        urlMap.put("/categories/{category}/subcategories", "Subcategories");
-        urlMap.put("/categories/{category}/subcategories/{subcategory}", "Subcategory");
+    }
+
+    public void addUrlPattern(String urlPattern, ChannelHandler channelHandler) {
+        urlMap.put(urlPattern, channelHandler);
     }
 
     public URLData getValueForUrl(String url) {
         URLData urlData = null;
 
         //Try Excact match first
-        String value = getValueForExactMatch(url);
+        String value = getKeyForExactMatch(url);
 
         if (value != null) {
-            urlData = new URLData(url, url, new HashMap<String, String>());
+            urlData = new URLData(url, url, new HashMap<String, String>(), urlMap.get(url));
         } else {
             urlData = getValueForUrlWithParameters(url);
         }
@@ -38,17 +39,17 @@ public class URLResolver {
         return urlData;
     }
 
-    public String getValueForExactMatch(String url) {
-        String value = null;
+    public String getKeyForExactMatch(String url) {
+        String key = null;
 
         for (String currUrl : urlMap.keySet()) {
             if (currUrl.equals(url)) {
-                value = urlMap.get(currUrl);
+                key= currUrl;
                 break;
             }
         }
 
-        return value;
+        return key;
     }
 
     public URLData getValueForUrlWithParameters(String actualUrl) {
@@ -77,7 +78,7 @@ public class URLResolver {
                 }
 
                 if (urlMatch) {
-                    urlData = new URLData(urlPattern, actualUrl, propertyMap);
+                    urlData = new URLData(urlPattern, actualUrl, propertyMap, urlMap.get(urlPattern));
 
                     break;
                 }
