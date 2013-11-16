@@ -4,7 +4,8 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import no.haagensoftware.contentice.netty.CmpiAppPipelineInitializer;
+import no.haagensoftware.contentice.netty.ContenticePipelineInitializer;
+import no.haagensoftware.contentice.util.URLResolver;
 
 public class Main {
     private Integer port;
@@ -19,6 +20,9 @@ public class Main {
     }
 
     public void bootstrap() throws Exception {
+        URLResolver urlResolver = new URLResolver();
+
+
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
@@ -26,7 +30,7 @@ public class Main {
             b.option(ChannelOption.SO_BACKLOG, 1024);
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new CmpiAppPipelineInitializer());
+                    .childHandler(new ContenticePipelineInitializer(urlResolver));
 
             Channel ch = b.bind(port).sync().channel();
             ch.closeFuture().sync();

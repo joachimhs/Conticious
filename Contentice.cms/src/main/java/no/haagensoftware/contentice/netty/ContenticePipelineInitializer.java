@@ -1,16 +1,19 @@
 package no.haagensoftware.contentice.netty;
 
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
+import io.netty.handler.codec.http.HttpContentCompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.stream.ChunkedWriteHandler;
+import no.haagensoftware.contentice.handlers.CategoriesHandler;
+import no.haagensoftware.contentice.handlers.RouterHandler;
+import no.haagensoftware.contentice.util.URLResolver;
 
-import java.util.LinkedHashMap;
+import java.util.logging.Logger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,12 +22,23 @@ import java.util.LinkedHashMap;
  * Time: 9:26 AM
  * To change this template use File | Settings | File Templates.
  */
-public class CmpiAppPipelineInitializer extends ChannelInitializer<SocketChannel> {
+public class ContenticePipelineInitializer extends ChannelInitializer<SocketChannel> {
+    private static final Logger logger = Logger.getLogger(ContenticePipelineInitializer.class.getName());
+
+    private URLResolver urlResolver;
+
+    public ContenticePipelineInitializer(URLResolver urlResolver) {
+        this.urlResolver = urlResolver;
+
+        this.urlResolver.addUrlPattern("/categories", new CategoriesHandler());
+
+        //Load plugins and add URLs to urlResolver
+    }
 
     @Override
     public void initChannel(SocketChannel ch) throws Exception {
+        logger.info("initChannelHandler");
         ChannelPipeline pipeline = ch.pipeline();
-        LinkedHashMap<String, ChannelHandler> routes = new LinkedHashMap<String, ChannelHandler>();
 
         // Uncomment the following line if you want HTTPS
         //SSLEngine engine = SecureChatSslContextFactory.getServerContext().createSSLEngine();
@@ -32,14 +46,15 @@ public class CmpiAppPipelineInitializer extends ChannelInitializer<SocketChannel
         //p.addLast("ssl", new SslHandler(engine));
 
         pipeline.addLast("decoder", new HttpRequestDecoder());
-        pipeline.addLast("aggregator", new HttpObjectAggregator(65536));
+        pipeline.addLast("aggregator", new HttpObjectAggregator(1048576));
         pipeline.addLast("encoder", new HttpResponseEncoder());
+        pipeline.addLast("gzip", new HttpContentCompressor(6));
         pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
 
-        //building router handler for Admin pages
+        //Router Handler
+        pipeline.addLast("router_handler", new RouterHandler(urlResolver));
 
-        //Category Handler
 
-        pipeline.addLast("handler", new HttpStaticFileServerHandler(true));
+        //pipeline.addLast("handler", new HttpStaticFileServerHandler(true));
     }
 }

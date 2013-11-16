@@ -39,7 +39,7 @@ public class URLResolver {
         return urlData;
     }
 
-    public String getKeyForExactMatch(String url) {
+    protected String getKeyForExactMatch(String url) {
         String key = null;
 
         for (String currUrl : urlMap.keySet()) {
@@ -52,7 +52,7 @@ public class URLResolver {
         return key;
     }
 
-    public URLData getValueForUrlWithParameters(String actualUrl) {
+    protected URLData getValueForUrlWithParameters(String actualUrl) {
         URLData urlData = null;
 
 
