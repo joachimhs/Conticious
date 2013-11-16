@@ -4,6 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import no.haagensoftware.contentice.handler.ContenticeGenericHandler;
 
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**

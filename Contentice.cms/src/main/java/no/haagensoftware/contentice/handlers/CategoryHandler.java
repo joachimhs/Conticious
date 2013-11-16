@@ -4,6 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import no.haagensoftware.contentice.handler.ContenticeGenericHandler;
 
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -19,7 +20,15 @@ public class CategoryHandler extends ContenticeGenericHandler {
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
         logger.info("reading CategoryHandler and writing contents to buffer");
-        writeContentsToBuffer(channelHandlerContext, "Channel CategoryHandler Response", "text/plain; charset=UTF-8");
+
+        String category = null;
+
+        logger.info("parameterMap: " + getParameterMap());
+        if (getParameterMap() != null) {
+            category = getParameterMap().get("category");
+        }
+
+        writeContentsToBuffer(channelHandlerContext, "Channel CategoryHandler Response: " + category, "text/plain; charset=UTF-8");
 
         channelHandlerContext.fireChannelRead(fullHttpRequest);
     }

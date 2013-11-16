@@ -12,6 +12,7 @@ import no.haagensoftware.contentice.handler.ContenticeGenericHandler;
 import no.haagensoftware.contentice.handler.NotFoundHandler;
 import no.haagensoftware.contentice.util.URLResolver;
 
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -52,7 +53,11 @@ public class RouterHandler extends ContenticeGenericHandler {
         } else {
             logger.info("Handler: " + urlData.getChannelHandler());
             //urlData.getChannelHandler().handleIncomingRequest(channelHandlerContext, fullHttpRequest);
-            addOrReplaceHandler(channelHandlerContext, urlData.getChannelHandler().newInstance(), "route-generated");
+            ChannelHandler handler = urlData.getChannelHandler().newInstance();
+            if (handler instanceof ContenticeGenericHandler) {
+                ((ContenticeGenericHandler)handler).setParameterMap(urlData.getParameters());
+            }
+            addOrReplaceHandler(channelHandlerContext, handler, "route-generated");
         }
         channelHandlerContext.fireChannelRead(fullHttpRequest);
     }

@@ -4,6 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import no.haagensoftware.contentice.handler.ContenticeGenericHandler;
 
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -14,7 +15,6 @@ import java.util.logging.Logger;
  * To change this template use File | Settings | File Templates.
  */
 public class SubCategoriesHandler extends ContenticeGenericHandler {
-
     private static final Logger logger = Logger.getLogger(CategoriesHandler.class.getName());
 
     @Override
