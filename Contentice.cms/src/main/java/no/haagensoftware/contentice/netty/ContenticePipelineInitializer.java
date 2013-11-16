@@ -30,7 +30,7 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
     public ContenticePipelineInitializer(URLResolver urlResolver) {
         this.urlResolver = urlResolver;
 
-        this.urlResolver.addUrlPattern("/categories", new CategoriesHandler());
+        this.urlResolver.addUrlPattern("/categories", CategoriesHandler.class);
 
         //Load plugins and add URLs to urlResolver
     }
@@ -52,7 +52,7 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
         pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
 
         //Router Handler
-        pipeline.addLast("router_handler", new RouterHandler(urlResolver));
+        pipeline.addLast("router_handler", new RouterHandler(urlResolver, null));
 
 
         //pipeline.addLast("handler", new HttpStaticFileServerHandler(true));

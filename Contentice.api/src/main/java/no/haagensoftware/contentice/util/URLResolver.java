@@ -2,6 +2,7 @@ package no.haagensoftware.contentice.util;
 
 import io.netty.channel.ChannelHandler;
 import no.haagensoftware.contentice.data.URLData;
+import no.haagensoftware.contentice.handler.ContenticeGenericHandler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,13 +15,13 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public class URLResolver {
-    private Map<String, ChannelHandler> urlMap;
+    private Map<String, Class<? extends ChannelHandler>> urlMap;
 
     public URLResolver() {
         urlMap = new HashMap<>();
     }
 
-    public void addUrlPattern(String urlPattern, ChannelHandler channelHandler) {
+    public void addUrlPattern(String urlPattern, Class<? extends ChannelHandler> channelHandler) {
         urlMap.put(urlPattern, channelHandler);
     }
 

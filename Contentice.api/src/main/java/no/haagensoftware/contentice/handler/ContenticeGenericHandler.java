@@ -1,4 +1,4 @@
-package no.haagensoftware.contentice.handlers;
+package no.haagensoftware.contentice.handler;
 
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
@@ -83,16 +83,22 @@ public class ContenticeGenericHandler extends SimpleChannelInboundHandler<FullHt
         return requestContent;
     }
 
+    public void handleIncomingRequest(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
+
+    }
+
     public void writeContentsToBuffer(ChannelHandlerContext ctx, String responseText, String contentType) {
         HttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, OK, Unpooled.copiedBuffer(responseText, CharsetUtil.UTF_8));
         response.headers().set(CONTENT_TYPE, contentType + "; charset=UTF-8");
 
         ctx.write(response);
+        ctx.flush();
     }
 
-    public void write401ToBuffer(ChannelHandlerContext ctx) {
-        HttpResponse response = new DefaultHttpResponse(HTTP_1_1, NOT_FOUND);
+    public void write404ToBuffer(ChannelHandlerContext ctx) {
+        HttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, NOT_FOUND, Unpooled.copiedBuffer("404 Not Found", CharsetUtil.UTF_8));
         ctx.write(response);
+        ctx.flush();
     }
 
     protected void sendError(ChannelHandlerContext ctx, HttpResponseStatus status) {
@@ -101,6 +107,7 @@ public class ContenticeGenericHandler extends SimpleChannelInboundHandler<FullHt
 
         // Close the connection as soon as the error message is sent.
         ctx.write(response);
+        ctx.flush();
     }
 
 }

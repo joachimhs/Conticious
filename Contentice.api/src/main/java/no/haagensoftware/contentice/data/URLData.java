@@ -1,6 +1,7 @@
 package no.haagensoftware.contentice.data;
 
 import io.netty.channel.ChannelHandler;
+import no.haagensoftware.contentice.handler.ContenticeGenericHandler;
 
 import java.util.Map;
 
@@ -14,7 +15,7 @@ import java.util.Map;
 public class URLData {
     private String urlPattern;
     private String realUrl;
-    private ChannelHandler channelHandler;
+    private Class<? extends ChannelHandler> channelHandler;
     private Map<String, String> parameters;
 
     public URLData(String urlPattern, String realUrl, Map<String, String> parameters) {
@@ -23,7 +24,7 @@ public class URLData {
         this.parameters = parameters;
     }
 
-    public URLData(String urlPattern, String realUrl, Map<String, String> parameters, ChannelHandler channelHandler) {
+    public URLData(String urlPattern, String realUrl, Map<String, String> parameters, Class<? extends ChannelHandler> channelHandler) {
         this.urlPattern = urlPattern;
         this.realUrl = realUrl;
         this.channelHandler = channelHandler;
@@ -42,7 +43,7 @@ public class URLData {
         return parameters;
     }
 
-    public ChannelHandler getChannelHandler() {
+    public Class<? extends ChannelHandler> getChannelHandler() {
         return channelHandler;
     }
 }

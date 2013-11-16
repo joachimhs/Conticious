@@ -6,6 +6,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
 import junit.framework.Assert;
 import no.haagensoftware.contentice.data.URLData;
+import no.haagensoftware.contentice.handler.ContenticeGenericHandler;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,37 +19,13 @@ import org.junit.Test;
  */
 public class URLResoverTest {
     private URLResolver resolver;
-    private ChannelHandler channelHandler1;
-    private ChannelHandler channelHandler2;
-    private ChannelHandler channelHandler3;
-    private ChannelHandler channelHandler4;
+    private Class<ChannelHandler> channelHandler1;
+    private Class<ChannelHandler> channelHandler2;
+    private Class<ChannelHandler> channelHandler3;
+    private Class<ChannelHandler> channelHandler4;
     @Before
     public void setup() {
         resolver = new URLResolver();
-        channelHandler1 = new SimpleChannelInboundHandler<FullHttpRequest>() {
-            @Override
-            protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
-                //To change body of implemented methods use File | Settings | File Templates.
-            }
-        };
-        channelHandler2 = new SimpleChannelInboundHandler<FullHttpRequest>() {
-            @Override
-            protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
-                //To change body of implemented methods use File | Settings | File Templates.
-            }
-        };
-        channelHandler3 = new SimpleChannelInboundHandler<FullHttpRequest>() {
-            @Override
-            protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
-                //To change body of implemented methods use File | Settings | File Templates.
-            }
-        };
-        channelHandler4 = new SimpleChannelInboundHandler<FullHttpRequest>() {
-            @Override
-            protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
-                //To change body of implemented methods use File | Settings | File Templates.
-            }
-        };
 
         resolver.addUrlPattern("/categories", channelHandler1);
         resolver.addUrlPattern("/categories/{category}", channelHandler2);
