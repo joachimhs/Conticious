@@ -11,6 +11,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
+import no.haagensoftware.contentice.spi.StoragePlugin;
 import org.apache.log4j.Logger;
 
 import java.util.Set;

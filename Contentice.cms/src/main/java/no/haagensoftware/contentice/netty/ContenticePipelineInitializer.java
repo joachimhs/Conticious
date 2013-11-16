@@ -9,8 +9,7 @@ import io.netty.handler.codec.http.HttpResponseEncoder;
 
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.stream.ChunkedWriteHandler;
-import no.haagensoftware.contentice.handlers.CategoriesHandler;
-import no.haagensoftware.contentice.handlers.RouterHandler;
+import no.haagensoftware.contentice.handlers.*;
 import no.haagensoftware.contentice.util.URLResolver;
 
 import java.util.logging.Logger;
@@ -31,6 +30,9 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
         this.urlResolver = urlResolver;
 
         this.urlResolver.addUrlPattern("/categories", CategoriesHandler.class);
+        this.urlResolver.addUrlPattern("/categories/{category}", CategoryHandler.class);
+        this.urlResolver.addUrlPattern("/categories/{category}/subcategories", SubCategoriesHandler.class);
+        this.urlResolver.addUrlPattern("/categories/{category}/subcategories/home", SubCategoryHandler.class);
 
         //Load plugins and add URLs to urlResolver
     }
