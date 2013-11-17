@@ -25,6 +25,9 @@ public class URLResolver {
     }
 
     public URLData getValueForUrl(String url) {
+        if (url.endsWith("/")) {
+            url = url.substring(0, url.length()-1);
+        }
         URLData urlData = null;
 
         //Try Excact match first

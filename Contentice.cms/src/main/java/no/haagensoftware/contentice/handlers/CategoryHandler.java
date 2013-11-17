@@ -23,7 +23,6 @@ public class CategoryHandler extends ContenticeGenericHandler {
         logger.info("reading CategoryHandler and writing contents to buffer");
 
         String category = null;
-
         logger.info("parameterMap: " + getParameterMap());
         if (getParameterMap() != null) {
             category = getParameterMap().get("category");
