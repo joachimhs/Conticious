@@ -19,6 +19,8 @@ public abstract class StoragePlugin {
 
     public abstract List<CategoryData> getCategories();
 
+    public abstract CategoryData getCategory(String category);
+
     public abstract void setCategory(String category, CategoryData categoryData);
 
     public abstract List<SubCategoryData> getSubCategories(String category);

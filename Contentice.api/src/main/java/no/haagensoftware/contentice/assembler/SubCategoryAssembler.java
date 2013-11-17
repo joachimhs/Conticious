@@ -18,7 +18,7 @@ public class SubCategoryAssembler {
             subCategoryObject.addProperty("id", subCategoryData.getId());
             subCategoryObject.addProperty("category", category);
             subCategoryObject.addProperty("content", subCategoryData.getContent());
-            
+
             for (String key : subCategoryData.getKeyMap().keySet()) {
                 subCategoryObject.add(key, subCategoryData.getKeyMap().get(key));
             }

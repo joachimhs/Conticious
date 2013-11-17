@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
+import no.haagensoftware.contentice.assembler.CategoryAssembler;
 import no.haagensoftware.contentice.data.CategoryData;
 
 import java.util.List;
@@ -30,15 +31,16 @@ public class CategoriesHandler extends ContenticeGenericHandler {
         List<CategoryData> categories = getStorage().getCategories();
 
         logger.info("Got " + categories.size() + " categories");
+
         JsonArray categoryArray = new JsonArray();
         for (CategoryData category : categories) {
-            JsonObject categoryObject = new JsonObject();
-            categoryObject.addProperty("id", category.getId());
-            categoryArray.add(categoryObject);
+            categoryArray.add(CategoryAssembler.buildCategoryJsonFromCategoryData(category));
         }
 
-        logger.info("Writing contents to buffer");
-        writeContentsToBuffer(channelHandlerContext, categoryArray.toString(), "application/json; charset=UTF-8");
+        JsonObject topLevelObject = new JsonObject();
+        topLevelObject.add("categories", categoryArray);
+
+        writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json; charset=UTF-8");
 
         channelHandlerContext.fireChannelRead(fullHttpRequest);
     }

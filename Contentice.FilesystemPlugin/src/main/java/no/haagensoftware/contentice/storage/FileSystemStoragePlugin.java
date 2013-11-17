@@ -72,6 +72,20 @@ public class FileSystemStoragePlugin extends StoragePlugin {
     }
 
     @Override
+    public CategoryData getCategory(String category) {
+        CategoryData categoryData = null;
+
+        for (CategoryData currCategory : getCategories()) {
+            if (currCategory.getId().equals(category)) {
+                categoryData = new CategoryData(currCategory.getId());
+                break;
+            }
+        }
+
+        return categoryData;
+    }
+
+    @Override
     public void setCategory(String category, CategoryData categoryData) {
         Path path = FileSystems.getDefault().getPath(documentsDirectory + File.separatorChar + category);
 

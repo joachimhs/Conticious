@@ -1,7 +1,10 @@
 package no.haagensoftware.contentice.handlers;
 
+import com.google.gson.JsonObject;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
+import no.haagensoftware.contentice.assembler.CategoryAssembler;
+import no.haagensoftware.contentice.data.CategoryData;
 
 import java.util.logging.Logger;
 
@@ -26,9 +29,15 @@ public class CategoryHandler extends ContenticeGenericHandler {
             category = getParameterMap().get("category");
         }
 
+        CategoryData categoryData = getStorage().getCategory(category);
+        if (categoryData == null) {
+            write404ToBuffer(channelHandlerContext);
+        } else {
+            JsonObject topLevelObject = new JsonObject();
+            topLevelObject.add("category", CategoryAssembler.buildCategoryJsonFromCategoryData(categoryData));
 
-
-        writeContentsToBuffer(channelHandlerContext, "Channel CategoryHandler Response: " + category, "text/plain; charset=UTF-8");
+            writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json; charset=UTF-8");
+        }
 
         channelHandlerContext.fireChannelRead(fullHttpRequest);
     }
