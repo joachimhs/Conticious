@@ -24,14 +24,8 @@ public class SubCategoryHandler extends ContenticeGenericHandler {
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
         logger.info("reading SubCategoryHandler and writing contents to buffer");
 
-        String category = null;
-        String subcategory = null;
-
-        logger.info("parameterMap: " + getParameterMap());
-        if (getParameterMap() != null) {
-            category = getParameterMap().get("category");
-            subcategory = getParameterMap().get("subcategory");
-        }
+        String category = getParameter("category");
+        String subcategory = getParameter("subcategory");
 
         SubCategoryData subCategoryData = getStorage().getSubCategory(category, subcategory);
 

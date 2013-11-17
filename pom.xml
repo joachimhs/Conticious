@@ -18,6 +18,7 @@
         <module>Contentice.api</module>
         <module>Contentice.cms</module>
         <module>Contentice.FilesystemPlugin</module>
+        <module>Contentice.AdminPlugin</module>
     </modules>
 
 	<build>

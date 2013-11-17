@@ -11,6 +11,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
+import no.haagensoftware.contentice.handler.ContenticeHandler;
+import no.haagensoftware.contentice.handler.ContenticeParameterMap;
 import no.haagensoftware.contentice.plugin.StoragePluginService;
 import no.haagensoftware.contentice.spi.StoragePlugin;
 import org.apache.log4j.Logger;
@@ -25,21 +27,12 @@ import java.util.Set;
  * Time: 1:29 PM
  * To change this template use File | Settings | File Templates.
  */
-public class ContenticeGenericHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+public class ContenticeGenericHandler extends ContenticeHandler {
     private Logger logger = Logger.getLogger(ContenticeGenericHandler.class.getName());
-    private Map<String, String> parameterMap;
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
         //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public Map<String, String> getParameterMap() {
-        return parameterMap;
-    }
-
-    public void setParameterMap(Map<String, String> parameterMap) {
-        this.parameterMap = parameterMap;
     }
 
     public String getUri(FullHttpRequest fullHttpRequest) {

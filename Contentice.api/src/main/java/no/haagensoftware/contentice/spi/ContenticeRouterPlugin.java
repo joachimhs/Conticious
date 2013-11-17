@@ -12,7 +12,7 @@ import java.util.LinkedHashMap;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class ContenticeRouterPlugin {
-    public abstract LinkedHashMap<String, ChannelHandler> getRoutes();
+    public abstract LinkedHashMap<String, Class<ChannelHandler>> getRoutes();
 
-    public abstract ChannelHandler getHandlerForRoute(String route);
+    public abstract Class<ChannelHandler> getHandlerForRoute(String route);
 }

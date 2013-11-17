@@ -22,11 +22,7 @@ public class CategoryHandler extends ContenticeGenericHandler {
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
         logger.info("reading CategoryHandler and writing contents to buffer");
 
-        String category = null;
-        logger.info("parameterMap: " + getParameterMap());
-        if (getParameterMap() != null) {
-            category = getParameterMap().get("category");
-        }
+        String category = getParameter("category");
 
         CategoryData categoryData = getStorage().getCategory(category);
         if (categoryData == null) {
