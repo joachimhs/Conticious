@@ -1,7 +1,12 @@
 package no.haagensoftware.contentice.handlers;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
+import no.haagensoftware.contentice.assembler.SubCategoryAssembler;
+import no.haagensoftware.contentice.data.CategoryData;
+import no.haagensoftware.contentice.data.SubCategoryData;
 
 import java.util.logging.Logger;
 
@@ -28,7 +33,17 @@ public class SubCategoryHandler extends ContenticeGenericHandler {
             subcategory = getParameterMap().get("subcategory");
         }
 
-        writeContentsToBuffer(channelHandlerContext, "Channel SubCategoryHandler Response: " + category + " : " + subcategory, "text/plain; charset=UTF-8");
-        channelHandlerContext.fireChannelRead(fullHttpRequest);
+        SubCategoryData subCategoryData = getStorage().getSubCategory(category, subcategory);
+
+        if (subCategoryData == null) {
+            write404ToBuffer(channelHandlerContext);
+
+        } else {
+            JsonObject topLevelObject = new JsonObject();
+            topLevelObject.add("subCategory", SubCategoryAssembler.buildJsonFromSubCategoryData(subCategoryData, category));
+
+            writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json; charset=UTF-8");
+            channelHandlerContext.fireChannelRead(fullHttpRequest);
+        }
     }
 }
