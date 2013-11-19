@@ -5,6 +5,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.FullHttpRequest;
 import no.haagensoftware.contentice.data.URLData;
+import no.haagensoftware.contentice.handler.ContenticeHandler;
+import no.haagensoftware.contentice.spi.StoragePlugin;
 import no.haagensoftware.contentice.util.URLResolver;
 
 import java.util.logging.Logger;
@@ -16,15 +18,17 @@ import java.util.logging.Logger;
  * Time: 2:14 PM
  * To change this template use File | Settings | File Templates.
  */
-public class RouterHandler extends ContenticeGenericHandler {
-    private static final Logger logger = Logger.getLogger(ContenticeGenericHandler.class.getName());
+public class RouterHandler extends ContenticeHandler {
+    private static final Logger logger = Logger.getLogger(RouterHandler.class.getName());
+    private StoragePlugin storage;
 
     private URLResolver urlResolver;
     private Class<? extends ChannelHandler> defaultHandler;
 
-    public RouterHandler(URLResolver urlResolver,Class<ChannelHandler> defaultHandler) {
+    public RouterHandler(URLResolver urlResolver,Class<ChannelHandler> defaultHandler, StoragePlugin storage) {
         this.urlResolver = urlResolver;
         this.defaultHandler = defaultHandler;
+        this.storage = storage;
     }
 
     @Override
@@ -46,10 +50,13 @@ public class RouterHandler extends ContenticeGenericHandler {
             addOrReplaceHandler(channelHandlerContext, defaultHandler.newInstance(), "route-generated");
         } else {
             logger.info("Handler: " + urlData.getChannelHandler());
-            //urlData.getChannelHandler().handleIncomingRequest(channelHandlerContext, fullHttpRequest);
+
+
             ChannelHandler handler = urlData.getChannelHandler().newInstance();
-            if (handler instanceof ContenticeGenericHandler) {
-                ((ContenticeGenericHandler)handler).setParameterMap(urlData.getParameters());
+            if (handler instanceof ContenticeHandler) {
+                //Initializer Handler correctly if the handler is a subclass of the ContenticeHandler
+                ((ContenticeHandler)handler).setParameterMap(urlData.getParameters());
+                ((ContenticeHandler)handler).setStorage(storage);
             }
             addOrReplaceHandler(channelHandlerContext, handler, "route-generated");
         }

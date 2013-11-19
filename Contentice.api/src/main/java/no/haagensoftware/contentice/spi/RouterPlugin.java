@@ -11,8 +11,8 @@ import java.util.LinkedHashMap;
  * Time: 10:42 AM
  * To change this template use File | Settings | File Templates.
  */
-public abstract class ContenticeRouterPlugin {
-    public abstract LinkedHashMap<String, Class<ChannelHandler>> getRoutes();
+public abstract class RouterPlugin {
+    public abstract LinkedHashMap<String, Class<? extends ChannelHandler>> getRoutes();
 
-    public abstract Class<ChannelHandler> getHandlerForRoute(String route);
+    public abstract Class<? extends ChannelHandler> getHandlerForRoute(String route);
 }

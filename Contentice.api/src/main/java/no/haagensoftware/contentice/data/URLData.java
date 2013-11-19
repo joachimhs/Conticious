@@ -1,7 +1,6 @@
 package no.haagensoftware.contentice.data;
 
 import io.netty.channel.ChannelHandler;
-import no.haagensoftware.contentice.handler.ContenticeGenericHandler;
 
 import java.util.Map;
 

@@ -10,6 +10,9 @@ import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import no.haagensoftware.contentice.handlers.*;
+import no.haagensoftware.contentice.plugin.RouterPluginService;
+import no.haagensoftware.contentice.plugin.StoragePluginService;
+import no.haagensoftware.contentice.spi.RouterPlugin;
 import no.haagensoftware.contentice.util.URLResolver;
 
 import java.util.logging.Logger;
@@ -29,10 +32,10 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
     public ContenticePipelineInitializer(URLResolver urlResolver) {
         this.urlResolver = urlResolver;
 
-        this.urlResolver.addUrlPattern("/categories", CategoriesHandler.class);
-        this.urlResolver.addUrlPattern("/categories/{category}", CategoryHandler.class);
-        this.urlResolver.addUrlPattern("/categories/{category}/subcategories", SubCategoriesHandler.class);
-        this.urlResolver.addUrlPattern("/categories/{category}/subcategories/{subcategory}", SubCategoryHandler.class);
+        this.urlResolver.addUrlPattern("/json/categories", CategoriesHandler.class);
+        this.urlResolver.addUrlPattern("/json/categories/{category}", CategoryHandler.class);
+        this.urlResolver.addUrlPattern("/json/categories/{category}/subcategories", SubCategoriesHandler.class);
+        this.urlResolver.addUrlPattern("/json/categories/{category}/subcategories/{subcategory}", SubCategoryHandler.class);
 
         //Load plugins and add URLs to urlResolver
     }
@@ -53,8 +56,14 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
         pipeline.addLast("gzip", new HttpContentCompressor(6));
         pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
 
+        for (RouterPlugin routerPlugin : RouterPluginService.getInstance().getRouterPlugins()) {
+            for (String key : routerPlugin.getRoutes().keySet()) {
+                urlResolver.addUrlPattern(key, routerPlugin.getRoutes().get(key));
+            }
+        }
+
         //Router Handler
-        pipeline.addLast("router_handler", new RouterHandler(urlResolver, null));
+        pipeline.addLast("router_handler", new RouterHandler(urlResolver, null, StoragePluginService.getInstance().getStoragePluginWithName("FileSystemStoragePlugin")));
 
 
         //pipeline.addLast("handler", new HttpStaticFileServerHandler(true));

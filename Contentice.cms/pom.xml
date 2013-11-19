@@ -43,6 +43,11 @@
             <artifactId>contentice-filesystem-plugin</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>no.haagensoftware</groupId>
+            <artifactId>contentice-admin-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
