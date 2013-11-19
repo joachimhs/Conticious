@@ -6,10 +6,10 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.FullHttpRequest;
 import no.haagensoftware.contentice.data.URLData;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
+import no.haagensoftware.contentice.handler.FileServerHandler;
 import no.haagensoftware.contentice.spi.StoragePlugin;
 import no.haagensoftware.contentice.util.URLResolver;
-
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -51,15 +51,18 @@ public class RouterHandler extends ContenticeHandler {
         } else {
             logger.info("Handler: " + urlData.getChannelHandler());
 
-
             ChannelHandler handler = urlData.getChannelHandler().newInstance();
-            if (handler instanceof ContenticeHandler) {
+            if (handler instanceof FileServerHandler) {
+                //Initializer Handler correctly if the handler is a subclass of the FileServerHandler
+                ((FileServerHandler)handler).setPath(url);
+            } else if (handler instanceof ContenticeHandler) {
                 //Initializer Handler correctly if the handler is a subclass of the ContenticeHandler
                 ((ContenticeHandler)handler).setParameterMap(urlData.getParameters());
                 ((ContenticeHandler)handler).setStorage(storage);
             }
             addOrReplaceHandler(channelHandlerContext, handler, "route-generated");
         }
+
         channelHandlerContext.fireChannelRead(fullHttpRequest);
     }
 
@@ -71,10 +74,6 @@ public class RouterHandler extends ContenticeHandler {
             logger.info("replacing handler: " + handleName);
             channelHandlerContext.pipeline().remove(handleName);
             channelHandlerContext.pipeline().addLast(handleName, channelHandler);
-        }
-
-        for (String name : channelHandlerContext.pipeline().names()) {
-            logger.info("Name: " + name);
         }
     }
 

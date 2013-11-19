@@ -6,13 +6,16 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import no.haagensoftware.contentice.netty.ContenticePipelineInitializer;
 import no.haagensoftware.contentice.util.URLResolver;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 public class Main {
     private static final Logger logger = Logger.getLogger(Main.class.getName());
@@ -26,13 +29,14 @@ public class Main {
 
     public Main() throws IOException {
         readProperties();
-
+        if (System.getProperty("log4j.configuration") == null) {
+            configureLog4J();
+        }
         port = 8085;
     }
 
     public void bootstrap() throws Exception {
         URLResolver urlResolver = new URLResolver();
-
 
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -73,7 +77,7 @@ public class Main {
             }
         } else {
             String message = "Could not find " + configFile.getAbsolutePath() + ". Unable to start.";
-            logger.severe(message);
+            logger.error(message);
             throw new RuntimeException(message);
         }
 
@@ -85,6 +89,15 @@ public class Main {
         while (propEnum.hasMoreElements()) {
             String property = (String) propEnum.nextElement();
             System.setProperty(property, properties.getProperty(property));
+        }
+    }
+
+    private void configureLog4J() throws IOException {
+        Logger root = Logger.getRootLogger();
+        if (!root.getAllAppenders().hasMoreElements()) {
+            //Log4J is not configured. Set it up correctly!
+            root.setLevel(Level.INFO);
+            root.addAppender(new ConsoleAppender(new PatternLayout("%d %-5p [%t] %C{1}: %m%n")));
         }
     }
 }

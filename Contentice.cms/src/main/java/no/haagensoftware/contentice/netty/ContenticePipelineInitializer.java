@@ -14,8 +14,7 @@ import no.haagensoftware.contentice.plugin.RouterPluginService;
 import no.haagensoftware.contentice.plugin.StoragePluginService;
 import no.haagensoftware.contentice.spi.RouterPlugin;
 import no.haagensoftware.contentice.util.URLResolver;
-
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 /**
  * Created with IntelliJ IDEA.

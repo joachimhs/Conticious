@@ -19,7 +19,5 @@ public class NotFoundHandler extends ContenticeHandler {
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
         write404ToBuffer(channelHandlerContext);
-
-        channelHandlerContext.fireChannelRead(fullHttpRequest);
     }
 }

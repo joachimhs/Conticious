@@ -34,7 +34,5 @@ public class CategoryHandler extends ContenticeHandler {
 
             writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json; charset=UTF-8");
         }
-
-        channelHandlerContext.fireChannelRead(fullHttpRequest);
     }
 }

@@ -1,10 +1,7 @@
 package no.haagensoftware.contentice.plugin;
 
 import io.netty.channel.ChannelHandler;
-import no.haagensoftware.contentice.plugin.handler.AdminCategoriesHandler;
-import no.haagensoftware.contentice.plugin.handler.AdminCategoryHandler;
-import no.haagensoftware.contentice.plugin.handler.AdminSubcategoriesHandler;
-import no.haagensoftware.contentice.plugin.handler.AdminSubcategoryHandler;
+import no.haagensoftware.contentice.plugin.handler.*;
 import no.haagensoftware.contentice.spi.RouterPlugin;
 import org.apache.log4j.Logger;
 
@@ -29,6 +26,7 @@ public class AdminRoutesPlugin extends RouterPlugin {
         routeMap.put("/json/admin/categories/{category}", AdminCategoryHandler.class);
         routeMap.put("/json/admin/categories/{category}/subcategories", AdminSubcategoriesHandler.class);
         routeMap.put("/json/admin/categories/{category}/subcategories/{subcategory}", AdminSubcategoryHandler.class);
+        routeMap.put("classpath:/admin", AdminPagesHandler.class);
     }
 
     @Override

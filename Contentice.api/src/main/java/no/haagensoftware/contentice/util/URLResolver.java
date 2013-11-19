@@ -39,6 +39,20 @@ public class URLResolver {
             urlData = getValueForUrlWithParameters(url);
         }
 
+        for (String urlPattern : urlMap.keySet()) {
+            if (urlPattern.startsWith("classpath:") && url.startsWith(urlPattern.substring(10))) {
+                urlData = new URLData(urlPattern, url, new HashMap<String, String>(), urlMap.get(urlPattern));
+            }
+        }
+
+        return urlData;
+    }
+
+    protected URLData getValueForClasspath(String url) {
+        URLData urlData = null;
+
+
+
         return urlData;
     }
 

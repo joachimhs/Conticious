@@ -20,6 +20,7 @@ public class URLResoverTest {
     private Class<ChannelHandler> channelHandler2;
     private Class<ChannelHandler> channelHandler3;
     private Class<ChannelHandler> channelHandler4;
+    private Class<ChannelHandler> channelHandler5;
     @Before
     public void setup() {
         resolver = new URLResolver();
@@ -28,6 +29,7 @@ public class URLResoverTest {
         resolver.addUrlPattern("/categories/{category}", channelHandler2);
         resolver.addUrlPattern("/categories/{category}/subcategories", channelHandler3);
         resolver.addUrlPattern("/categories/{category}/subcategories/{subcategory}", channelHandler4);
+        resolver.addUrlPattern("classpath:/admin", channelHandler5);
     }
     @Test
     public void verifyUrlWithoutParameters() {
@@ -64,6 +66,17 @@ public class URLResoverTest {
         Assert.assertEquals("pages", urlData.getParameters().get("category"));
         Assert.assertEquals("home", urlData.getParameters().get("subcategory"));
         Assert.assertEquals(channelHandler4, urlData.getChannelHandler());
+    }
+
+    @Test
+    public void verifyClasspathUrl() {
+        URLData urlData = resolver.getValueForUrl("/admin/index.html");
+
+        Assert.assertNotNull(urlData);
+        Assert.assertEquals("classpath:/admin", urlData.getUrlPattern());
+        Assert.assertEquals("/admin/index.html", urlData.getRealUrl());
+        Assert.assertEquals(channelHandler5, urlData.getChannelHandler());
+
     }
 
     @Test
