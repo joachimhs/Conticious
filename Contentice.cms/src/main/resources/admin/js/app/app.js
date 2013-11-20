@@ -26,11 +26,15 @@ Ember.Application.reopen({
 });
 
 var Contentice = Ember.Application.create({
-    templates: ['application', 'index', 'header']
+    templates: ['application', 'categories', 'header', 'category', 'category/index', 'category/subcategory']
 });
 
 Contentice.Router.map(function() {
-    this.resource("index", {path: "/"});
+    this.resource("categories", {path: "/"}, function() {
+        this.resource('category', {path: "/category/:category_id"}, function() {
+            this.route('subcategory', {path: "/subcategory/:subcategory_id"});
+        });
+    });
 });
 
 DS.RESTAdapter.reopen({
@@ -41,9 +45,25 @@ Contentice.Store = DS.Store.extend({
     adapter:  "DS.RESTAdapter"
 });
 
-Contentice.IndexRoute = Ember.Route.extend({
+Contentice.CategoriesRoute = Ember.Route.extend({
     model: function() {
         return this.store.find('category');
+    }
+});
+
+Contentice.CategoryRoute = Ember.Route.extend({
+    model: function(category) {
+        return this.store.find('category', category.category_id);
+    }
+});
+
+Contentice.CategoryIndexController = Ember.Controller.extend({
+    needs: 'category'
+});
+
+Contentice.SubcategoriesCategoryRoute = Ember.Route.extend({
+    model: function(subcategory) {
+        return this.store.find('subcategory', subcategory.subcategory_id);
     }
 });
 
