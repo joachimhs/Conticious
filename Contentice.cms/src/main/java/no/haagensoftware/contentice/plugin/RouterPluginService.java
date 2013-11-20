@@ -36,10 +36,7 @@ public class RouterPluginService {
     public List<RouterPlugin> getRouterPlugins() {
         List<RouterPlugin> plugins = new ArrayList<>();
 
-        Iterator<RouterPlugin> iterator = loader.iterator();
-
-        while (iterator.hasNext()) {
-            RouterPlugin plugin = iterator.next();
+        for (RouterPlugin plugin : loader) {
             plugins.add(plugin);
         }
 

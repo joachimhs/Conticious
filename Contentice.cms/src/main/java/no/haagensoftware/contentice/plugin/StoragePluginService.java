@@ -33,9 +33,7 @@ public class StoragePluginService {
     public StoragePlugin getStoragePluginWithName(String storagePluginName) {
         StoragePlugin returnPlugin = null;
 
-        Iterator<StoragePlugin> iterator = loader.iterator();
-        while (iterator.hasNext()) {
-            StoragePlugin plugin = iterator.next();
+        for (StoragePlugin plugin : loader) {
             if (plugin.getStoragePluginName().equals(storagePluginName)) {
                 returnPlugin = plugin;
                 break;

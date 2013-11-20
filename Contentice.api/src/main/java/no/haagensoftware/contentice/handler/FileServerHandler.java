@@ -4,6 +4,7 @@ package no.haagensoftware.contentice.handler;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
+import no.haagensoftware.contentice.util.ContentTypeUtil;
 import org.apache.log4j.Logger;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -90,11 +91,18 @@ public class FileServerHandler extends ContenticeHandler {
 
         logger.info("path: " + path);
 
+        URL fileUrl = this.getClass().getResource(path);
+        File file = new File(fileUrl.getPath());
+        if (file.isDirectory()) {
+            path = path + File.separatorChar + "index.html";
+        }
+
         InputStream in = this.getClass().getResourceAsStream(path);
         String fileContent = convertStreamToString(in);
 
 
-        writeContentsToBuffer(channelHandlerContext, fileContent.toString(), "text/html");
+
+        writeContentsToBuffer(channelHandlerContext, fileContent.toString(), ContentTypeUtil.getContentType(path));
     }
 
     @Override

@@ -5,7 +5,9 @@ import com.google.gson.JsonObject;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import no.haagensoftware.contentice.assembler.CategoryAssembler;
+import no.haagensoftware.contentice.assembler.SubCategoryAssembler;
 import no.haagensoftware.contentice.data.CategoryData;
+import no.haagensoftware.contentice.data.SubCategoryData;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
 import org.apache.log4j.Logger;
 
@@ -30,12 +32,20 @@ public class AdminCategoriesHandler extends ContenticeHandler {
         logger.info("Got " + categories.size() + " categories");
 
         JsonArray categoryArray = new JsonArray();
+        JsonArray subCategoryArray = new JsonArray();
+
         for (CategoryData category : categories) {
+            for (SubCategoryData subcategoryData : getStorage().getSubCategories(category.getId())) {
+                category.addSubCategory(subcategoryData);
+                subCategoryArray.add(SubCategoryAssembler.buildJsonFromSubCategoryData(subcategoryData, category.getId()));
+            }
+
             categoryArray.add(CategoryAssembler.buildCategoryJsonFromCategoryData(category));
         }
 
         JsonObject topLevelObject = new JsonObject();
         topLevelObject.add("categories", categoryArray);
+        topLevelObject.add("subcategories", subCategoryArray);
 
         writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json; charset=UTF-8");
 

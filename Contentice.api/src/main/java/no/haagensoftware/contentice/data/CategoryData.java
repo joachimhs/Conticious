@@ -1,5 +1,8 @@
 package no.haagensoftware.contentice.data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: joahaage
@@ -9,8 +12,10 @@ package no.haagensoftware.contentice.data;
  */
 public class CategoryData {
     public String id;
+    public List<SubCategoryData> subCategories = new ArrayList<>();
 
     public CategoryData() {
+
     }
 
     public CategoryData(String id) {
@@ -23,5 +28,13 @@ public class CategoryData {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public List<SubCategoryData> getSubCategories() {
+        return subCategories;
+    }
+
+    public void addSubCategory(SubCategoryData subCategoryData) {
+        subCategories.add(subCategoryData);
     }
 }

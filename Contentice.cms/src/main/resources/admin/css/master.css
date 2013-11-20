@@ -1,0 +1,39 @@
+body {
+    color: #454545;
+    font-weight: 200;
+    font-size: 17px;
+    background-color: rgb(229, 224, 206);
+}
+
+p { margin-top: 0.95em; }
+
+.wrap {
+    width: 1100px;
+    margin: 0 auto;
+}
+
+#headerArea {
+    background-color: rgb(229, 224, 206);
+    height: 6em;
+}
+
+.righthand {
+    background-color: rgba(122, 105, 17, 0.28);
+    color: #232323;
+    padding-bottom: 8em;
+}
+
+.pagesBackground {
+    background-color: rgb(229, 224, 206);
+}
+
+.keyFeaturesList li {
+    padding-bottom: 0.2em;
+}
+
+h1 {
+    padding-top: 1em;
+    font-size: 2em;
+    font-weight: 700;
+    color: #590007;
+}

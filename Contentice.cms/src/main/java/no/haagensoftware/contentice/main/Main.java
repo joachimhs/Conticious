@@ -28,11 +28,11 @@ public class Main {
     }
 
     public Main() throws IOException {
-        readProperties();
         if (System.getProperty("log4j.configuration") == null) {
             configureLog4J();
         }
-        port = 8085;
+
+        readProperties();
     }
 
     public void bootstrap() throws Exception {
@@ -85,6 +85,20 @@ public class Main {
     }
 
     private void setProperties(Properties properties) {
+        if (properties.get("no.haagensoftware.contentice.port") == null) {
+            throw new RuntimeException("HTTP Port missing from configuration. Please ensure that no.haagensoftware.contentice.port is defined in config.properties");
+        }
+
+        if (properties.get("no.haagensoftware.contentice.storage.file.documentsDirectory") == null) {
+            throw new RuntimeException("Documents directory is missing from configuration. Please ensure that no.haagensoftware.contentice.storage.file.documentsDirectory is defined in config.properties");
+        }
+
+        if (properties.get("no.haagensoftware.contentice.storage.plugin") == null) {
+            properties.setProperty("no.haagensoftware.contentice.storage.plugin", "FileSystemStoragePlugin");
+            logger.warn("Storage Plugin is missing from configuration. Using default 'FileSystemStoragePlugin' plugin");
+        }
+
+        port = Integer.parseInt(properties.getProperty("no.haagensoftware.contentice.port"));
         Enumeration<Object> propEnum = properties.keys();
         while (propEnum.hasMoreElements()) {
             String property = (String) propEnum.nextElement();

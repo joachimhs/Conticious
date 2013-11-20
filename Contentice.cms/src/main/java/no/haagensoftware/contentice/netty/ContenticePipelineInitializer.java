@@ -62,7 +62,7 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
         }
 
         //Router Handler
-        pipeline.addLast("router_handler", new RouterHandler(urlResolver, null, StoragePluginService.getInstance().getStoragePluginWithName("FileSystemStoragePlugin")));
+        pipeline.addLast("router_handler", new RouterHandler(urlResolver, null, StoragePluginService.getInstance().getStoragePluginWithName(System.getProperty("no.haagensoftware.contentice.storage.plugin"))));
 
 
         //pipeline.addLast("handler", new HttpStaticFileServerHandler(true));
