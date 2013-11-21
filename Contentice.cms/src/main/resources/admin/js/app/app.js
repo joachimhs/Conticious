@@ -68,9 +68,14 @@ Contentice.SubcategoriesCategoryRoute = Ember.Route.extend({
 });
 
 Contentice.Category = DS.Model.extend({
-    subcategories: DS.hasMany('subcategory')
+    subcategories: DS.hasMany('subcategory'),
+    defaultFields: DS.hasMany('categoryField')
 });
 
+Contentice.CategoryField = DS.Model.extend({
+    name: DS.attr('string'),
+    type: DS.attr('string')
+});
 
 Contentice.Subcategory = DS.Model.extend({
 

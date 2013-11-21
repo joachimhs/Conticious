@@ -1,12 +1,15 @@
 package no.haagensoftware.contentice.storage;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import no.haagensoftware.contentice.data.CategoryData;
+import no.haagensoftware.contentice.data.CategoryField;
 import no.haagensoftware.contentice.data.FileData;
 import no.haagensoftware.contentice.data.SubCategoryData;
 import no.haagensoftware.contentice.spi.StoragePlugin;
+import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -18,7 +21,6 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.logging.Logger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -59,8 +61,31 @@ public class FileSystemStoragePlugin extends StoragePlugin {
         try (DirectoryStream<Path> ds = Files.newDirectoryStream(FileSystems.getDefault().getPath(documentsDirectory))) {
             for (Path p : ds) {
                 if (Files.isDirectory(p)) {
-                    // Iterate over the paths in the directory and print filenames
-                    categories.add(new CategoryData(p.getFileName().toString()));
+                    CategoryData categoryData = new CategoryData(p.getFileName().toString());
+                    String json = getFileContents(documentsDirectory + File.separatorChar + p.getFileName() + ".json");
+                    if (json != null) {
+                        JsonElement jsonElement = new JsonParser().parse(json);
+                        if (jsonElement.isJsonArray()) {
+                            List<CategoryField> defaultFields = new ArrayList<>();
+
+                            for (JsonElement elem : jsonElement.getAsJsonArray()) {
+                                if (elem.isJsonObject()) {
+                                    JsonObject elemObj = elem.getAsJsonObject();
+                                    if (elemObj.has("name") && elemObj.has("type")) {
+
+                                        defaultFields.add(new CategoryField(
+                                                categoryData.getId() + "_" + elemObj.getAsJsonPrimitive("name").getAsString(),
+                                                elemObj.get("name").getAsString(),
+                                                elemObj.get("type").getAsString()
+                                        ));
+                                    }
+
+                                }
+                            }
+                            categoryData.setDefaultFields(defaultFields);
+                        }
+                    }
+                    categories.add(categoryData);
                 }
             }
 
@@ -150,40 +175,65 @@ public class FileSystemStoragePlugin extends StoragePlugin {
     }
 
     private String getMarkdownContent(String category, SubCategoryData subCategory) throws IOException {
-        StringBuffer sb = new StringBuffer();
-        BufferedReader fileBufferedReader = Files.newBufferedReader((FileSystems.getDefault().getPath(documentsDirectory + File.separatorChar + category + File.separatorChar + subCategory.getId() + ".md")), Charset.forName("utf-8"));
-        String line = null;
-        while ((line = fileBufferedReader.readLine()) != null) {
-            sb.append(line).append("\n");
-        }
-
-        return sb.toString();
+        return getFileContents(documentsDirectory + File.separatorChar + category + File.separatorChar + subCategory.getId() + ".md");
     }
 
     private Map<String, JsonElement> getJsonContent(String category, SubCategoryData subCategory) throws IOException {
+        String jsonContent = getFileContents(documentsDirectory + File.separatorChar + category + File.separatorChar + subCategory.getId() + ".json");
+
+        return buildKeysMapFromJsonObject(jsonContent);
+    }
+
+    private Map<String, JsonElement> buildKeysMapFromJsonObject(String jsonContent) {
+        logger.info("Building Keymap for Json: " + jsonContent);
         Map<String, JsonElement> keysMap = new HashMap<>();
 
-        BufferedReader fileBufferedReader = Files.newBufferedReader((FileSystems.getDefault().getPath(documentsDirectory + File.separatorChar + category + File.separatorChar + subCategory.getId() + ".json")), Charset.forName("utf-8"));
+        JsonElement jsonElement = new JsonParser().parse(jsonContent);
+        if (jsonElement.isJsonObject()) {
+            extractJsonObject(keysMap, jsonElement);
+        }
+
+        return keysMap;
+    }
+
+    private Map<String, JsonElement> buildKeysMapFromJsonArray(String jsonContent) {
+        Map<String, JsonElement> keysMap = new HashMap<>();
+
+        JsonElement jsonElement = new JsonParser().parse(jsonContent);
+        if (jsonElement.isJsonObject()) {
+            extractJsonObject(keysMap, jsonElement);
+        }
+
+        return keysMap;
+    }
+
+    private void extractJsonObject(Map<String, JsonElement> keysMap, JsonElement jsonElement) {
+        JsonObject jsonObject = jsonElement.getAsJsonObject();
+        logger.info(jsonObject.toString());
+        Set<Map.Entry<String, JsonElement>> entrySet = jsonObject.entrySet();
+        for (Map.Entry<String, JsonElement> entry : entrySet) {
+            if (entry.getValue().isJsonArray()) {
+                keysMap.put(entry.getKey(), entry.getValue().getAsJsonArray());
+            } else {
+                keysMap.put(entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
+    private String getFileContents(String path) throws IOException {
+        String returnString = null;
+        BufferedReader fileBufferedReader = Files.newBufferedReader((FileSystems.getDefault().getPath(path)), Charset.forName("utf-8"));
         StringBuffer sb = new StringBuffer();
         String line = null;
         while ((line = fileBufferedReader.readLine()) != null) {
             sb.append(line).append("\n");
         }
 
-        JsonElement jsonElement = new JsonParser().parse(sb.toString());
-        if (jsonElement.isJsonObject()) {
-            JsonObject jsonObject = jsonElement.getAsJsonObject();
-            Set<Map.Entry<String, JsonElement>> entrySet = jsonObject.entrySet();
-            for (Map.Entry<String, JsonElement> entry : entrySet) {
-                if (entry.getValue().isJsonArray()) {
-                    keysMap.put(entry.getKey(), entry.getValue().getAsJsonArray());
-                } else {
-                    keysMap.put(entry.getKey(), entry.getValue());
-                }
-            }
+        if (sb.length() > 0) {
+            returnString = sb.toString();
         }
 
-        return keysMap;
+        return returnString;
     }
 
     @Override

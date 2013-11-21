@@ -1,9 +1,8 @@
 package no.haagensoftware.contentice.assembler;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import com.google.gson.*;
 import no.haagensoftware.contentice.data.CategoryData;
+import no.haagensoftware.contentice.data.CategoryField;
 import no.haagensoftware.contentice.data.SubCategoryData;
 
 /**
@@ -22,8 +21,14 @@ public class CategoryAssembler {
         for (SubCategoryData subCategoryData : categoryData.getSubCategories()) {
             subCategories.add(new JsonPrimitive(subCategoryData.getId()));
         }
-
         categoryObject.add("subcategories", subCategories);
+
+
+        JsonArray defaultFields = new JsonArray();
+        for (CategoryField field : categoryData.getDefaultFields()) {
+            defaultFields.add(new JsonPrimitive(field.getId()));
+        }
+        categoryObject.add("defaultFields", defaultFields);
         return categoryObject;
     }
 }

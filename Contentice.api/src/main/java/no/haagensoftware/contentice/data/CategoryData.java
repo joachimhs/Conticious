@@ -1,7 +1,11 @@
 package no.haagensoftware.contentice.data;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -11,8 +15,9 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class CategoryData {
-    public String id;
-    public List<SubCategoryData> subCategories = new ArrayList<>();
+    private String id;
+    private List<SubCategoryData> subCategories = new ArrayList<>();
+    private List<CategoryField> defaultFields = new ArrayList<>();
 
     public CategoryData() {
 
@@ -36,5 +41,13 @@ public class CategoryData {
 
     public void addSubCategory(SubCategoryData subCategoryData) {
         subCategories.add(subCategoryData);
+    }
+
+    public List<CategoryField> getDefaultFields() {
+        return defaultFields;
+    }
+
+    public void setDefaultFields(List<CategoryField> defaultFields) {
+        this.defaultFields = defaultFields;
     }
 }
