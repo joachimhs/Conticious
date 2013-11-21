@@ -58,7 +58,18 @@ Contentice.CategoryRoute = Ember.Route.extend({
 });
 
 Contentice.CategoryIndexController = Ember.Controller.extend({
-    needs: 'category'
+    needs: 'category',
+
+    init: function() {
+        this._super();
+
+        var fieldTypes = [];
+        fieldTypes.pushObject('textarea');
+        fieldTypes.pushObject('textfield');
+        fieldTypes.pushObject('boolean');
+
+        this.set('fieldTypes', fieldTypes);
+    }
 });
 
 Contentice.SubcategoriesCategoryRoute = Ember.Route.extend({
@@ -74,7 +85,19 @@ Contentice.Category = DS.Model.extend({
 
 Contentice.CategoryField = DS.Model.extend({
     name: DS.attr('string'),
-    type: DS.attr('string')
+    type: DS.attr('string'),
+
+    isTextfield: function() {
+        return this.get('type') === 'textfield'
+    }.property('type'),
+
+    isTextarea: function() {
+        return this.get('type') === 'textarea'
+    }.property('type'),
+
+    isBoolean: function() {
+        return this.get('type') === 'boolean'
+    }.property('type')
 });
 
 Contentice.Subcategory = DS.Model.extend({

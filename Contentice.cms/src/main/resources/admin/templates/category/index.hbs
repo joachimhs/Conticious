@@ -1,2 +1,18 @@
-CATEGORY INDEX: {{controllers.category.id}} <br />
-DefaultFields: {{#each controllers.category.defaultFields}} {{name}} : {{type}} <br />{{/each}}
+<button class="btn btn-default">Add New Field</button><br />
+<table class="table">
+    <tr>
+        <th>Field Name</th>
+        <th>Field Type</th>
+        <th>Field Action</th>
+    </tr>
+    {{#each controllers.category.defaultFields}}
+        <tr>
+            <td>{{view Ember.TextField valueBinding="name" classNames="form-control"}}</td>
+            <td>{{view Ember.Select contentBinding="controller.fieldTypes" valueBinding="type" prompt="Select a field type" classNames="form-control"}}</td>
+            <td><button class="btn btn-danger">Delete</button></td>
+        </tr>
+    {{/each}}
+    <tr>
+        <td colspan="3" style="text-align: center;"><button class="btn btn-primary" style="width: 45%; margin-right: 5%;">Save Changes</button><button class="btn btn-default" style="width: 45%";>Reset</button></td>
+    </tr>
+</table>
