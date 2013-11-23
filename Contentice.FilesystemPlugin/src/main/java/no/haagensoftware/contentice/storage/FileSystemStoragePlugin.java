@@ -1,9 +1,6 @@
 package no.haagensoftware.contentice.storage;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import no.haagensoftware.contentice.data.CategoryData;
 import no.haagensoftware.contentice.data.CategoryField;
 import no.haagensoftware.contentice.data.FileData;
@@ -102,7 +99,7 @@ public class FileSystemStoragePlugin extends StoragePlugin {
 
         for (CategoryData currCategory : getCategories()) {
             if (currCategory.getId().equals(category)) {
-                categoryData = new CategoryData(currCategory.getId());
+                categoryData = currCategory;
                 break;
             }
         }
@@ -114,11 +111,28 @@ public class FileSystemStoragePlugin extends StoragePlugin {
     public void setCategory(String category, CategoryData categoryData) {
         Path path = FileSystems.getDefault().getPath(documentsDirectory + File.separatorChar + category);
 
-        if (Files.exists(path)) {
-            //Category exists, nothing to do
-        } else {
+        if (!Files.exists(path)) {
             try {
                 Files.createDirectory(path);
+            } catch (IOException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        }
+
+        if (Files.exists(path)) {
+            Path jsonPath = FileSystems.getDefault().getPath(documentsDirectory + File.separatorChar + category + ".json");
+
+            JsonArray fieldArray = new JsonArray();
+            for (CategoryField cf : categoryData.getDefaultFields()) {
+                fieldArray.add(new Gson().toJsonTree(cf));
+            }
+            String jsonContent =  fieldArray.toString();
+
+            BufferedWriter jsonWriter = null;
+            try {
+                jsonWriter = Files.newBufferedWriter(jsonPath, Charset.forName("utf-8"));
+                jsonWriter.write(jsonContent, 0, jsonContent.length());
+                jsonWriter.flush();
             } catch (IOException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
@@ -160,11 +174,14 @@ public class FileSystemStoragePlugin extends StoragePlugin {
             // Iterate over the paths in the directory and print filenames
             String filename = p.getFileName().toString();
             if (filename.endsWith(".md")) {
-                subCategory = new SubCategoryData(filename.substring(0, filename.length() - 3));
+                subCategory = new SubCategoryData(category + "_" + filename.substring(0, filename.length() - 3));
+                subCategory.setName(filename.substring(0, filename.length() - 3));
             } else if (filename.endsWith(".json")) {
-                subCategory = new SubCategoryData(filename.substring(0, filename.length() - 5));
+                subCategory = new SubCategoryData(category + "_" + filename.substring(0, filename.length() - 5));
+                subCategory.setName(filename.substring(0, filename.length() - 4));
             } else {
-                subCategory = new SubCategoryData(filename);
+                subCategory = new SubCategoryData(category + "_" + filename);
+                subCategory.setName(filename);
             }
 
             subCategory.setContent(getMarkdownContent(category, subCategory));
@@ -175,11 +192,11 @@ public class FileSystemStoragePlugin extends StoragePlugin {
     }
 
     private String getMarkdownContent(String category, SubCategoryData subCategory) throws IOException {
-        return getFileContents(documentsDirectory + File.separatorChar + category + File.separatorChar + subCategory.getId() + ".md");
+        return getFileContents(documentsDirectory + File.separatorChar + category + File.separatorChar + subCategory.getName() + ".md");
     }
 
     private Map<String, JsonElement> getJsonContent(String category, SubCategoryData subCategory) throws IOException {
-        String jsonContent = getFileContents(documentsDirectory + File.separatorChar + category + File.separatorChar + subCategory.getId() + ".json");
+        String jsonContent = getFileContents(documentsDirectory + File.separatorChar + category + File.separatorChar + subCategory.getName() + ".json");
 
         return buildKeysMapFromJsonObject(jsonContent);
     }
@@ -257,8 +274,12 @@ public class FileSystemStoragePlugin extends StoragePlugin {
         BufferedWriter markdownWriter = null;
         BufferedWriter jsonWriter = null;
         try {
+            String markdownContent = "";
+            if (subCategoryData.getContent() != null && subCategoryData.getContent().length() > 0) {
+                markdownContent = subCategoryData.getContent();
+            }
             markdownWriter = Files.newBufferedWriter(markdownPath, Charset.forName("utf-8"));
-            markdownWriter.write(subCategoryData.getContent(), 0, subCategoryData.getContent().length());
+            markdownWriter.write(markdownContent, 0, markdownContent.length());
             markdownWriter.flush();
 
 

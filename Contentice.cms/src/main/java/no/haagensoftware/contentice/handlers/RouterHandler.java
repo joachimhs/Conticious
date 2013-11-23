@@ -47,7 +47,7 @@ public class RouterHandler extends ContenticeHandler {
 
             logger.info("DEFAULT HANDLER");
             //Load default handler
-            addOrReplaceHandler(channelHandlerContext, defaultHandler.newInstance(), "route-generated");
+            addOrReplaceHandler(channelHandlerContext, defaultHandler.newInstance(), "route-generated", fullHttpRequest);
         } else {
             logger.info("Handler: " + urlData.getChannelHandler());
 
@@ -60,21 +60,29 @@ public class RouterHandler extends ContenticeHandler {
                 ((ContenticeHandler)handler).setParameterMap(urlData.getParameters());
                 ((ContenticeHandler)handler).setStorage(storage);
             }
-            addOrReplaceHandler(channelHandlerContext, handler, "route-generated");
+            addOrReplaceHandler(channelHandlerContext, handler, "route-generated", fullHttpRequest);
         }
 
+        fullHttpRequest.retain();
         channelHandlerContext.fireChannelRead(fullHttpRequest);
     }
 
-    private void addOrReplaceHandler(ChannelHandlerContext channelHandlerContext, ChannelHandler channelHandler, String handleName) {
+    private void addOrReplaceHandler(ChannelHandlerContext channelHandlerContext, ChannelHandler channelHandler, String handleName, FullHttpRequest fullHttpRequest) {
         if (channelHandlerContext.pipeline().get(handleName) == null) {
             logger.info("Adding handler last: " + handleName + " : " + channelHandler);
             channelHandlerContext.pipeline().addLast(handleName, channelHandler);
         } else {
             logger.info("replacing handler: " + handleName);
-            channelHandlerContext.pipeline().remove(handleName);
-            channelHandlerContext.pipeline().addLast(handleName, channelHandler);
+            channelHandlerContext.pipeline().replace(handleName, handleName, channelHandler);
         }
+
+
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
+        super.exceptionCaught(ctx, cause);    //To change body of overridden methods use File | Settings | File Templates.
     }
 
     private void removeHandler(ChannelPipeline pipeline, String handleName) {

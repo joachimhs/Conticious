@@ -23,9 +23,17 @@ public class AdminRoutesPlugin extends RouterPlugin {
         logger.info("Initializing AdminRoutesPlugin");
         routeMap = new LinkedHashMap<>();
         routeMap.put("/json/admin/categories", AdminCategoriesHandler.class);
+
         routeMap.put("/json/admin/categories/{category}", AdminCategoryHandler.class);
+
         routeMap.put("/json/admin/categories/{category}/subcategories", AdminSubcategoriesHandler.class);
+        routeMap.put("/json/admin/subcategories", AdminSubcategoriesHandler.class);
+
         routeMap.put("/json/admin/categories/{category}/subcategories/{subcategory}", AdminSubcategoryHandler.class);
+        routeMap.put("/json/admin/subcategories/{subcategory}", AdminSubcategoryHandler.class);
+
+        routeMap.put("/json/admin/categoryFields", AdminCategoryFieldsHandler.class);
+
         routeMap.put("classpath:/admin", AdminPagesHandler.class);
     }
 

@@ -16,6 +16,7 @@ public class SubCategoryAssembler {
         JsonObject subCategoryObject = new JsonObject();
         if (subCategoryData != null) {
             subCategoryObject.addProperty("id", subCategoryData.getId());
+            subCategoryObject.addProperty("name", subCategoryData.getName());
             subCategoryObject.addProperty("category", category);
             //subCategoryObject.addProperty("content", subCategoryData.getContent());
 

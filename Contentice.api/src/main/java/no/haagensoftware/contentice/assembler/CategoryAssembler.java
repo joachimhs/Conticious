@@ -23,12 +23,6 @@ public class CategoryAssembler {
         }
         categoryObject.add("subcategories", subCategories);
 
-
-        JsonArray defaultFields = new JsonArray();
-        for (CategoryField field : categoryData.getDefaultFields()) {
-            defaultFields.add(new JsonPrimitive(field.getId()));
-        }
-        categoryObject.add("defaultFields", defaultFields);
         return categoryObject;
     }
 }

@@ -57,8 +57,134 @@ Contentice.CategoryRoute = Ember.Route.extend({
     }
 });
 
+Contentice.CategoryIndexRoute = Ember.Route.extend({
+    actions: {
+
+        addNewField: function() {
+            var category = this.modelFor('category');
+            var newFieldName = this.get('controller.newFieldName');
+            var newFieldType = this.get('controller.newFieldType');
+
+            if (newFieldName) {
+                var newField = this.store.createRecord('categoryField', {
+                    id: category.get('id') + "_" + newFieldName,
+                    name: newFieldName,
+                    type: newFieldType
+                });
+
+                category.get('defaultFields').pushObject(newField);
+            }
+
+            this.set('controller.newFieldName', null);
+            this.set('controller.newFieldType', null);
+            this.set('controller.showNewFieldArea', false);
+        },
+
+        addNewSubcategory: function() {
+            var category = this.modelFor('category');
+            var newSubcategoryName = this.get('controller.newSubcategoryName');
+
+            if (newSubcategoryName) {
+                var newSubcategory = this.store.createRecord('subcategory', {
+                    id: category.get('id') + "_" + newSubcategoryName,
+                    name: newSubcategoryName
+                });
+
+                category.get('subcategories').pushObject(newSubcategory);
+
+                category.save();
+                newSubcategory.save();
+            }
+
+            this.set('controller.newSubcategoryName', null);
+            this.set('controller.showNewSubcategoryArea', false);
+        }
+    }
+});
+
+Contentice.CategoriesController = Ember.ArrayController.extend({
+    showNewCategoryField: false,
+    newCategoryName: null,
+
+    actions: {
+        showNewCategory: function() {
+            this.set('showNewCategoryField', true)
+        },
+
+        cancelNewCategory: function() {
+            this.set('showNewCategoryField', false);
+            this.set('newCategoryName', null);
+        },
+
+        saveNewCategory: function() {
+            var categoryId = this.get('newCategoryName');
+
+            var category = this.store.createRecord('category', {
+                id: categoryId
+            });
+
+            category.save();
+
+            this.set('showNewCategoryField', false);
+            this.set('newCategoryName', null);
+        }
+    }
+});
+
 Contentice.CategoryIndexController = Ember.Controller.extend({
     needs: 'category',
+    showNewFieldArea: false,
+    showNewSubcategoryArea: false,
+
+    showNewField: function() {
+        return this.get('showNewFieldArea') || this.get('showNewSubcategoryArea');
+    }.property('showNewFieldArea', 'showNewSubcategoryArea'),
+
+    actions: {
+        openNewField: function() {
+            this.set('showNewFieldArea', true);
+        },
+
+        cancelNewField: function() {
+            this.set('showNewFieldArea', false);
+            this.set('newFieldName', null);
+            this.set('newFieldType', null)
+        },
+
+        openNewSubcategory: function() {
+            this.set('showNewSubcategoryArea', true);
+        },
+
+        cancelNewSubcategory: function() {
+            this.set('showNewSubcategoryArea', false);
+            this.set('newSubcategoryName', null);
+        },
+
+        saveCategory: function(category) {
+            this.doSaveCategory(category);
+        }
+    },
+
+    doSaveCategory: function(category) {
+        category.save();
+        var defaultFields = category.get('defaultFields');
+        if (defaultFields) {
+            defaultFields.forEach(function(field) {
+                if (field.get('isDirty') || field.get('isNew')) {
+                    field.save();
+                }
+            })
+        }
+
+        var subcategories = category.get('subategories');
+        if (subcategories) {
+            subcategories.forEach(function(subcategory) {
+                if (subcategory.get('isDirty') || subcategory.get('isNew')) {
+                    subcategory.save();
+                }
+            })
+        }
+    },
 
     init: function() {
         this._super();
@@ -67,6 +193,7 @@ Contentice.CategoryIndexController = Ember.Controller.extend({
         fieldTypes.pushObject('textarea');
         fieldTypes.pushObject('textfield');
         fieldTypes.pushObject('boolean');
+        fieldTypes.pushObject('array');
 
         this.set('fieldTypes', fieldTypes);
     }
@@ -101,7 +228,7 @@ Contentice.CategoryField = DS.Model.extend({
 });
 
 Contentice.Subcategory = DS.Model.extend({
-
+    name: DS.attr('string')
 });
 
 

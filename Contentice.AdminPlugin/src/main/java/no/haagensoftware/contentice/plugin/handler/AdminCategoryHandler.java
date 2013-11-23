@@ -1,12 +1,18 @@
 package no.haagensoftware.contentice.plugin.handler;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import no.haagensoftware.contentice.assembler.CategoryAssembler;
 import no.haagensoftware.contentice.data.CategoryData;
+import no.haagensoftware.contentice.data.CategoryField;
+import no.haagensoftware.contentice.data.SubCategoryData;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
 import no.haagensoftware.contentice.handler.ContenticeParameterMap;
+import no.haagensoftware.contentice.plugin.assembler.AdminCategoryAssembler;
+import no.haagensoftware.contentice.plugin.assembler.AdminSubCategoryAssembler;
 import org.apache.log4j.Logger;
 
 import java.util.Map;
@@ -26,17 +32,40 @@ public class AdminCategoryHandler extends ContenticeHandler  {
         logger.info("reading CategoryHandler and writing contents to buffer");
 
         String category = getParameter("category");
-
         CategoryData categoryData = getStorage().getCategory(category);
-        if (categoryData == null) {
-            write404ToBuffer(channelHandlerContext);
-        } else {
-            JsonObject topLevelObject = new JsonObject();
-            topLevelObject.add("category", CategoryAssembler.buildCategoryJsonFromCategoryData(categoryData));
 
-            writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json; charset=UTF-8");
+        if (isPost(fullHttpRequest)) {
+            logger.info("POSTING CATEGORY: " + category);
+
+        } else if (isPut(fullHttpRequest) && category != null) {
+            logger.info("PUTTING CATEGORY: " + category);
+            logger.info(getHttpMessageContent(fullHttpRequest));
+
+        } else if (isGet(fullHttpRequest)) {
+            if (categoryData == null) {
+                write404ToBuffer(channelHandlerContext);
+            } else {
+                JsonObject topLevelObject = new JsonObject();
+
+
+                JsonArray subCategoriesArray = new JsonArray();
+                JsonArray defaultFieldsArray = new JsonArray();
+
+                for (SubCategoryData subcategoryData : getStorage().getSubCategories(categoryData.getId())) {
+                    categoryData.addSubCategory(subcategoryData);
+                    subCategoriesArray.add(AdminSubCategoryAssembler.buildAdminJsonFromSubCategoryData(subcategoryData, categoryData.getId()));
+                }
+
+                topLevelObject.add("category", AdminCategoryAssembler.buildAdminCategoryJson(categoryData));
+
+                for (CategoryField field : categoryData.getDefaultFields()) {
+                    defaultFieldsArray.add(new Gson().toJsonTree(field));
+                }
+
+                topLevelObject.add("subcategories", subCategoriesArray);
+                topLevelObject.add("categoryFields", defaultFieldsArray);
+                writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json; charset=UTF-8");
+            }
         }
-
-        channelHandlerContext.fireChannelRead(fullHttpRequest);
     }
 }
