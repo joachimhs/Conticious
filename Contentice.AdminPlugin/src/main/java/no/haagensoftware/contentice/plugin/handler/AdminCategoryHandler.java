@@ -53,7 +53,7 @@ public class AdminCategoryHandler extends ContenticeHandler  {
 
                 for (SubCategoryData subcategoryData : getStorage().getSubCategories(categoryData.getId())) {
                     categoryData.addSubCategory(subcategoryData);
-                    subCategoriesArray.add(AdminSubCategoryAssembler.buildAdminJsonFromSubCategoryData(subcategoryData, categoryData.getId()));
+                    subCategoriesArray.add(AdminSubCategoryAssembler.buildAdminJsonFromSubCategoryData(subcategoryData, categoryData));
                 }
 
                 topLevelObject.add("category", AdminCategoryAssembler.buildAdminCategoryJson(categoryData));

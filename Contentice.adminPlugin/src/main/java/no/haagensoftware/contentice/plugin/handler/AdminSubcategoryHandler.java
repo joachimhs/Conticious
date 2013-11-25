@@ -51,13 +51,14 @@ public class AdminSubcategoryHandler extends ContenticeHandler {
         }
 
         SubCategoryData subCategoryData = getStorage().getSubCategory(category, subcategory);
+        CategoryData categoryData = getStorage().getCategory(category);
 
         if (subCategoryData == null) {
             write404ToBuffer(channelHandlerContext);
 
         } else {
             JsonObject topLevelObject = new JsonObject();
-            topLevelObject.add("subCategory", AdminSubCategoryAssembler.buildAdminJsonFromSubCategoryData(subCategoryData, category));
+            topLevelObject.add("subCategory", AdminSubCategoryAssembler.buildAdminJsonFromSubCategoryData(subCategoryData, categoryData));
 
             writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json; charset=UTF-8");
         }

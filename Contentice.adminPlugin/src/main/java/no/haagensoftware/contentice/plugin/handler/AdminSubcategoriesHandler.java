@@ -7,6 +7,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.util.CharsetUtil;
 import no.haagensoftware.contentice.assembler.SubCategoryAssembler;
+import no.haagensoftware.contentice.data.CategoryData;
 import no.haagensoftware.contentice.data.SubCategoryData;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
 import no.haagensoftware.contentice.plugin.admindata.AdminSubcategoryObject;
@@ -51,13 +52,14 @@ public class AdminSubcategoriesHandler extends ContenticeHandler {
 
         //Always return the updated subcategories
         List<SubCategoryData> subCategories = getStorage().getSubCategories(category);
+        CategoryData categoryData = getStorage().getCategory(category);
 
         if (subCategories == null) {
             write404ToBuffer(channelHandlerContext);
         } else {
             JsonArray subCategoryArray = new JsonArray();
             for (SubCategoryData subCategory : subCategories) {
-                subCategoryArray.add(AdminSubCategoryAssembler.buildAdminJsonFromSubCategoryData(subCategory, category));
+                subCategoryArray.add(AdminSubCategoryAssembler.buildAdminJsonFromSubCategoryData(subCategory, categoryData));
             }
 
             JsonObject topLevelObject = new JsonObject();
