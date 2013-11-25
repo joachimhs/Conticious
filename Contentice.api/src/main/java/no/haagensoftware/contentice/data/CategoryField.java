@@ -16,10 +16,11 @@ public class CategoryField {
     public CategoryField() {
     }
 
-    public CategoryField(String id, String name, String type) {
+    public CategoryField(String id, String name, String type, boolean required) {
         this.id = id;
         this.name = name;
         this.type = type;
+        this.required = required;
     }
 
     public String getId() {

@@ -3,11 +3,12 @@
     {{#if showNewFieldArea}}
         <table class="table">
             <tr>
-                <th colspan="3">Add new Field</th>
+                <th colspan="4">Add new Field</th>
             </tr>
             <tr>
                 <td>{{view Ember.TextField valueBinding="newFieldName" classNames="form-control" placeholder="Field Name"}}</td>
                 <td>{{view Ember.Select contentBinding="fieldTypes" valueBinding="newFieldType" prompt="Select a field type" classNames="form-control"}}</td>
+                <td><label class="checkbox-inline">{{view Ember.Checkbox checkedBinding="newFieldRequired"}}Required</label></td>
                 <td>
                     <button class="btn btn-primary" style="margin-right: 10px;" {{action "addNewField"}}>Add Field</button>
                     <button class="btn btn-default" {{action "cancelNewField"}}>Cancel</button>
@@ -37,19 +38,21 @@
     <tr>
         <th>Field Name</th>
         <th>Field Type</th>
+        <th>Required</th>
         <th>Field Action</th>
     </tr>
     {{#each field in controllers.category.defaultFields}}
         <tr>
             <td>{{view Ember.TextField valueBinding="field.name" classNames="form-control"}}</td>
             <td>{{view Ember.Select contentBinding="controller.fieldTypes" valueBinding="field.type" prompt="Select a field type" classNames="form-control"}}</td>
-            <td><button class="btn btn-danger">Delete</button></td>
+            <td><label class="checkbox-inline">{{view Ember.Checkbox checkedBinding="field.required"}}Required</label></td>
+            <td>
+                {{#if field.isDirty}}
+                    <button class="btn btn-primary" {{action "saveCategoryField" field}}>Save</button>
+                    <button class="btn btn-default" {{action "revertCategoryField" field}}>Revert</button>
+                {{/if}}
+                <button class="btn btn-danger">Delete</button>
+            </td>
         </tr>
     {{/each}}
-    <tr>
-        <td colspan="3" style="text-align: center;">
-            <button class="btn btn-primary" style="width: 45%; margin-right: 5%;" {{action "saveCategory" controllers.category}}>Save Changes</button>
-            <button class="btn btn-default" style="width: 45%";>Reset</button>
-        </td>
-    </tr>
 </table>

@@ -68,15 +68,20 @@ Contentice.CategoryIndexRoute = Ember.Route.extend({
             var category = this.modelFor('category');
             var newFieldName = this.get('controller.newFieldName');
             var newFieldType = this.get('controller.newFieldType');
+            var newFieldRequired = this.get('controller.newFieldRequired');
 
             if (newFieldName) {
                 var newField = this.store.createRecord('categoryField', {
                     id: category.get('id') + "_" + newFieldName,
                     name: newFieldName,
-                    type: newFieldType
+                    type: newFieldType,
+                    required: newFieldRequired
                 });
 
                 category.get('defaultFields').pushObject(newField);
+
+                category.save();
+                newField.save();
             }
 
             this.set('controller.newFieldName', null);
@@ -180,6 +185,7 @@ Contentice.CategoryIndexController = Ember.Controller.extend({
             this.set('showNewFieldArea', false);
             this.set('newFieldName', null);
             this.set('newFieldType', null)
+            this.set('newFieldRequired', false)
         },
 
         openNewSubcategory: function() {
@@ -193,6 +199,14 @@ Contentice.CategoryIndexController = Ember.Controller.extend({
 
         saveCategory: function(category) {
             this.doSaveCategory(category);
+        },
+
+        saveCategoryField: function(categoryField) {
+            categoryField.save();
+        },
+
+        revertCategoryField: function(categoryField) {
+            categoryField.rollback();
         }
     },
 
@@ -255,6 +269,7 @@ Contentice.Category = DS.Model.extend({
 Contentice.CategoryField = DS.Model.extend({
     name: DS.attr('string'),
     type: DS.attr('string'),
+    required: DS.attr('boolean'),
 
     isTextfield: function() {
         return this.get('type') === 'textfield'

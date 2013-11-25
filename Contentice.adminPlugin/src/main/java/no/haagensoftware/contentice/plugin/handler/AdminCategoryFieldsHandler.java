@@ -43,6 +43,7 @@ public class AdminCategoryFieldsHandler extends ContenticeHandler {
                     if (cf.getId().equals(categoryField.getCategoryField().getId())) {
                         cf.setName(newCategoryField.getName());
                         cf.setType(newCategoryField.getType());
+                        cf.setRequired(newCategoryField.getRequired());
                         updated = true;
                     }
                 }
@@ -77,6 +78,7 @@ public class AdminCategoryFieldsHandler extends ContenticeHandler {
                     cf.setId(fieldId);
                     cf.setName(categoryField.getCategoryField().getName());
                     cf.setType(categoryField.getCategoryField().getType());
+                    cf.setRequired(categoryField.getCategoryField().getRequired());
                     updatedField = cf;
                     break;
                 }
@@ -84,7 +86,9 @@ public class AdminCategoryFieldsHandler extends ContenticeHandler {
 
             getStorage().setCategory(category, categoryData);
 
-            returnJson = new Gson().toJson(updatedField);
+            CategoryFieldObject cfObject = new CategoryFieldObject();
+            cfObject.setCategoryField(updatedField);
+            returnJson = new Gson().toJson(categoryField);
         }
 
         writeContentsToBuffer(channelHandlerContext, returnJson, "application/json; charset=UTF-8");
