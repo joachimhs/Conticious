@@ -74,8 +74,7 @@ public class AdminCategoryFieldsHandler extends ContenticeHandler {
             CategoryField updatedField = null;
             CategoryData categoryData = getStorage().getCategory(category);
             for (CategoryField cf : categoryData.getDefaultFields()) {
-                if (cf.getName().equals(fieldId)) {
-                    cf.setId(fieldId);
+                if (cf.getId().equals(categoryFieldId)) {
                     cf.setName(categoryField.getCategoryField().getName());
                     cf.setType(categoryField.getCategoryField().getType());
                     cf.setRequired(categoryField.getCategoryField().getRequired());
@@ -88,7 +87,30 @@ public class AdminCategoryFieldsHandler extends ContenticeHandler {
 
             CategoryFieldObject cfObject = new CategoryFieldObject();
             cfObject.setCategoryField(updatedField);
-            returnJson = new Gson().toJson(categoryField);
+            returnJson = new Gson().toJson(cfObject);
+        } else if (isDelete(fullHttpRequest)) {
+            String categoryFieldId = getParameter("categoryField");
+
+            if (categoryFieldId.contains("_")) {
+                String category = categoryFieldId.substring(0, categoryFieldId.indexOf("_"));
+                String fieldId = categoryFieldId.substring(categoryFieldId.indexOf("_")+1, categoryFieldId.length());
+
+                CategoryData categoryData = getStorage().getCategory(category);
+
+                CategoryField fieldToDelete = null;
+                for (CategoryField cf : categoryData.getDefaultFields()) {
+                    if (cf.getName().equals(fieldId)) {
+                        fieldToDelete = cf;
+                        break;
+                    }
+                }
+
+                if (fieldToDelete != null) {
+                    categoryData.getDefaultFields().remove(fieldToDelete);
+                }
+
+                getStorage().setCategory(category, categoryData);
+            }
         }
 
         writeContentsToBuffer(channelHandlerContext, returnJson, "application/json; charset=UTF-8");

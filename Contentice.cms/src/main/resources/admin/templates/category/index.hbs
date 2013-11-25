@@ -48,10 +48,11 @@
             <td><label class="checkbox-inline">{{view Ember.Checkbox checkedBinding="field.required"}}Required</label></td>
             <td>
                 {{#if field.isDirty}}
-                    <button class="btn btn-primary" {{action "saveCategoryField" field}}>Save</button>
-                    <button class="btn btn-default" {{action "revertCategoryField" field}}>Revert</button>
+                    <button class="btn btn-primary" {{action "saveCategoryField" field}} style="width: 75px;">Save</button>
+                    <button class="btn btn-default" {{action "revertCategoryField" field}} style="width: 75px;">Revert</button>
+                {{else}}
+                    <button class="btn btn-danger" {{action "deleteCategoryField" field}} style="width: 155px;">Delete</button>
                 {{/if}}
-                <button class="btn btn-danger">Delete</button>
             </td>
         </tr>
     {{/each}}

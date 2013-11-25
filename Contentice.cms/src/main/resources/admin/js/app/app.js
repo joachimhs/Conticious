@@ -26,14 +26,13 @@ Ember.Application.reopen({
 });
 
 var Contentice = Ember.Application.create({
-    templates: ['application', 'categories', 'header', 'category', 'category/index', 'subcategory', 'subcategory/content', 'subcategory/fields', 'subcategory/preview']
+    templates: ['application', 'categories', 'header', 'category', 'category/index', 'subcategory', 'subcategory/index', 'subcategory/fields', 'subcategory/preview']
 });
 
 Contentice.Router.map(function() {
     this.resource("categories", {path: "/"}, function() {
         this.resource('category', {path: "/category/:category_id"}, function() {
             this.resource('subcategory', {path: "/subcategory/:subcategory_id"}, function() {
-                this.route('content');
                 this.route('fields');
                 this.route('preview');
             });
@@ -112,12 +111,10 @@ Contentice.CategoryIndexRoute = Ember.Route.extend({
 });
 
 Contentice.SubcategoryIndexRoute = Ember.Route.extend({
-    beforeModel: function() {
-        this.transitionTo('subcategory.content');
-    }
+
 });
 
-Contentice.SubcategoryContentRoute = Ember.Route.extend({
+Contentice.SubcategoryIndexRoute = Ember.Route.extend({
     model: function() {
         var subcategory = this.modelFor('subcategory');
         return subcategory;
@@ -207,6 +204,11 @@ Contentice.CategoryIndexController = Ember.Controller.extend({
 
         revertCategoryField: function(categoryField) {
             categoryField.rollback();
+        },
+
+        deleteCategoryField: function(categoryField) {
+            categoryField.deleteRecord();
+            categoryField.save();
         }
     },
 

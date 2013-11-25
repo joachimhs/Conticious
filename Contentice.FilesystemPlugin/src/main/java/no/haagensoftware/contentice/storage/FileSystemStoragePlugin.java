@@ -68,10 +68,14 @@ public class FileSystemStoragePlugin extends StoragePlugin {
                             for (JsonElement elem : jsonElement.getAsJsonArray()) {
                                 if (elem.isJsonObject()) {
                                     JsonObject elemObj = elem.getAsJsonObject();
-                                    if (elemObj.has("name") && elemObj.has("type") && elemObj.has("required")) {
 
+                                    String fieldId = categoryData.getId() + "_" + elemObj.getAsJsonPrimitive("name").getAsString();
+                                    if (elemObj.has("id")) {
+                                        fieldId = elemObj.get("id").getAsString();
+                                    }
+                                    if (elemObj.has("name") && elemObj.has("type") && elemObj.has("required")) {
                                         defaultFields.add(new CategoryField(
-                                                categoryData.getId() + "_" + elemObj.getAsJsonPrimitive("name").getAsString(),
+                                                fieldId,
                                                 elemObj.get("name").getAsString(),
                                                 elemObj.get("type").getAsString(),
                                                 elemObj.get("required").getAsBoolean()
