@@ -17,20 +17,20 @@ import org.apache.log4j.Logger;
  * Time: 2:34 PM
  * To change this template use File | Settings | File Templates.
  */
-public class AdminCategoryFieldsHandler extends ContenticeHandler {
-    private Logger logger = Logger.getLogger(AdminCategoryFieldsHandler.class.getName());
+public class AdminSubcategoryFieldsHandler extends ContenticeHandler {
+    private Logger logger = Logger.getLogger(AdminSubcategoryFieldsHandler.class.getName());
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
-        logger.info("Post/Put CategoryField");
+        logger.info("Post/Put SubcategoryField");
 
         String returnJson = "";
 
-        String messageContent = fullHttpRequest.content().toString(CharsetUtil.UTF_8);
 
-        if (isPost(fullHttpRequest)) {
-
-            CategoryFieldObject categoryField = new Gson().fromJson(messageContent, CategoryFieldObject.class);
+        if (isPost(fullHttpRequest) || isPut(fullHttpRequest)) {
+            String messageContent = fullHttpRequest.content().toString(CharsetUtil.UTF_8);
+            logger.info(messageContent);
+            /*CategoryFieldObject categoryField = new Gson().fromJson(messageContent, CategoryFieldObject.class);
 
             if (categoryField != null && categoryField.getCategoryField() != null) {
                 CategoryField newCategoryField = categoryField.getCategoryField();
@@ -60,31 +60,7 @@ public class AdminCategoryFieldsHandler extends ContenticeHandler {
                 categoryField.setCategoryField(newCategoryField);
 
                 returnJson = new Gson().toJson(categoryField);
-            }
-        } else if (isPut(fullHttpRequest)) {
-            String categoryFieldId = getParameter("categoryField");
-            CategoryFieldObject categoryField = new Gson().fromJson(messageContent, CategoryFieldObject.class);
-
-            String category = categoryFieldId.substring(0, categoryFieldId.indexOf("_"));
-            String fieldId = categoryFieldId.substring(categoryFieldId.indexOf("_")+1, categoryFieldId.length());
-
-            logger.info("Updating fieldid: " + categoryField.getCategoryField().getName() + " with: " + fieldId + " for category: " + category);
-
-            CategoryField updatedField = null;
-            CategoryData categoryData = getStorage().getCategory(category);
-            for (CategoryField cf : categoryData.getDefaultFields()) {
-                if (cf.getName().equals(fieldId)) {
-                    cf.setId(fieldId);
-                    cf.setName(categoryField.getCategoryField().getName());
-                    cf.setType(categoryField.getCategoryField().getType());
-                    updatedField = cf;
-                    break;
-                }
-            }
-
-            getStorage().setCategory(category, categoryData);
-
-            returnJson = new Gson().toJson(updatedField);
+            }*/
         }
 
         writeContentsToBuffer(channelHandlerContext, returnJson, "application/json; charset=UTF-8");

@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.util.CharsetUtil;
 import no.haagensoftware.contentice.assembler.SubCategoryAssembler;
+import no.haagensoftware.contentice.data.CategoryData;
 import no.haagensoftware.contentice.data.SubCategoryData;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
 import no.haagensoftware.contentice.plugin.admindata.AdminSubcategoryObject;
@@ -35,6 +36,8 @@ public class AdminSubcategoryHandler extends ContenticeHandler {
                 category = subcategory.substring(0, subcategory.indexOf("_"));
                 subcategory = subcategory.substring(subcategory.indexOf("_")+1, subcategory.length());
             }
+
+            //CategoryData categoryData = getStorage().getCategory(category);
 
             String messageContent = fullHttpRequest.content().toString(CharsetUtil.UTF_8);
 

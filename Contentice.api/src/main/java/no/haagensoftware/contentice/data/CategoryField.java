@@ -11,6 +11,7 @@ public class CategoryField {
     private String id;
     private String name;
     private String type;
+    private boolean required;
 
     public CategoryField() {
     }
@@ -43,5 +44,13 @@ public class CategoryField {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public boolean getRequired() {
+        return required;
+    }
+
+    public void setRequired(boolean required) {
+        this.required = required;
     }
 }
