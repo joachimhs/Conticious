@@ -1,7 +1,7 @@
 <div class="wrap">
     <h1>Categories</h1>
 
-    <div class="row">
+    <div class="row" style="height: 100%;">
         <div class="col-md-4">
             {{#if showNewCategoryField}}
                 <table class="table">
@@ -20,16 +20,21 @@
                 <button class="btn btn-default form-control" {{action "showNewCategory"}}>Add Category</button>
             {{/if}}
 
+
             {{#each category in controller}}
-                <div>{{#linkTo "category" category}}{{category.id}}{{/linkTo}}</div>
-                {{#each subcategory in category.subcategories}}
-                    <div style="margin-left: 18px;">
-                        {{#linkTo "category.subcategory" category subcategory}}{{subcategory.name}}{{/linkTo}}
-                    </div>
-                {{/each}}
+                <div class="list-group">
+                    {{#linkTo "category" category classNames="list-group-item"}}{{category.id}}{{/linkTo}}
+                    {{#each subcategory in category.subcategories}}
+
+                        {{#linkTo "subcategory" category subcategory classNames="list-group-item"}}
+                            <span style="margin-left: 18px;"></span> {{category.id}} - {{subcategory.name}}
+                        {{/linkTo}}
+                    {{/each}}
+                </div>
             {{/each}}
+
         </div>
-        <div class="col-md-8">
+        <div class="col-md-8" style="height: 100%">
             {{outlet}}
         </div>
     </div>

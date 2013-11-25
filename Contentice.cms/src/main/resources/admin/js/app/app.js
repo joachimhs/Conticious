@@ -26,13 +26,17 @@ Ember.Application.reopen({
 });
 
 var Contentice = Ember.Application.create({
-    templates: ['application', 'categories', 'header', 'category', 'category/index', 'category/subcategory']
+    templates: ['application', 'categories', 'header', 'category', 'category/index', 'subcategory', 'subcategory/content', 'subcategory/fields', 'subcategory/preview']
 });
 
 Contentice.Router.map(function() {
     this.resource("categories", {path: "/"}, function() {
         this.resource('category', {path: "/category/:category_id"}, function() {
-            this.route('subcategory', {path: "/subcategory/:subcategory_id"});
+            this.resource('subcategory', {path: "/subcategory/:subcategory_id"}, function() {
+                this.route('content');
+                this.route('fields');
+                this.route('preview');
+            });
         });
     });
 });
@@ -99,6 +103,33 @@ Contentice.CategoryIndexRoute = Ember.Route.extend({
             this.set('controller.newSubcategoryName', null);
             this.set('controller.showNewSubcategoryArea', false);
         }
+    }
+});
+
+Contentice.SubcategoryIndexRoute = Ember.Route.extend({
+    beforeModel: function() {
+        this.transitionTo('subcategory.content');
+    }
+});
+
+Contentice.SubcategoryContentRoute = Ember.Route.extend({
+    model: function() {
+        var subcategory = this.modelFor('subcategory');
+        return subcategory;
+    }
+});
+
+Contentice.SubcategoryFieldsRoute = Ember.Route.extend({
+    model: function() {
+        var subcategory = this.modelFor('subcategory');
+        return subcategory;
+    }
+});
+
+Contentice.SubcategoryPreviewRoute = Ember.Route.extend({
+    model: function() {
+        var subcategory = this.modelFor('subcategory');
+        return subcategory;
     }
 });
 
@@ -199,7 +230,18 @@ Contentice.CategoryIndexController = Ember.Controller.extend({
     }
 });
 
-Contentice.SubcategoriesCategoryRoute = Ember.Route.extend({
+Contentice.SubcategoryController = Ember.ObjectController.extend({
+    actions: {
+        doSaveSubcategory: function(subcategory) {
+            console.log('doSaveSubcategory: ' + subcategory.get('id'));
+            if (subcategory.get('isDirty')) {
+                subcategory.save();
+            }
+        }
+    }
+});
+
+Contentice.SubcategoryRoute = Ember.Route.extend({
     model: function(subcategory) {
         return this.store.find('subcategory', subcategory.subcategory_id);
     }
@@ -228,7 +270,8 @@ Contentice.CategoryField = DS.Model.extend({
 });
 
 Contentice.Subcategory = DS.Model.extend({
-    name: DS.attr('string')
+    name: DS.attr('string'),
+    content: DS.attr('string')
 });
 
 

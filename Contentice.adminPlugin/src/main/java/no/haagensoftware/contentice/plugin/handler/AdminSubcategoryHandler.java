@@ -1,11 +1,14 @@
 package no.haagensoftware.contentice.plugin.handler;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.util.CharsetUtil;
 import no.haagensoftware.contentice.assembler.SubCategoryAssembler;
 import no.haagensoftware.contentice.data.SubCategoryData;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
+import no.haagensoftware.contentice.plugin.admindata.AdminSubcategoryObject;
 import no.haagensoftware.contentice.plugin.assembler.AdminSubCategoryAssembler;
 import org.apache.log4j.Logger;
 
@@ -25,6 +28,24 @@ public class AdminSubcategoryHandler extends ContenticeHandler {
 
         String category = getParameter("category");
         String subcategory = getParameter("subcategory");
+
+        if (isPost(fullHttpRequest) || isPut((fullHttpRequest))) {
+
+            if (category == null) {
+                category = subcategory.substring(0, subcategory.indexOf("_"));
+                subcategory = subcategory.substring(subcategory.indexOf("_")+1, subcategory.length());
+            }
+
+            String messageContent = fullHttpRequest.content().toString(CharsetUtil.UTF_8);
+
+            AdminSubcategoryObject adminSubcategory = new Gson().fromJson(messageContent, AdminSubcategoryObject.class);
+
+            if (adminSubcategory != null && adminSubcategory.getSubcategory() != null) {
+                logger.info("Subcategory: " + adminSubcategory.getSubcategory().getId());
+
+                getStorage().setSubCategory(category, adminSubcategory.getSubcategory().getName(), adminSubcategory.getSubcategory());
+            }
+        }
 
         SubCategoryData subCategoryData = getStorage().getSubCategory(category, subcategory);
 

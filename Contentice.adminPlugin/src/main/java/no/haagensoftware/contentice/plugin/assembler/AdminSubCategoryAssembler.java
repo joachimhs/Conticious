@@ -17,10 +17,12 @@ public class AdminSubCategoryAssembler {
         if (subCategoryData != null) {
             subCategoryObject.addProperty("id", subCategoryData.getId());
             subCategoryObject.addProperty("name", subCategoryData.getName());
+            subCategoryObject.addProperty("content", subCategoryData.getContent());
+
 
             JsonObject json = new JsonObject();
             json.addProperty("category", category);
-            //json.addProperty("content", subCategoryData.getContent());
+
             for (String key : subCategoryData.getKeyMap().keySet()) {
                 json.add(key, subCategoryData.getKeyMap().get(key));
             }
