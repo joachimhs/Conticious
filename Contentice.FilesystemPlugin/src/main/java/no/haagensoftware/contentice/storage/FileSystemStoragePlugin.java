@@ -289,9 +289,11 @@ public class FileSystemStoragePlugin extends StoragePlugin {
 
 
             String jsonContent = convertKeyMapToJson(subCategoryData.getKeyMap());
-            jsonWriter = Files.newBufferedWriter(jsonPath, Charset.forName("utf-8"));
-            jsonWriter.write(jsonContent, 0, jsonContent.length());
-            jsonWriter.flush();
+            if (jsonContent.length() > 2) {
+                jsonWriter = Files.newBufferedWriter(jsonPath, Charset.forName("utf-8"));
+                jsonWriter.write(jsonContent, 0, jsonContent.length());
+                jsonWriter.flush();
+            }
 
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.

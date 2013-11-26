@@ -106,13 +106,13 @@ public class FileServerHandler extends ContenticeHandler {
 
             InputStream in = this.getClass().getResourceAsStream(path);
             fileContent = convertStreamToString(in);
+            writeContentsToBuffer(channelHandlerContext, fileContent.toString(), ContentTypeUtil.getContentType(path));
         } else {
-            fileContent = getFileContent(this.rootPath + File.separatorChar + path);
+            writeFileToBuffer(channelHandlerContext, this.rootPath + File.separatorChar + path, ContentTypeUtil.getContentType(path));
         }
 
-        logger.info("Path: " + path + " Content type: " + ContentTypeUtil.getContentType(path));
-        writeContentsToBuffer(channelHandlerContext, fileContent.toString(), ContentTypeUtil.getContentType(path));
-        logger.info("Wrote: " + path);
+
+
     }
 
     @Override

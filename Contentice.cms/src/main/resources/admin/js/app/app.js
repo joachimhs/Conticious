@@ -257,6 +257,10 @@ Contentice.CategoryIndexController = Ember.Controller.extend({
 });
 
 Contentice.SubcategoryController = Ember.ObjectController.extend({
+
+});
+
+Contentice.SubcategoryIndexController = Ember.ObjectController.extend({
     actions: {
         doSaveSubcategory: function(subcategory) {
             console.log('doSaveSubcategory: ' + subcategory.get('id'));

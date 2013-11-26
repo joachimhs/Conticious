@@ -119,11 +119,15 @@ public abstract class ContenticeHandler extends SimpleChannelInboundHandler<Full
 
         ctx.write(response);
         ctx.flush();
+
+        ChannelFuture lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
+        lastContentFuture.addListener(ChannelFutureListener.CLOSE);
     }
 
     public void writeFileToBuffer(ChannelHandlerContext ctx, String path, String contentType) {
         HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
         response.headers().set(CONTENT_TYPE, contentType);
+
 
         File file = new File(path);
 
@@ -141,7 +145,7 @@ public abstract class ContenticeHandler extends SimpleChannelInboundHandler<Full
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
-        response.headers().set(CONTENT_LENGTH, fileLength);
+        //response.headers().set(CONTENT_LENGTH, fileLength);
         response.headers().set(CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
         ctx.write(response);
 
@@ -152,16 +156,16 @@ public abstract class ContenticeHandler extends SimpleChannelInboundHandler<Full
 
                 @Override
                 public void operationProgressed(ChannelProgressiveFuture future, long progress, long total) {
-                    if (total < 0) { // total unknown
+                    /*if (total < 0) { // total unknown
                         System.err.println("Transfer progress: " + progress);
                     } else {
                         System.err.println("Transfer progress: " + progress + " / " + total);
-                    }
+                    }*/
                 }
 
                 @Override
                 public void operationComplete(ChannelProgressiveFuture future) throws Exception {
-                    System.err.println("Transfer complete.");
+                    //System.err.println("Transfer complete.");
                 }
             });
         } catch (IOException e) {
@@ -173,8 +177,6 @@ public abstract class ContenticeHandler extends SimpleChannelInboundHandler<Full
         // Write the end marker
         ChannelFuture lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
         lastContentFuture.addListener(ChannelFutureListener.CLOSE);
-
-        ctx.flush();
     }
 
     public void write404ToBuffer(ChannelHandlerContext ctx) {

@@ -15,6 +15,7 @@ import no.haagensoftware.contentice.plugin.RouterPluginService;
 import no.haagensoftware.contentice.plugin.StoragePluginService;
 import no.haagensoftware.contentice.spi.RouterPlugin;
 import no.haagensoftware.contentice.util.URLResolver;
+import no.teknologihuset.handlers.RoomHandler;
 import org.apache.log4j.Logger;
 
 /**
@@ -37,6 +38,8 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
         this.urlResolver.addUrlPattern("/json/categories/{category}/subcategories", SubCategoriesHandler.class);
         this.urlResolver.addUrlPattern("/json/categories/{category}/subcategories/{subcategory}", SubCategoryHandler.class);
 
+
+        this.urlResolver.addUrlPattern("/json/rooms", RoomHandler.class);
         //Load plugins and add URLs to urlResolver
     }
 
@@ -53,7 +56,7 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
         pipeline.addLast("decoder", new HttpRequestDecoder());
         pipeline.addLast("aggregator", new HttpObjectAggregator(1048576));
         pipeline.addLast("encoder", new HttpResponseEncoder());
-        pipeline.addLast("gzip", new HttpContentCompressor(6));
+        //pipeline.addLast("gzip", new HttpContentCompressor(6));
         pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
 
         for (RouterPlugin routerPlugin : RouterPluginService.getInstance().getRouterPlugins()) {
