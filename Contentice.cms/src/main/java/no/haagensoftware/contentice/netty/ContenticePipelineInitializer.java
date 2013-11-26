@@ -9,6 +9,7 @@ import io.netty.handler.codec.http.HttpResponseEncoder;
 
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.stream.ChunkedWriteHandler;
+import no.haagensoftware.contentice.handler.FileServerHandler;
 import no.haagensoftware.contentice.handlers.*;
 import no.haagensoftware.contentice.plugin.RouterPluginService;
 import no.haagensoftware.contentice.plugin.StoragePluginService;
@@ -62,7 +63,7 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
         }
 
         //Router Handler
-        pipeline.addLast("router_handler", new RouterHandler(urlResolver, null, StoragePluginService.getInstance().getStoragePluginWithName(System.getProperty("no.haagensoftware.contentice.storage.plugin"))));
+        pipeline.addLast("router_handler", new RouterHandler(urlResolver, FileServerHandler.class, StoragePluginService.getInstance().getStoragePluginWithName(System.getProperty("no.haagensoftware.contentice.storage.plugin"))));
 
 
         //pipeline.addLast("handler", new HttpStaticFileServerHandler(true));

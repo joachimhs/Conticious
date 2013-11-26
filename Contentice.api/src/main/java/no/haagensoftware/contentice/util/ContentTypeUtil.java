@@ -25,7 +25,6 @@ public class ContentTypeUtil {
 	
 	public static String getContentType(String filename) {
 		String fileEnding = filename.substring(filename.lastIndexOf(".")+1);
-		System.out.println(fileEnding);
 		if (contentTypeHash.get(fileEnding) != null) {
 			return contentTypeHash.get(fileEnding);
 		}

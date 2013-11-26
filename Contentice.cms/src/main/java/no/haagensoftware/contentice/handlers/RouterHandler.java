@@ -25,7 +25,7 @@ public class RouterHandler extends ContenticeHandler {
     private URLResolver urlResolver;
     private Class<? extends ChannelHandler> defaultHandler;
 
-    public RouterHandler(URLResolver urlResolver,Class<ChannelHandler> defaultHandler, StoragePlugin storage) {
+    public RouterHandler(URLResolver urlResolver,Class<? extends ChannelHandler> defaultHandler, StoragePlugin storage) {
         this.urlResolver = urlResolver;
         this.defaultHandler = defaultHandler;
         this.storage = storage;
@@ -54,7 +54,7 @@ public class RouterHandler extends ContenticeHandler {
             ChannelHandler handler = urlData.getChannelHandler().newInstance();
             if (handler instanceof FileServerHandler) {
                 //Initializer Handler correctly if the handler is a subclass of the FileServerHandler
-                ((FileServerHandler)handler).setPath(url);
+                //((FileServerHandler)handler).setFromClasspath(false);
             } else if (handler instanceof ContenticeHandler) {
                 //Initializer Handler correctly if the handler is a subclass of the ContenticeHandler
                 ((ContenticeHandler)handler).setParameterMap(urlData.getParameters());

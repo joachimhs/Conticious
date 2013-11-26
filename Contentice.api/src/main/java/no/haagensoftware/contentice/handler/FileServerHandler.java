@@ -3,7 +3,6 @@ package no.haagensoftware.contentice.handler;
 
 import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
-import no.haagensoftware.contentice.handler.ContenticeHandler;
 import no.haagensoftware.contentice.util.ContentTypeUtil;
 import org.apache.log4j.Logger;
 
@@ -21,15 +20,21 @@ public class FileServerHandler extends ContenticeHandler {
     private static final Logger logger = Logger.getLogger(FileServerHandler.class.getName());
 
     private static final String HTTP_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss zzz";
+
     private String rootPath;
     private String stripFromUri;
     private int cacheMaxAge = -1;
     private boolean fromClasspath = false;
     private MimetypesFileTypeMap fileTypeMap = new MimetypesFileTypeMap();
 
-    public void setPath(String path) {
-        rootPath = path;
-        rootPath = rootPath.replace(File.separatorChar, '/');
+    public FileServerHandler() {
+        if (System.getProperty("no.haagensoftware.contentice.webappDir") != null && System.getProperty("no.haagensoftware.contentice.webappDir").length() > 3) {
+            rootPath = System.getProperty("no.haagensoftware.contentice.webappDir");
+        }
+    }
+
+    public void setFromClasspath(boolean fromClasspath) {
+        this.fromClasspath = fromClasspath;
     }
 
     protected String sanitizeUri(String uri) throws URISyntaxException {
@@ -91,18 +96,23 @@ public class FileServerHandler extends ContenticeHandler {
 
         logger.info("path: " + path);
 
-        URL fileUrl = this.getClass().getResource(path);
-        File file = new File(fileUrl.getPath());
-        if (file.isDirectory()) {
-            path = path + File.separatorChar + "index.html";
+        String fileContent = "";
+        if (fromClasspath) {
+            URL fileUrl = this.getClass().getResource(path);
+            File file = new File(fileUrl.getPath());
+            if (file.isDirectory()) {
+                path = path + File.separatorChar + "index.html";
+            }
+
+            InputStream in = this.getClass().getResourceAsStream(path);
+            fileContent = convertStreamToString(in);
+        } else {
+            fileContent = getFileContent(this.rootPath + File.separatorChar + path);
         }
 
-        InputStream in = this.getClass().getResourceAsStream(path);
-        String fileContent = convertStreamToString(in);
-
-
-
+        logger.info("Path: " + path + " Content type: " + ContentTypeUtil.getContentType(path));
         writeContentsToBuffer(channelHandlerContext, fileContent.toString(), ContentTypeUtil.getContentType(path));
+        logger.info("Wrote: " + path);
     }
 
     @Override
@@ -116,5 +126,28 @@ public class FileServerHandler extends ContenticeHandler {
     private static String convertStreamToString(java.io.InputStream is) {
         java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";
+    }
+
+    protected String getFileContent(String path) {
+        String fileContent = null;
+        InputStream is;
+        try {
+            if (fromClasspath) {
+                is = this.getClass().getResourceAsStream(path);
+            } else {
+                is = new FileInputStream(path);
+            }
+
+            if (is == null) {
+                return null;
+            }
+
+            fileContent = convertStreamToString(is);
+
+        } catch (IOException e) {
+            return null;
+        }
+
+        return fileContent;
     }
 }

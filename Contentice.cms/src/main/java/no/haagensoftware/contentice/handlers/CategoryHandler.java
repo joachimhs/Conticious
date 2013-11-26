@@ -5,8 +5,10 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import no.haagensoftware.contentice.assembler.CategoryAssembler;
 import no.haagensoftware.contentice.data.CategoryData;
+import no.haagensoftware.contentice.data.SubCategoryData;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -30,6 +32,9 @@ public class CategoryHandler extends ContenticeHandler {
             write404ToBuffer(channelHandlerContext);
         } else {
             JsonObject topLevelObject = new JsonObject();
+
+            List<SubCategoryData> subcategories = getStorage().getSubCategories(categoryData.getId());
+            categoryData.getSubCategories().addAll(subcategories);
             topLevelObject.add("category", CategoryAssembler.buildCategoryJsonFromCategoryData(categoryData));
 
             writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json; charset=UTF-8");

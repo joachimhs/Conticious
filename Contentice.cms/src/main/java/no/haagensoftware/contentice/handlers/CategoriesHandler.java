@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import no.haagensoftware.contentice.assembler.CategoryAssembler;
 import no.haagensoftware.contentice.data.CategoryData;
+import no.haagensoftware.contentice.data.SubCategoryData;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
 
 import java.util.List;
@@ -35,10 +36,14 @@ public class CategoriesHandler extends ContenticeHandler {
 
         JsonArray categoryArray = new JsonArray();
         for (CategoryData category : categories) {
+            List<SubCategoryData> subcategories = getStorage().getSubCategories(category.getId());
+            category.getSubCategories().addAll(subcategories);
             categoryArray.add(CategoryAssembler.buildCategoryJsonFromCategoryData(category));
         }
 
         JsonObject topLevelObject = new JsonObject();
         topLevelObject.add("categories", categoryArray);
+
+        writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json; charset=UTF-8");
     }
 }

@@ -15,6 +15,10 @@ import org.apache.log4j.Logger;
 public class AdminPagesHandler extends FileServerHandler {
     private static final Logger logger = Logger.getLogger(AdminPagesHandler.class.getName());
 
+    public AdminPagesHandler() {
+        setFromClasspath(true);
+    }
+
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
         logger.info("AdminPagesHandler channelRead0");

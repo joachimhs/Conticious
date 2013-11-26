@@ -2,16 +2,19 @@ package no.haagensoftware.contentice.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
+import io.netty.handler.stream.ChunkedFile;
 import io.netty.util.CharsetUtil;
 import no.haagensoftware.contentice.spi.StoragePlugin;
 import org.apache.log4j.Logger;
 
+import java.io.*;
 import java.util.Map;
 import java.util.Set;
 
+import static io.netty.handler.codec.http.HttpHeaders.Names.CONNECTION;
+import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
 import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
@@ -115,6 +118,62 @@ public abstract class ContenticeHandler extends SimpleChannelInboundHandler<Full
         response.headers().set(CONTENT_TYPE, contentType + "; charset=UTF-8");
 
         ctx.write(response);
+        ctx.flush();
+    }
+
+    public void writeFileToBuffer(ChannelHandlerContext ctx, String path, String contentType) {
+        HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
+        response.headers().set(CONTENT_TYPE, contentType);
+
+        File file = new File(path);
+
+        RandomAccessFile raf;
+        try {
+            raf = new RandomAccessFile(file, "r");
+        } catch (FileNotFoundException fnfe) {
+            sendError(ctx, NOT_FOUND);
+            return;
+        }
+        long fileLength = 0;
+        try {
+            fileLength = raf.length();
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        response.headers().set(CONTENT_LENGTH, fileLength);
+        response.headers().set(CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+        ctx.write(response);
+
+        ChannelFuture sendFileFuture = null;
+        try {
+            sendFileFuture = ctx.write(new ChunkedFile(raf, 0, fileLength, 8192), ctx.newProgressivePromise());
+            sendFileFuture.addListener(new ChannelProgressiveFutureListener() {
+
+                @Override
+                public void operationProgressed(ChannelProgressiveFuture future, long progress, long total) {
+                    if (total < 0) { // total unknown
+                        System.err.println("Transfer progress: " + progress);
+                    } else {
+                        System.err.println("Transfer progress: " + progress + " / " + total);
+                    }
+                }
+
+                @Override
+                public void operationComplete(ChannelProgressiveFuture future) throws Exception {
+                    System.err.println("Transfer complete.");
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+
+
+        // Write the end marker
+        ChannelFuture lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
+        lastContentFuture.addListener(ChannelFutureListener.CLOSE);
+
         ctx.flush();
     }
 
