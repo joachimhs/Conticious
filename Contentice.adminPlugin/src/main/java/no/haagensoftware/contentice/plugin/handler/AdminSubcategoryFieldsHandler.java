@@ -65,9 +65,13 @@ public class AdminSubcategoryFieldsHandler extends ContenticeHandler {
                     } else if (subcategoryFieldObject.getSubcategoryField().getType().equals("boolean")) {
                         subCategoryData.getKeyMap().put(subcategoryFieldObject.getSubcategoryField().getName(), new JsonPrimitive(Boolean.parseBoolean(subcategoryFieldObject.getSubcategoryField().getValue())));
                     }
+
+                    subcategoryFieldObject.getSubcategoryField().setId(category + "_" + subcategory + "_" + fieldName);
                 }
 
                 getStorage().setSubCategory(category, subcategory, subCategoryData);
+
+                returnJson = new Gson().toJson(subcategoryFieldObject);
             }
 
             /*CategoryFieldObject categoryField = new Gson().fromJson(messageContent, CategoryFieldObject.class);
