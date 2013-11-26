@@ -1,14 +1,20 @@
 package no.haagensoftware.contentice.plugin.handler;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.util.CharsetUtil;
 import no.haagensoftware.contentice.data.CategoryData;
 import no.haagensoftware.contentice.data.CategoryField;
+import no.haagensoftware.contentice.data.SubCategoryData;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
 import no.haagensoftware.contentice.plugin.admindata.CategoryFieldObject;
+import no.haagensoftware.contentice.plugin.admindata.SubcategoryFieldObject;
 import org.apache.log4j.Logger;
+import sun.org.mozilla.javascript.internal.json.JsonParser;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,10 +32,44 @@ public class AdminSubcategoryFieldsHandler extends ContenticeHandler {
 
         String returnJson = "";
 
+        String subcategoryFieldId = getParameter("subcategoryField");
 
-        if (isPost(fullHttpRequest) || isPut(fullHttpRequest)) {
+        if (isPut(fullHttpRequest) && subcategoryFieldId != null) {
             String messageContent = fullHttpRequest.content().toString(CharsetUtil.UTF_8);
             logger.info(messageContent);
+
+            SubcategoryFieldObject subcategoryFieldObject = new Gson().fromJson(messageContent, SubcategoryFieldObject.class);
+
+            String category = subcategoryFieldId.substring(0, subcategoryFieldId.indexOf("_"));
+            String fieldName = subcategoryFieldId.substring(subcategoryFieldId.indexOf("_")+1, subcategoryFieldId.length());
+            String subcategory = fieldName.substring(0, fieldName.indexOf("_"));
+            fieldName = fieldName.substring(fieldName.indexOf("_")+1, fieldName.length());
+
+
+            if (subcategoryFieldObject != null && subcategoryFieldId != null && subcategoryFieldId.contains("_")) {
+                logger.info("category: " + category + " subcategory: " + subcategory + " fieldName: " + fieldName);
+
+                SubCategoryData subCategoryData = getStorage().getSubCategory(category, subcategory);
+
+                logger.info(new Gson().toJson(subCategoryData).toString());
+                if (subCategoryData != null) {
+                    if (subcategoryFieldObject.getSubcategoryField().getType().equals("textfield") || subcategoryFieldObject.getSubcategoryField().getType().equals("textarea")) {
+                        subCategoryData.getKeyMap().put(subcategoryFieldObject.getSubcategoryField().getName(), new JsonPrimitive(subcategoryFieldObject.getSubcategoryField().getValue()));
+                    } else if (subcategoryFieldObject.getSubcategoryField().getType().equals("array")) {
+                        logger.info("array: " + subcategoryFieldObject.getSubcategoryField().getValue());
+                        String value = subcategoryFieldObject.getSubcategoryField().getValue();
+                        JsonElement jsonElement = new com.google.gson.JsonParser().parse(value);
+                        if (jsonElement.isJsonArray()) {
+                            subCategoryData.getKeyMap().put(subcategoryFieldObject.getSubcategoryField().getName(), jsonElement.getAsJsonArray());
+                        }
+                    } else if (subcategoryFieldObject.getSubcategoryField().getType().equals("boolean")) {
+                        subCategoryData.getKeyMap().put(subcategoryFieldObject.getSubcategoryField().getName(), new JsonPrimitive(Boolean.parseBoolean(subcategoryFieldObject.getSubcategoryField().getValue())));
+                    }
+                }
+
+                getStorage().setSubCategory(category, subcategory, subCategoryData);
+            }
+
             /*CategoryFieldObject categoryField = new Gson().fromJson(messageContent, CategoryFieldObject.class);
 
             if (categoryField != null && categoryField.getCategoryField() != null) {

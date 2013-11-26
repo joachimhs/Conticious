@@ -2,6 +2,7 @@ package no.haagensoftware.contentice.plugin.handler;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -11,6 +12,7 @@ import no.haagensoftware.contentice.assembler.SubCategoryAssembler;
 import no.haagensoftware.contentice.data.CategoryData;
 import no.haagensoftware.contentice.data.CategoryField;
 import no.haagensoftware.contentice.data.SubCategoryData;
+import no.haagensoftware.contentice.data.SubcategoryField;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
 import no.haagensoftware.contentice.plugin.admindata.AdminCategoryObject;
 import no.haagensoftware.contentice.plugin.assembler.AdminCategoryAssembler;
@@ -52,10 +54,30 @@ public class AdminCategoriesHandler extends ContenticeHandler {
         JsonArray categoryArray = new JsonArray();
         JsonArray subCategoriesArray = new JsonArray();
         JsonArray defaultFieldsArray = new JsonArray();
+        JsonArray subcategoryFieldArray= new JsonArray();
+
         for (CategoryData category : categories) {
             for (SubCategoryData subcategoryData : getStorage().getSubCategories(category.getId())) {
                 category.addSubCategory(subcategoryData);
                 subCategoriesArray.add(AdminSubCategoryAssembler.buildAdminJsonFromSubCategoryData(subcategoryData, category));
+
+                for (CategoryField cf : category.getDefaultFields()) {
+                    SubcategoryField subField = new SubcategoryField();
+                    subField.setId(subcategoryData.getId() + "_" + cf.getName());
+                    subField.setRequired(cf.getRequired());
+                    subField.setType(cf.getType());
+                    subField.setName(cf.getName());
+                    if (subcategoryData.getKeyMap().get(cf.getName()) != null) {
+                        JsonElement element = subcategoryData.getKeyMap().get(cf.getName());
+                        if (element.isJsonArray()) {
+                            subField.setValue(element.getAsJsonArray().toString());
+                        } else {
+                            subField.setValue(element.getAsString());
+                        }
+                    }
+
+                    subcategoryFieldArray.add(new Gson().toJsonTree(subField));
+                }
             }
 
             categoryArray.add(AdminCategoryAssembler.buildAdminCategoryJson(category));
@@ -69,6 +91,7 @@ public class AdminCategoriesHandler extends ContenticeHandler {
         topLevelObject.add("categories", categoryArray);
         topLevelObject.add("subcategories", subCategoriesArray);
         topLevelObject.add("categoryFields", defaultFieldsArray);
+        topLevelObject.add("subcategoryFields", subcategoryFieldArray);
 
         writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json; charset=UTF-8");
     }

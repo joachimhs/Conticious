@@ -122,6 +122,16 @@ Contentice.SubcategoryIndexRoute = Ember.Route.extend({
 });
 
 Contentice.SubcategoryFieldsRoute = Ember.Route.extend({
+    actions: {
+        saveSubcategoryField: function(field) {
+            field.save();
+        },
+
+        revertSubcategoryField: function(field) {
+            field.rollback();
+        }
+    },
+
     model: function() {
         var subcategory = this.modelFor('subcategory');
         return subcategory;
@@ -288,7 +298,31 @@ Contentice.CategoryField = DS.Model.extend({
 
 Contentice.Subcategory = DS.Model.extend({
     name: DS.attr('string'),
-    content: DS.attr('string')
+    content: DS.attr('string'),
+    fields: DS.hasMany('subcategoryField')
+});
+
+Contentice.SubcategoryField = DS.Model.extend({
+    name: DS.attr('string'),
+    type: DS.attr('string'),
+    required: DS.attr('boolean'),
+    value: DS.attr('string'),
+
+    isTextfield: function() {
+        return this.get('type') === 'textfield';
+    }.property('type'),
+
+    isTextarea: function() {
+        return this.get('type') === 'textarea';
+    }.property('type'),
+
+    isBoolean: function() {
+        return this.get('type') === 'boolean';
+    }.property('type'),
+
+    isArray: function() {
+        return this.get('type') === "array";
+    }.property('type')
 });
 
 

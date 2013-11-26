@@ -35,8 +35,8 @@ public class AdminRoutesPlugin extends RouterPlugin {
         routeMap.put("/json/admin/categoryFields", AdminCategoryFieldsHandler.class);
         routeMap.put("/json/admin/categoryFields/{categoryField}", AdminCategoryFieldsHandler.class);
 
-        routeMap.put("/json/admin/subcategoryFields", AdminCategoryFieldsHandler.class);
-        routeMap.put("/json/admin/subcategoryFields/{subcategoryField}", AdminCategoryFieldsHandler.class);
+        routeMap.put("/json/admin/subcategoryFields", AdminSubcategoryFieldsHandler.class);
+        routeMap.put("/json/admin/subcategoryFields/{subcategoryField}", AdminSubcategoryFieldsHandler.class);
 
         routeMap.put("classpath:/admin", AdminPagesHandler.class);
     }

@@ -51,3 +51,12 @@ h1 {
     height:65vh;
     width: 100%;
 }
+
+.subcategoryFields {
+
+}
+
+.subcategoryFields textarea {
+    height:250px;
+    width: 100%;
+}

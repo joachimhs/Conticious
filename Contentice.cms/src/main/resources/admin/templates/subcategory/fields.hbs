@@ -1,1 +1,37 @@
-Fields Not Yet Implemented
+{{id}} -<br />
+<table class="table subcategoryFields">
+    <tr>
+        <th>Name</th>
+        <th>Value</th>
+        <th>Actions</th>
+    </tr>
+
+{{#each field in fields}}
+    <tr>
+        <td>{{field.name}}</td>
+        <td>
+            {{#if field.isTextfield}}
+                {{view Ember.TextField valueBinding="field.value"}}
+            {{/if}}
+
+            {{#if field.isTextarea}}
+                {{view Ember.TextArea valueBinding="field.value"}} <br />
+            {{/if}}
+
+            {{#if field.isBoolean}}
+                {{view Ember.Checkbox checkedBinding="field.value"}} <br />
+            {{/if}}
+
+            {{#if field.isArray}}
+                {{view Ember.TextField valueBinding="field.value"}} <br />
+            {{/if}}
+        </td>
+        <td>
+            {{#if field.isDirty}}
+                <button class="btn btn-primary" style="width: 75px;" {{action "saveSubcategoryField" field}}>Save</button>
+                <button class="btn btn-default" style="width: 75px;" {{action "revertSubcategoryField" field}}>Revert</button>
+            {{/if}}
+        </td>
+    </tr>
+{{/each}}
+</table>

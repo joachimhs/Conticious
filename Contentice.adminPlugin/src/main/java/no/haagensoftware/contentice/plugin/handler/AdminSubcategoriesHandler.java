@@ -8,7 +8,9 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.util.CharsetUtil;
 import no.haagensoftware.contentice.assembler.SubCategoryAssembler;
 import no.haagensoftware.contentice.data.CategoryData;
+import no.haagensoftware.contentice.data.CategoryField;
 import no.haagensoftware.contentice.data.SubCategoryData;
+import no.haagensoftware.contentice.data.SubcategoryField;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
 import no.haagensoftware.contentice.plugin.admindata.AdminSubcategoryObject;
 import no.haagensoftware.contentice.plugin.assembler.AdminSubCategoryAssembler;
@@ -58,12 +60,30 @@ public class AdminSubcategoriesHandler extends ContenticeHandler {
             write404ToBuffer(channelHandlerContext);
         } else {
             JsonArray subCategoryArray = new JsonArray();
+
+            JsonArray subcategoryFieldArray= new JsonArray();
             for (SubCategoryData subCategory : subCategories) {
                 subCategoryArray.add(AdminSubCategoryAssembler.buildAdminJsonFromSubCategoryData(subCategory, categoryData));
+
+                for (CategoryField cf : categoryData.getDefaultFields()) {
+                    SubcategoryField subField = new SubcategoryField();
+                    subField.setId(categoryData.getId() + "_" + cf.getName());
+                    subField.setRequired(cf.getRequired());
+                    subField.setType(cf.getType());
+                    subField.setName(cf.getName());
+                    if (subCategory.getKeyMap().get(cf.getName()) != null) {
+                        subField.setValue(subCategory.getKeyMap().get(cf.getName()).getAsString());
+                    }
+
+                    subcategoryFieldArray.add(new Gson().toJsonTree(subField));
+                }
             }
 
             JsonObject topLevelObject = new JsonObject();
+
+
             topLevelObject.add("subCategories", subCategoryArray);
+            topLevelObject.add("subcategoryFields", subcategoryFieldArray);
 
             writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json; charset=UTF-8");
         }
