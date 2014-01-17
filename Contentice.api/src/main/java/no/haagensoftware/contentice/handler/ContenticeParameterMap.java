@@ -1,6 +1,7 @@
 package no.haagensoftware.contentice.handler;
 
 import java.util.Map;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,4 +15,8 @@ public interface ContenticeParameterMap {
     public void setParameterMap(Map<String, String> parameterMap);
 
     public String getParameter(String key);
+
+    public void setQueryStringIds(List<String> queryStringids);
+
+    public List<String> getQueryStringIds();
 }

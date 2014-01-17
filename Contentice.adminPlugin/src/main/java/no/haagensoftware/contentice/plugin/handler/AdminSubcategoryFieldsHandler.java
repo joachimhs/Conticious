@@ -7,14 +7,10 @@ import com.google.gson.JsonPrimitive;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.util.CharsetUtil;
-import no.haagensoftware.contentice.data.CategoryData;
-import no.haagensoftware.contentice.data.CategoryField;
 import no.haagensoftware.contentice.data.SubCategoryData;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
-import no.haagensoftware.contentice.plugin.admindata.CategoryFieldObject;
 import no.haagensoftware.contentice.plugin.admindata.SubcategoryFieldObject;
 import org.apache.log4j.Logger;
-import sun.org.mozilla.javascript.internal.json.JsonParser;
 
 /**
  * Created with IntelliJ IDEA.
@@ -42,8 +38,8 @@ public class AdminSubcategoryFieldsHandler extends ContenticeHandler {
 
             String category = subcategoryFieldId.substring(0, subcategoryFieldId.indexOf("_"));
             String fieldName = subcategoryFieldId.substring(subcategoryFieldId.indexOf("_")+1, subcategoryFieldId.length());
-            String subcategory = fieldName.substring(0, fieldName.indexOf("_"));
-            fieldName = fieldName.substring(fieldName.indexOf("_")+1, fieldName.length());
+            String subcategory = fieldName.substring(0, fieldName.lastIndexOf("_")).replaceAll("\\%20", " ");
+            fieldName = fieldName.substring(fieldName.lastIndexOf("_")+1, fieldName.length());
 
 
             if (subcategoryFieldObject != null && subcategoryFieldId != null && subcategoryFieldId.contains("_")) {
@@ -61,6 +57,10 @@ public class AdminSubcategoryFieldsHandler extends ContenticeHandler {
                         JsonElement jsonElement = new com.google.gson.JsonParser().parse(value);
                         if (jsonElement.isJsonArray()) {
                             subCategoryData.getKeyMap().put(subcategoryFieldObject.getSubcategoryField().getName(), jsonElement.getAsJsonArray());
+                        } else if (jsonElement.isJsonPrimitive()) {
+                            JsonArray jsonArray = new JsonArray();
+                            jsonArray.add(jsonElement);
+                            subCategoryData.getKeyMap().put(subcategoryFieldObject.getSubcategoryField().getName(), jsonArray);
                         }
                     } else if (subcategoryFieldObject.getSubcategoryField().getType().equals("boolean")) {
                         subCategoryData.getKeyMap().put(subcategoryFieldObject.getSubcategoryField().getName(), new JsonPrimitive(Boolean.parseBoolean(subcategoryFieldObject.getSubcategoryField().getValue())));

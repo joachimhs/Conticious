@@ -37,6 +37,10 @@ public class FileServerHandler extends ContenticeHandler {
         this.fromClasspath = fromClasspath;
     }
 
+    public void setRootPath(String rootPath) {
+        this.rootPath = rootPath;
+    }
+
     protected String sanitizeUri(String uri) throws URISyntaxException {
         // Decode the path.
         try {
@@ -72,7 +76,7 @@ public class FileServerHandler extends ContenticeHandler {
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
-        logger.info("FileServerHandler channelRead0");
+        logger.info("FileServerHandler channelRead0: " + rootPath);
         if (!fullHttpRequest.getDecoderResult().isSuccess()) {
             sendError(channelHandlerContext, HttpResponseStatus.BAD_REQUEST);
             return;
@@ -108,7 +112,12 @@ public class FileServerHandler extends ContenticeHandler {
             fileContent = convertStreamToString(in);
             writeContentsToBuffer(channelHandlerContext, fileContent.toString(), ContentTypeUtil.getContentType(path));
         } else {
-            writeFileToBuffer(channelHandlerContext, this.rootPath + File.separatorChar + path, ContentTypeUtil.getContentType(path));
+            File file = new File(this.rootPath + path);
+            if (file.isDirectory()) {
+                path = path + File.separatorChar + "index.html";
+            }
+            logger.info(this.rootPath + path);
+            writeFileToBuffer(channelHandlerContext, this.rootPath + path, ContentTypeUtil.getContentType(path));
         }
 
 
@@ -124,8 +133,12 @@ public class FileServerHandler extends ContenticeHandler {
     }
 
     private static String convertStreamToString(java.io.InputStream is) {
-        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
+        if (is != null) {
+            java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+            return (s != null && s.hasNext()) ? s.next() : "";
+        }
+
+        return "";
     }
 
     protected String getFileContent(String path) {

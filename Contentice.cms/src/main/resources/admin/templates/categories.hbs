@@ -1,12 +1,10 @@
-<div class="wrap">
-    <h1>Categories</h1>
-
+<div class="wrap" style="margin-top: 25px;">
     <div class="row" style="height: 100%;">
         <div class="col-md-4">
             {{#if showNewCategoryField}}
                 <table class="table">
                     <tr>
-                        <th colspan="2">Add new Category</th>
+                        <th colspan="2" class="tableHeader">Add new Category</th>
                     </tr>
                     <tr>
                         <td colspan="2">{{view Ember.TextField valueBinding="newCategoryName" classNames="form-control" placeholder="Category Name"}}</td>
@@ -20,14 +18,17 @@
                 <button class="btn btn-default form-control" {{action "showNewCategory"}}>Add Category</button>
             {{/if}}
 
+            <div style="margin-bottom: 10px;">
+
+            </div>
 
             {{#each category in controller}}
                 <div class="list-group">
-                    {{#linkTo "category" category classNames="list-group-item"}}{{category.id}}{{/linkTo}}
+                    {{#linkTo "category" category classNames="list-group-item categoryItem"}}{{category.id}}{{/linkTo}}
                     {{#each subcategory in category.subcategories}}
 
-                        {{#linkTo "subcategory" category subcategory classNames="list-group-item"}}
-                            <span style="margin-left: 18px;"></span> {{category.id}} - {{subcategory.name}}
+                        {{#linkTo "subcategory" category subcategory classNames="list-group-item subcategoryItem"}}
+                            <span style="margin-left: 18px;"></span> {{subcategory.name}}
                         {{/linkTo}}
                     {{/each}}
                 </div>

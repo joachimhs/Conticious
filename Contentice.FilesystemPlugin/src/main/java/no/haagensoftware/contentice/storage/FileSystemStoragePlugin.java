@@ -210,9 +210,11 @@ public class FileSystemStoragePlugin extends StoragePlugin {
         logger.info("Building Keymap for Json: " + jsonContent);
         Map<String, JsonElement> keysMap = new HashMap<>();
 
-        JsonElement jsonElement = new JsonParser().parse(jsonContent);
-        if (jsonElement.isJsonObject()) {
-            extractJsonObject(keysMap, jsonElement);
+        if (jsonContent != null) {
+            JsonElement jsonElement = new JsonParser().parse(jsonContent);
+            if (jsonElement.isJsonObject()) {
+                extractJsonObject(keysMap, jsonElement);
+            }
         }
 
         return keysMap;
@@ -244,15 +246,18 @@ public class FileSystemStoragePlugin extends StoragePlugin {
 
     private String getFileContents(String path) throws IOException {
         String returnString = null;
-        BufferedReader fileBufferedReader = Files.newBufferedReader((FileSystems.getDefault().getPath(path)), Charset.forName("utf-8"));
-        StringBuffer sb = new StringBuffer();
-        String line = null;
-        while ((line = fileBufferedReader.readLine()) != null) {
-            sb.append(line).append("\n");
-        }
+        File file = new File(path);
+        if (file.exists() && file.isFile()) {
+            BufferedReader fileBufferedReader = Files.newBufferedReader((FileSystems.getDefault().getPath(path)), Charset.forName("utf-8"));
+            StringBuffer sb = new StringBuffer();
+            String line = null;
+            while ((line = fileBufferedReader.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
 
-        if (sb.length() > 0) {
-            returnString = sb.toString();
+            if (sb.length() > 0) {
+                returnString = sb.toString();
+            }
         }
 
         return returnString;
@@ -260,7 +265,13 @@ public class FileSystemStoragePlugin extends StoragePlugin {
 
     @Override
     public SubCategoryData getSubCategory(String category, String subCategory) {
-        Path path = FileSystems.getDefault().getPath(documentsDirectory + File.separatorChar + category + File.separatorChar + subCategory + ".md");
+        String useSubcategory = subCategory;
+
+        if (useSubcategory.startsWith(category + "_")) {
+            useSubcategory = useSubcategory.substring(9);
+        }
+
+        Path path = FileSystems.getDefault().getPath(documentsDirectory + File.separatorChar + category + File.separatorChar + useSubcategory + ".md");
         SubCategoryData subCategoryData = null;
         try {
             subCategoryData = this.getSubCategoryData(category, getSubCategories(category), path);
@@ -280,13 +291,12 @@ public class FileSystemStoragePlugin extends StoragePlugin {
         BufferedWriter jsonWriter = null;
         try {
             String markdownContent = "";
-            if (subCategoryData.getContent() != null && subCategoryData.getContent().length() > 0) {
+            if (subCategoryData != null && subCategoryData.getContent() != null && subCategoryData.getContent().length() > 0) {
                 markdownContent = subCategoryData.getContent();
             }
             markdownWriter = Files.newBufferedWriter(markdownPath, Charset.forName("utf-8"));
             markdownWriter.write(markdownContent, 0, markdownContent.length());
             markdownWriter.flush();
-
 
             String jsonContent = convertKeyMapToJson(subCategoryData.getKeyMap());
             if (jsonContent.length() > 2) {

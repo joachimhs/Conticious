@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import java.io.*;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
 
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONNECTION;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
@@ -30,6 +31,7 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 public abstract class ContenticeHandler extends SimpleChannelInboundHandler<FullHttpRequest> implements ContenticeParameterMap {
     private static final Logger logger = Logger.getLogger(ContenticeHandler.class.getName());
     private Map<String, String> parameterMap;
+    private List<String> queryStringIds;
     private StoragePlugin storage;
 
     @Override
@@ -46,6 +48,16 @@ public abstract class ContenticeHandler extends SimpleChannelInboundHandler<Full
     @Override
     public void setParameterMap(Map<String, String> parameterMap) {
         this.parameterMap = parameterMap;
+    }
+
+    @Override
+    public List<String> getQueryStringIds() {
+        return queryStringIds;
+    }
+
+    @Override
+    public void setQueryStringIds(List<String> queryStringids) {
+        this.queryStringIds = queryStringids;
     }
 
     public void setStorage(StoragePlugin storage) {

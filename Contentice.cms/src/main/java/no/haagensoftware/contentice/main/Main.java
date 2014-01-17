@@ -33,6 +33,22 @@ public class Main {
         }
 
         readProperties();
+
+        String pluginsDir = System.getProperty("no.haagensoftware.contentice.pluginDirectory");
+        loadPluginsFromDir(pluginsDir);
+    }
+
+    private static void loadPluginsFromDir(String dir) {
+        if (dir != null && new File(dir).isDirectory()) {
+
+            try {
+                ClassPathUtil.addDirToClasspath(new File(dir));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            //PluginClassLoader classLoader = new PluginClassLoader(ClassLoader.getSystemClassLoader());
+            //classLoader.addJarsFromDirectory(dir);
+        }
     }
 
     public void bootstrap() throws Exception {
@@ -91,6 +107,14 @@ public class Main {
 
         if (properties.get("no.haagensoftware.contentice.storage.file.documentsDirectory") == null) {
             throw new RuntimeException("Documents directory is missing from configuration. Please ensure that no.haagensoftware.contentice.storage.file.documentsDirectory is defined in config.properties");
+        }
+
+        if (properties.get("no.haagensoftware.contentice.pluginDirectory") == null) {
+//            throw new RuntimeException("Plugin directory is missing from configuration. Please ensure that no.haagensoftware.contentice.pluginDirectory is defined in config.properties");
+        }
+
+        if (properties.get("no.haagensoftware.contentice.adminDir") == null) {
+            throw new RuntimeException("Admin Dir directory is missing from configuration. Please ensure that no.haagensoftware.contentice.adminDir is defined in config.properties");
         }
 
         if (properties.get("no.haagensoftware.contentice.storage.plugin") == null) {

@@ -1,12 +1,13 @@
 package no.haagensoftware.contentice.plugin;
 
+import no.haagensoftware.contentice.main.ClassPathUtil;
 import no.haagensoftware.contentice.spi.RouterPlugin;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
-import java.util.logging.Logger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,10 +20,16 @@ public class RouterPluginService {
     private static final Logger logger = Logger.getLogger(RouterPluginService.class.getName());
 
     private static RouterPluginService pluginService = null;
-    private ServiceLoader<RouterPlugin> loader;
+    private ServiceLoader<RouterPlugin> loader = null;
 
     public RouterPluginService() {
+        ClassPathUtil.addPluginDirectory();
+        logger.info("Loading router plugins");
         loader = ServiceLoader.load(RouterPlugin.class);
+        for (RouterPlugin plugin : loader) {
+            logger.info("Plugin loaded: " + plugin);
+        }
+        logger.info("Done loading router plugins");
     }
 
     public static synchronized RouterPluginService getInstance() {

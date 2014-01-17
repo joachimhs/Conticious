@@ -58,6 +58,7 @@ public class RouterHandler extends ContenticeHandler {
             } else if (handler instanceof ContenticeHandler) {
                 //Initializer Handler correctly if the handler is a subclass of the ContenticeHandler
                 ((ContenticeHandler)handler).setParameterMap(urlData.getParameters());
+                ((ContenticeHandler)handler).setQueryStringIds(urlData.getQueryStringIds());
                 ((ContenticeHandler)handler).setStorage(storage);
             }
             addOrReplaceHandler(channelHandlerContext, handler, "route-generated", fullHttpRequest);

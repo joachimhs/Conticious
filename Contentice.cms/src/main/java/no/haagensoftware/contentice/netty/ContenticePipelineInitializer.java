@@ -15,7 +15,13 @@ import no.haagensoftware.contentice.plugin.RouterPluginService;
 import no.haagensoftware.contentice.plugin.StoragePluginService;
 import no.haagensoftware.contentice.spi.RouterPlugin;
 import no.haagensoftware.contentice.util.URLResolver;
+import no.kodegenet.handlers.ChaptersHandler;
+import no.kodegenet.handlers.CoursesHandler;
+import no.kodegenet.handlers.OppgaverHandler;
+import no.teknologihuset.handlers.PageHandler;
+import no.teknologihuset.handlers.RoomWeekHandler;
 import no.teknologihuset.handlers.RoomHandler;
+import no.teknologihuset.handlers.WeekHandler;
 import org.apache.log4j.Logger;
 
 /**
@@ -40,6 +46,18 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
 
 
         this.urlResolver.addUrlPattern("/json/rooms", RoomHandler.class);
+        this.urlResolver.addUrlPattern("/json/week/{week}", WeekHandler.class);
+        this.urlResolver.addUrlPattern("/json/weeks/{week}", WeekHandler.class);
+        this.urlResolver.addUrlPattern("/json/roomWeeks", RoomWeekHandler.class);
+        this.urlResolver.addUrlPattern("/json/roomWeeks/{roomName}", RoomWeekHandler.class);
+
+        this.urlResolver.addUrlPattern("/json/pages", PageHandler.class);
+        this.urlResolver.addUrlPattern("/json/courses", CoursesHandler.class);
+        this.urlResolver.addUrlPattern("/json/chapters", ChaptersHandler.class);
+        this.urlResolver.addUrlPattern("/json/chapters/{chapter}", ChaptersHandler.class);
+        this.urlResolver.addUrlPattern("/json/oppgaver", OppgaverHandler.class);
+        this.urlResolver.addUrlPattern("/json/oppgaver/{oppgave}", OppgaverHandler.class);
+
         //Load plugins and add URLs to urlResolver
     }
 
@@ -56,7 +74,7 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
         pipeline.addLast("decoder", new HttpRequestDecoder());
         pipeline.addLast("aggregator", new HttpObjectAggregator(1048576));
         pipeline.addLast("encoder", new HttpResponseEncoder());
-        //pipeline.addLast("gzip", new HttpContentCompressor(6));
+        //pipeline.addLast("deflater", new HttpContentCompressor(1));
         pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
 
         for (RouterPlugin routerPlugin : RouterPluginService.getInstance().getRouterPlugins()) {

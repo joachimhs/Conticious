@@ -5,10 +5,11 @@ import com.google.gson.JsonPrimitive;
 import junit.framework.Assert;
 import no.haagensoftware.contentice.data.CategoryData;
 import no.haagensoftware.contentice.data.SubCategoryData;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,18 +24,39 @@ import java.util.Map;
 public class FileSystemStoragePluginTest {
     private FileSystemStoragePlugin plugin;
 
-    @Before
-    public void setup() {
-        System.setProperty("no.haagensoftware.contentice.storage.file.documentsDirectory", "/srv/contenticeDocuments");
-        plugin = new FileSystemStoragePlugin();
+    @BeforeClass
+    public static void setupDirectory() throws IOException {
+        File contenticeDir = new File("/srv/contenticeDocumentsTest");
+        if (contenticeDir == null || !contenticeDir.exists()) {
+            contenticeDir.mkdirs();
+        } else {
+            //delete it and all its contents
+            delete(contenticeDir);
+            contenticeDir = new File("/srv/contenticeDocumentsTest");
+            contenticeDir.mkdir();
+        }
     }
 
-    @Test
-    public void verifyDocumentRootListing() {
-        List<CategoryData> categories = plugin.getCategories();
-        Assert.assertEquals("Expecting 2 Categories inside the document directory", 2, categories.size());
-        Assert.assertEquals("Expecting the first category to be blogPosts", "blogPosts", categories.get(0).getId());
-        Assert.assertEquals("Expecting the second category to be pages", "pages", categories.get(1).getId());
+    @AfterClass
+    public static void teardownDirectory() throws  IOException {
+        delete(new File("/srv/contenticeDocumentsTest"));
+    }
+
+    private static void delete(File f) throws IOException {
+        if (f.isDirectory()) {
+            for (File c : f.listFiles())
+                delete(c);
+        }
+        if (!f.delete())
+            throw new FileNotFoundException("Failed to delete file: " + f);
+    }
+
+    @Before
+    public void setup() {
+        System.setProperty("no.haagensoftware.contentice.storage.file.documentsDirectory", "/srv/contenticeDocumentsTest");
+        plugin = new FileSystemStoragePlugin();
+
+
     }
 
     @Test
@@ -43,26 +65,35 @@ public class FileSystemStoragePluginTest {
 
         List<CategoryData> categories = plugin.getCategories();
 
-        Assert.assertEquals("Expecting 3 Categories inside the document directory", 3, categories.size());
-        Assert.assertEquals("Expecting the first category to be blogPosts", "blogPosts", categories.get(0).getId());
-        Assert.assertEquals("Expecting the second category to be newCategory", "newCategory", categories.get(1).getId());
-        Assert.assertEquals("Expecting the third category to be pages", "pages", categories.get(2).getId());
+        Assert.assertEquals("Expecting 1 Categories inside the document directory", 1, categories.size());
+        Assert.assertEquals("Expecting the second category to be newCategory", "newCategory", categories.get(0).getId());
 
         plugin.deleteCategory("newCategory");
 
         categories = plugin.getCategories();
-        Assert.assertEquals("Expecting 2 Categories inside the document directory", 2, categories.size());
-        Assert.assertEquals("Expecting the first category to be blogPosts", "blogPosts", categories.get(0).getId());
-        Assert.assertEquals("Expecting the second category to be pages", "pages", categories.get(1).getId());
+        Assert.assertEquals("Expecting 0 Categories inside the document directory", 0, categories.size());
     }
 
     @Test
     public void verifyGetSubcategories() {
+        plugin.setCategory("pages", new CategoryData("Pages"));
+        SubCategoryData about = new SubCategoryData();
+        about.setContent("about");
+        about.getKeyMap().put("name", new JsonPrimitive("About"));
+
+
+        SubCategoryData opensource = new SubCategoryData();
+        opensource.setContent("open source");
+        opensource.getKeyMap().put("name", new JsonPrimitive("About"));
+
+        plugin.setSubCategory("pages", "about", about);
+        plugin.setSubCategory("pages", "opensource", opensource);
+
         List<SubCategoryData> subCategories = plugin.getSubCategories("pages");
 
         Assert.assertEquals("Expecting 2 sub categories inside the pages category", 2, subCategories.size());
-        Assert.assertEquals("Expecting the first sub category to be about", "about", subCategories.get(0).getId());
-        Assert.assertEquals("Expecting the second sub category to be opensource", "opensource", subCategories.get(1).getId());
+        Assert.assertEquals("Expecting the first sub category to be about", "pages_about", subCategories.get(0).getId());
+        Assert.assertEquals("Expecting the second sub category to be opensource", "pages_opensource", subCategories.get(1).getId());
         Assert.assertTrue("Expecting the the about sub category to have a content", subCategories.get(0).getContent() != null && subCategories.get(0).getContent().length() > 0);
         Assert.assertTrue("Expecting the the opensource sub category to have a content", subCategories.get(1).getContent() != null && subCategories.get(1).getContent().length() > 0);
         Assert.assertTrue("Expecting the the about sub category to have a json keys", subCategories.get(0).getKeyMap() != null && subCategories.get(0).getKeyMap().size() > 0);

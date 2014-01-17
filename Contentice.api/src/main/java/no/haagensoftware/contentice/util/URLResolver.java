@@ -3,8 +3,10 @@ package no.haagensoftware.contentice.util;
 import io.netty.channel.ChannelHandler;
 import no.haagensoftware.contentice.data.URLData;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -34,7 +36,7 @@ public class URLResolver {
         String value = getKeyForExactMatch(url);
 
         if (value != null) {
-            urlData = new URLData(url, url, new HashMap<String, String>(), urlMap.get(url));
+            urlData = new URLData(value, url, new HashMap<String, String>(), urlMap.get(value));
         } else {
             urlData = getValueForUrlWithParameters(url);
         }
@@ -43,21 +45,45 @@ public class URLResolver {
             if (urlPattern.startsWith("classpath:") && url.startsWith(urlPattern.substring(10))) {
                 urlData = new URLData(urlPattern, url, new HashMap<String, String>(), urlMap.get(urlPattern));
             }
+            if (urlPattern.startsWith("startsWith:") && url.startsWith(urlPattern.substring(11))) {
+                urlData = new URLData(urlPattern, url, new HashMap<String, String>(), urlMap.get(urlPattern));
+            }
+        }
+
+        List queryIds = buildIdsFromQueryStringString(url);
+        if (urlData != null) {
+            urlData.setQueryStringIds(queryIds);
         }
 
         return urlData;
     }
 
-    protected URLData getValueForClasspath(String url) {
-        URLData urlData = null;
+    protected List<String> buildIdsFromQueryStringString(String url) {
+        //?ids[]=
+        List<String> ids = new ArrayList<>();
 
+        if (url.contains("?")) {
+            String queryString = url.substring(url.indexOf("?") + 1, url.length());
 
+            queryString = queryString.replaceAll("%5B", "");
+            queryString = queryString.replaceAll("%5D", "");
 
-        return urlData;
+            for (String query : queryString.split("&")) {
+                if (query.startsWith("ids=")) {
+                    ids.add(query.substring(4, query.length()));
+                }
+            }
+        }
+
+        return ids;
     }
 
     protected String getKeyForExactMatch(String url) {
         String key = null;
+
+        if (url.contains("?")) {
+            url = url.substring(0, url.indexOf("?"));
+        }
 
         for (String currUrl : urlMap.keySet()) {
             if (currUrl.equals(url)) {

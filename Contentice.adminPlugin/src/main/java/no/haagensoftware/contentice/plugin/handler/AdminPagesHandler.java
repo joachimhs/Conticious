@@ -16,7 +16,11 @@ public class AdminPagesHandler extends FileServerHandler {
     private static final Logger logger = Logger.getLogger(AdminPagesHandler.class.getName());
 
     public AdminPagesHandler() {
-        setFromClasspath(true);
+        setFromClasspath(false);
+
+        if (System.getProperty("no.haagensoftware.contentice.adminDir") != null && System.getProperty("no.haagensoftware.contentice.adminDir").length() > 3) {
+            setRootPath(System.getProperty("no.haagensoftware.contentice.adminDir"));
+        }
     }
 
     @Override

@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>no.haagensoftware</groupId>
-		<artifactId>contentice-parent</artifactId>
+		<artifactId>kontize-parent</artifactId>
 		<version>0.1</version>
 	</parent>
-	<artifactId>contentice-api</artifactId>
-	<name>Contentice API</name>
+	<artifactId>kontize-api</artifactId>
+	<name>Kontize API</name>
 	<packaging>jar</packaging>
 
 	<build>

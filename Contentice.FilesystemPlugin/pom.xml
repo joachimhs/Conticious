@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>no.haagensoftware</groupId>
-		<artifactId>contentice-parent</artifactId>
+		<artifactId>kontize-parent</artifactId>
 		<version>0.1</version>
 	</parent>
-	<artifactId>contentice-filesystem-plugin</artifactId>
-	<name>Contentice Filesystem Plugin</name>
+	<artifactId>kontize-filesystem-plugin</artifactId>
+	<name>Kontize Filesystem Plugin</name>
 	<packaging>jar</packaging>
 
 	<build>

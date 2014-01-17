@@ -1,10 +1,11 @@
 package no.haagensoftware.contentice.plugin;
 
+import no.haagensoftware.contentice.main.ClassPathUtil;
 import no.haagensoftware.contentice.spi.StoragePlugin;
+import org.apache.log4j.Logger;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
-import java.util.logging.Logger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,7 +20,13 @@ public class StoragePluginService {
     private ServiceLoader<StoragePlugin> loader;
 
     public StoragePluginService() {
+        ClassPathUtil.addPluginDirectory();
+        logger.info("Loading StoragePlugins");
         loader = ServiceLoader.load(StoragePlugin.class);
+        for (StoragePlugin plugin : loader) {
+            logger.info("Plugin loaded: " + plugin);
+        }
+        logger.info("Done loading StoragePlugins");
     }
 
     public static synchronized StoragePluginService getInstance() {
@@ -33,17 +40,24 @@ public class StoragePluginService {
     public StoragePlugin getStoragePluginWithName(String storagePluginName) {
         StoragePlugin returnPlugin = null;
 
-        for (StoragePlugin plugin : loader) {
-            if (plugin.getStoragePluginName().equals(storagePluginName)) {
-                returnPlugin = plugin;
-                break;
-            }
-        }
+        returnPlugin = getStoragePlugin(storagePluginName, returnPlugin);
 
         if (returnPlugin == null) {
             throw new IllegalArgumentException("There is no plugin named: " + storagePluginName + ". Storage is unavailable. Please load the plugin JAR file into the plugins directory.");
         }
 
+        return returnPlugin;
+    }
+
+    private StoragePlugin getStoragePlugin(String storagePluginName, StoragePlugin returnPlugin) {
+        for (StoragePlugin plugin : loader) {
+            logger.info("checking if Storage Plugin is correct: " + plugin.getStoragePluginName() + " :: " + storagePluginName);
+
+            if (plugin.getStoragePluginName().equals(storagePluginName)) {
+                returnPlugin = plugin;
+                break;
+            }
+        }
         return returnPlugin;
     }
 }

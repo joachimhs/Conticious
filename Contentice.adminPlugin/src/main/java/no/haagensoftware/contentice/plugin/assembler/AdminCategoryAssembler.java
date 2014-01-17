@@ -1,12 +1,8 @@
 package no.haagensoftware.contentice.plugin.assembler;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.sun.tools.javac.util.List;
-import no.haagensoftware.contentice.assembler.CategoryAssembler;
-import no.haagensoftware.contentice.assembler.SubCategoryAssembler;
 import no.haagensoftware.contentice.data.CategoryData;
 import no.haagensoftware.contentice.data.CategoryField;
 import no.haagensoftware.contentice.data.SubCategoryData;

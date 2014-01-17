@@ -3,6 +3,7 @@ package no.haagensoftware.contentice.data;
 import io.netty.channel.ChannelHandler;
 
 import java.util.Map;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,6 +17,7 @@ public class URLData {
     private String realUrl;
     private Class<? extends ChannelHandler> channelHandler;
     private Map<String, String> parameters;
+    private List<String> queryStringIds;
 
     public URLData(String urlPattern, String realUrl, Map<String, String> parameters) {
         this.urlPattern = urlPattern;
@@ -44,5 +46,13 @@ public class URLData {
 
     public Class<? extends ChannelHandler> getChannelHandler() {
         return channelHandler;
+    }
+
+    public List<String> getQueryStringIds() {
+        return queryStringIds;
+    }
+
+    public void setQueryStringIds(List<String> queryStringIds) {
+        this.queryStringIds = queryStringIds;
     }
 }
