@@ -33,7 +33,7 @@ public class RouterHandler extends ContenticeHandler {
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
-        logger.info("channelRead: HttpRequest");
+        logger.info("channelRead: HttpRequest. File handlers before: " + FileServerHandler.getOpenFileDescriptorCount());
         String url = fullHttpRequest.getUri();
         logger.info("URL: " + url);
         URLData urlData = urlResolver.getValueForUrl(url);
@@ -65,6 +65,7 @@ public class RouterHandler extends ContenticeHandler {
         }
 
         fullHttpRequest.retain();
+        logger.info("//channelRead: HttpRequest. File handlers before: " + FileServerHandler.getOpenFileDescriptorCount());
         channelHandlerContext.fireChannelRead(fullHttpRequest);
     }
 

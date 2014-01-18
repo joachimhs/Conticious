@@ -1,6 +1,7 @@
 package no.haagensoftware.contentice.handler;
 
 
+import com.sun.management.UnixOperatingSystemMXBean;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
 import no.haagensoftware.contentice.util.ContentTypeUtil;
@@ -8,6 +9,8 @@ import org.apache.log4j.Logger;
 
 import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.net.*;
 
 /**
@@ -74,9 +77,18 @@ public class FileServerHandler extends ContenticeHandler {
         return uri;
     }
 
+    public static long getOpenFileDescriptorCount() {
+        OperatingSystemMXBean osStats = ManagementFactory.getOperatingSystemMXBean();
+        if(osStats instanceof UnixOperatingSystemMXBean) {
+            return ((UnixOperatingSystemMXBean)osStats).getOpenFileDescriptorCount();
+        }
+
+        return 0;
+    }
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
-        logger.info("FileServerHandler channelRead0: " + rootPath);
+        logger.info("FileServerHandler channelRead0: " + rootPath + " File handlers before: " + FileServerHandler.getOpenFileDescriptorCount());
+
         if (!fullHttpRequest.getDecoderResult().isSuccess()) {
             sendError(channelHandlerContext, HttpResponseStatus.BAD_REQUEST);
             return;
@@ -100,6 +112,8 @@ public class FileServerHandler extends ContenticeHandler {
 
         logger.info("path: " + path);
 
+        logger.info("//FileServerHandler channelRead0: " + rootPath + " File handlers before: " + FileServerHandler.getOpenFileDescriptorCount());
+
         String fileContent = "";
         if (fromClasspath) {
             URL fileUrl = this.getClass().getResource(path);
@@ -108,8 +122,16 @@ public class FileServerHandler extends ContenticeHandler {
                 path = path + File.separatorChar + "index.html";
             }
 
-            InputStream in = this.getClass().getResourceAsStream(path);
-            fileContent = convertStreamToString(in);
+            InputStream in = null;
+            try {
+                in = this.getClass().getResourceAsStream(path);
+                fileContent = convertStreamToString(in);
+            } finally {
+                if (in != null) {
+                    in.close();
+                }
+            }
+
             writeContentsToBuffer(channelHandlerContext, fileContent.toString(), ContentTypeUtil.getContentType(path));
         } else {
             File file = new File(this.rootPath + path);
@@ -119,9 +141,6 @@ public class FileServerHandler extends ContenticeHandler {
             logger.info(this.rootPath + path);
             writeFileToBuffer(channelHandlerContext, this.rootPath + path, ContentTypeUtil.getContentType(path));
         }
-
-
-
     }
 
     @Override

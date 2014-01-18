@@ -51,8 +51,6 @@ public class StoragePluginService {
 
     private StoragePlugin getStoragePlugin(String storagePluginName, StoragePlugin returnPlugin) {
         for (StoragePlugin plugin : loader) {
-            logger.info("checking if Storage Plugin is correct: " + plugin.getStoragePluginName() + " :: " + storagePluginName);
-
             if (plugin.getStoragePluginName().equals(storagePluginName)) {
                 returnPlugin = plugin;
                 break;

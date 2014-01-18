@@ -184,7 +184,13 @@ public abstract class ContenticeHandler extends SimpleChannelInboundHandler<Full
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
-
+        /*if (raf != null) {
+            try {
+                raf.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }*/
 
         // Write the end marker
         ChannelFuture lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);

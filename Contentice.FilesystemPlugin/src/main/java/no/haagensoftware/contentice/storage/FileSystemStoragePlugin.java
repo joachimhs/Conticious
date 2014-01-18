@@ -140,7 +140,17 @@ public class FileSystemStoragePlugin extends StoragePlugin {
                 jsonWriter.flush();
             } catch (IOException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } finally {
+                if (jsonWriter != null) {
+                    try {
+                        jsonWriter.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
+
+
         }
     }
 
@@ -248,15 +258,23 @@ public class FileSystemStoragePlugin extends StoragePlugin {
         String returnString = null;
         File file = new File(path);
         if (file.exists() && file.isFile()) {
-            BufferedReader fileBufferedReader = Files.newBufferedReader((FileSystems.getDefault().getPath(path)), Charset.forName("utf-8"));
-            StringBuffer sb = new StringBuffer();
-            String line = null;
-            while ((line = fileBufferedReader.readLine()) != null) {
-                sb.append(line).append("\n");
-            }
+            BufferedReader fileBufferedReader = null;
+            try {
+                fileBufferedReader = Files.newBufferedReader((FileSystems.getDefault().getPath(path)), Charset.forName("utf-8"));
 
-            if (sb.length() > 0) {
-                returnString = sb.toString();
+                StringBuffer sb = new StringBuffer();
+                String line = null;
+                while ((line = fileBufferedReader.readLine()) != null) {
+                    sb.append(line).append("\n");
+                }
+
+                if (sb.length() > 0) {
+                    returnString = sb.toString();
+                }
+            } finally {
+                if (fileBufferedReader != null) {
+                    fileBufferedReader.close();
+                }
             }
         }
 

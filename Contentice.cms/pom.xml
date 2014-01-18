@@ -35,18 +35,18 @@
     <dependencies>
         <dependency>
             <groupId>no.haagensoftware</groupId>
-            <artifactId>contentice-api</artifactId>
+            <artifactId>kontize-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>no.haagensoftware</groupId>
-            <artifactId>contentice-filesystem-plugin</artifactId>
+            <artifactId>kontize-filesystem-plugin</artifactId>
             <version>${project.version}</version>
 
         </dependency>
         <dependency>
             <groupId>no.haagensoftware</groupId>
-            <artifactId>contentice-admin-plugin</artifactId>
+            <artifactId>kontize-admin-plugin</artifactId>
             <version>${project.version}</version>
 
         </dependency>
