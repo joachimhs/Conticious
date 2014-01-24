@@ -7,6 +7,7 @@ import io.netty.handler.codec.http.*;
 import io.netty.handler.stream.ChunkedFile;
 import io.netty.util.CharsetUtil;
 import no.haagensoftware.contentice.spi.StoragePlugin;
+import no.haagensoftware.contentice.util.URLResolver;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -32,6 +33,8 @@ public abstract class ContenticeHandler extends SimpleChannelInboundHandler<Full
     private static final Logger logger = Logger.getLogger(ContenticeHandler.class.getName());
     private Map<String, String> parameterMap;
     private List<String> queryStringIds;
+    private URLResolver urlResolver;
+
     private StoragePlugin storage;
 
     @Override
@@ -58,6 +61,16 @@ public abstract class ContenticeHandler extends SimpleChannelInboundHandler<Full
     @Override
     public void setQueryStringIds(List<String> queryStringids) {
         this.queryStringIds = queryStringids;
+    }
+
+    @Override
+    public void setUrlResolver(URLResolver urlResolver) {
+        this.urlResolver = urlResolver;
+    }
+
+    @Override
+    public URLResolver getUrlResolver() {
+        return this.urlResolver;
     }
 
     public void setStorage(StoragePlugin storage) {

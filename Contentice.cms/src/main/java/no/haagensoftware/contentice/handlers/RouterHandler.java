@@ -60,6 +60,7 @@ public class RouterHandler extends ContenticeHandler {
                 ((ContenticeHandler)handler).setParameterMap(urlData.getParameters());
                 ((ContenticeHandler)handler).setQueryStringIds(urlData.getQueryStringIds());
                 ((ContenticeHandler)handler).setStorage(storage);
+                ((ContenticeHandler)handler).setUrlResolver(urlResolver);
             }
             addOrReplaceHandler(channelHandlerContext, handler, "route-generated", fullHttpRequest);
         }

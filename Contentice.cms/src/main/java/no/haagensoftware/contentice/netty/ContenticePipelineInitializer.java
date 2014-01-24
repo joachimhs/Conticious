@@ -9,6 +9,7 @@ import io.netty.handler.codec.http.HttpResponseEncoder;
 
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.stream.ChunkedWriteHandler;
+import no.haagensoftware.contentice.handler.DataHandler;
 import no.haagensoftware.contentice.handler.FileServerHandler;
 import no.haagensoftware.contentice.handlers.*;
 import no.haagensoftware.contentice.plugin.RouterPluginService;
@@ -18,10 +19,8 @@ import no.haagensoftware.contentice.util.URLResolver;
 import no.kodegenet.handlers.ChaptersHandler;
 import no.kodegenet.handlers.CoursesHandler;
 import no.kodegenet.handlers.OppgaverHandler;
-import no.teknologihuset.handlers.PageHandler;
-import no.teknologihuset.handlers.RoomWeekHandler;
-import no.teknologihuset.handlers.RoomHandler;
-import no.teknologihuset.handlers.WeekHandler;
+import no.kodegenet.handlers.RevealHandler;
+import no.teknologihuset.handlers.*;
 import org.apache.log4j.Logger;
 
 /**
@@ -44,12 +43,15 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
         this.urlResolver.addUrlPattern("/json/categories/{category}/subcategories", SubCategoriesHandler.class);
         this.urlResolver.addUrlPattern("/json/categories/{category}/subcategories/{subcategory}", SubCategoryHandler.class);
 
+        this.urlResolver.addUrlPattern("/json/data/{category}", DataHandler.class);
+        this.urlResolver.addUrlPattern("/json/data/{category}/{subcategory}", DataHandler.class);
 
         this.urlResolver.addUrlPattern("/json/rooms", RoomHandler.class);
         this.urlResolver.addUrlPattern("/json/week/{week}", WeekHandler.class);
         this.urlResolver.addUrlPattern("/json/weeks/{week}", WeekHandler.class);
         this.urlResolver.addUrlPattern("/json/roomWeeks", RoomWeekHandler.class);
         this.urlResolver.addUrlPattern("/json/roomWeeks/{roomName}", RoomWeekHandler.class);
+        this.urlResolver.addUrlPattern("/json/bookingInquiries", BookingInquiriesHandler.class);
 
         this.urlResolver.addUrlPattern("/json/pages", PageHandler.class);
         this.urlResolver.addUrlPattern("/json/courses", CoursesHandler.class);
@@ -58,6 +60,11 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
         this.urlResolver.addUrlPattern("/json/oppgaver", OppgaverHandler.class);
         this.urlResolver.addUrlPattern("/json/oppgaver/{oppgave}", OppgaverHandler.class);
 
+
+        this.urlResolver.addUrlPattern("/reveal.html", RevealHandler.class);
+
+
+        this.urlResolver.addPlural("oppgave", "oppgaver");
         //Load plugins and add URLs to urlResolver
     }
 

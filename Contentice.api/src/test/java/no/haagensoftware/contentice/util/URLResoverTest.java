@@ -29,6 +29,8 @@ public class URLResoverTest {
         resolver.addUrlPattern("/categories/{category}", channelHandler2);
         resolver.addUrlPattern("/categories/{category}/subcategories", channelHandler3);
         resolver.addUrlPattern("/categories/{category}/subcategories/{subcategory}", channelHandler4);
+        resolver.addUrlPattern("/json/data/{category}", channelHandler4);
+        resolver.addUrlPattern("/json/data/{category}/{subcategory}", channelHandler4);
         resolver.addUrlPattern("classpath:/admin", channelHandler5);
     }
     @Test
@@ -51,6 +53,16 @@ public class URLResoverTest {
     }
 
     @Test
+    public void verifyUrlWithOneParameterWithoutUrlIndex() {
+        URLData urlData = resolver.getValueForUrl("/json/data/pages");
+        Assert.assertNotNull(urlData);
+
+        Assert.assertEquals("/json/data/{category}", urlData.getUrlPattern());
+        Assert.assertEquals("pages", urlData.getParameters().get("category"));
+        Assert.assertEquals(channelHandler4, urlData.getChannelHandler());
+    }
+
+    @Test
     public void verifyUrlWithMultipleParameters() {
         URLData urlData = resolver.getValueForUrl("/categories/pages/subcategories");
         Assert.assertNotNull(urlData);
@@ -65,6 +77,17 @@ public class URLResoverTest {
         Assert.assertEquals("/categories/{category}/subcategories/{subcategory}", urlData.getUrlPattern());
         Assert.assertEquals("pages", urlData.getParameters().get("category"));
         Assert.assertEquals("home", urlData.getParameters().get("subcategory"));
+        Assert.assertEquals(channelHandler4, urlData.getChannelHandler());
+    }
+
+    @Test
+    public void verifyUrlWithMultipleParametersWihtoutUrlIndex() {
+        URLData urlData = resolver.getValueForUrl("/json/data/pages/pageOne");
+        Assert.assertNotNull(urlData);
+
+        Assert.assertEquals("/json/data/{category}/{subcategory}", urlData.getUrlPattern());
+        Assert.assertEquals("pages", urlData.getParameters().get("category"));
+        Assert.assertEquals("pageOne", urlData.getParameters().get("subcategory"));
         Assert.assertEquals(channelHandler4, urlData.getChannelHandler());
     }
 

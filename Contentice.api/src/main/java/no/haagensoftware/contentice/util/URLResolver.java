@@ -17,13 +17,54 @@ import java.util.List;
  */
 public class URLResolver {
     private Map<String, Class<? extends ChannelHandler>> urlMap;
+    private Map<String, String> plurals;
+    private Map<String, String> singulars;
 
     public URLResolver() {
         urlMap = new HashMap<>();
+        plurals = new HashMap<>();
+        singulars = new HashMap<>();
     }
 
     public void addUrlPattern(String urlPattern, Class<? extends ChannelHandler> channelHandler) {
         urlMap.put(urlPattern, channelHandler);
+    }
+
+    public void addPlural(String singular, String plural) {
+        plurals.put(singular, plural);
+        singulars.put(plural, singular);
+    }
+
+    public String getPluralFor(String singular) {
+        String plural = plurals.get(singular);
+
+        if (plural == null && singulars.get(singular) != null) {
+            plural = singular;
+        }
+
+        if (plural == null) {
+            plural = singular;
+
+            if (!plural.endsWith("s")) {
+                plural = plural + "s";
+            }
+        }
+
+        return plural;
+    }
+
+    public String getSingularFor(String plural) {
+        String singular = singulars.get(plural);
+
+        if (singular == null) {
+            singular = plural;
+
+            if (singular.endsWith("s")) {
+                singular = singular.substring(0, singular.length()-1);
+            }
+        }
+
+        return singular;
     }
 
     public URLData getValueForUrl(String url) {
