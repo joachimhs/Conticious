@@ -35,7 +35,7 @@ public class DataAssembler {
             subCategoryObject.addProperty("id", subCategoryData.getId());
             subCategoryObject.addProperty("name", subCategoryData.getName());
             subCategoryObject.addProperty("category", category);
-            //subCategoryObject.addProperty("content", subCategoryData.getContent());
+            subCategoryObject.addProperty("content", subCategoryData.getContent());
 
             for (String key : subCategoryData.getKeyMap().keySet()) {
                 subCategoryObject.add(key, subCategoryData.getKeyMap().get(key));
