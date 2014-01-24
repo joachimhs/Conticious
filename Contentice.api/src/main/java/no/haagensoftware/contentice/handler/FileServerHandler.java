@@ -135,11 +135,16 @@ public class FileServerHandler extends ContenticeHandler {
             writeContentsToBuffer(channelHandlerContext, fileContent.toString(), ContentTypeUtil.getContentType(path));
         } else {
             File file = new File(this.rootPath + path);
-            if (file.isDirectory()) {
-                path = path + File.separatorChar + "index.html";
+            if (!file.exists()) {
+                path = rootPath + File.separatorChar + "index.html";
+            } else if (file.isDirectory()) {
+                path = this.rootPath + path + File.separatorChar + "index.html";
+            } else {
+                path = this.rootPath + path;
             }
-            logger.info(this.rootPath + path);
-            writeFileToBuffer(channelHandlerContext, this.rootPath + path, ContentTypeUtil.getContentType(path));
+
+            logger.info(path);
+            writeFileToBuffer(channelHandlerContext, path, ContentTypeUtil.getContentType(path));
         }
     }
 
