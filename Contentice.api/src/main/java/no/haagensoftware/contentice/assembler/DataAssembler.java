@@ -32,7 +32,7 @@ public class DataAssembler {
     private static JsonObject buildJson(SubCategoryData subCategoryData, String category) {
         JsonObject subCategoryObject = new JsonObject();
         if (subCategoryData != null) {
-            subCategoryObject.addProperty("id", subCategoryData.getId());
+            subCategoryObject.addProperty("id", subCategoryData.getName());
             subCategoryObject.addProperty("name", subCategoryData.getName());
             subCategoryObject.addProperty("category", category);
             subCategoryObject.addProperty("content", subCategoryData.getContent());
