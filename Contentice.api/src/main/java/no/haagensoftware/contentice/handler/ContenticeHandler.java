@@ -85,6 +85,15 @@ public abstract class ContenticeHandler extends SimpleChannelInboundHandler<Full
         return fullHttpRequest.getUri();
     }
 
+    public String getContentType(FullHttpRequest fullHttpRequest) {
+        String contentType = null;
+
+        HttpHeaders httpHeaders = fullHttpRequest.headers();
+        contentType = httpHeaders.get("Content-Type");
+
+        return contentType;
+    }
+
     public String getCookieValue(FullHttpRequest fullHttpRequest, String cookieName) {
         String cookieValue = null;
 

@@ -57,4 +57,29 @@ public class SubCategoryData {
     public void setKeyMap(Map<String, JsonElement> keyMap) {
         this.keyMap = keyMap;
     }
+
+    public String getValueForKey(String key) {
+        String value = null;
+
+        JsonElement element = getKeyMap().get(key);
+
+        if (element != null) {
+            value = element.getAsString();
+        }
+
+        return value;
+    }
+
+    public Long getLongValueForKey(String key) {
+        String valueString = getValueForKey(key);
+        Long value = null;
+
+        try {
+            value = Long.parseLong(valueString);
+        } catch (NumberFormatException nfe) {
+            //Nothing to do, really
+        }
+
+        return value;
+    }
 }
