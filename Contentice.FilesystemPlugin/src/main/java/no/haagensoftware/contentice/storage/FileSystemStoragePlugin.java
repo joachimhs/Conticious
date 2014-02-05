@@ -217,7 +217,6 @@ public class FileSystemStoragePlugin extends StoragePlugin {
     }
 
     private Map<String, JsonElement> buildKeysMapFromJsonObject(String jsonContent) {
-        logger.info("Building Keymap for Json: " + jsonContent);
         Map<String, JsonElement> keysMap = new HashMap<>();
 
         if (jsonContent != null) {
@@ -243,7 +242,6 @@ public class FileSystemStoragePlugin extends StoragePlugin {
 
     private void extractJsonObject(Map<String, JsonElement> keysMap, JsonElement jsonElement) {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
-        logger.info(jsonObject.toString());
         Set<Map.Entry<String, JsonElement>> entrySet = jsonObject.entrySet();
         for (Map.Entry<String, JsonElement> entry : entrySet) {
             if (entry.getValue().isJsonArray()) {

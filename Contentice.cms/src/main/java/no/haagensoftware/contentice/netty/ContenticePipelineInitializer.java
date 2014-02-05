@@ -20,7 +20,6 @@ import no.kodegenet.handlers.ChaptersHandler;
 import no.kodegenet.handlers.CoursesHandler;
 import no.kodegenet.handlers.OppgaverHandler;
 import no.kodegenet.handlers.RevealHandler;
-import no.teknologihuset.handlers.*;
 import org.apache.log4j.Logger;
 
 /**
@@ -46,14 +45,6 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
         this.urlResolver.addUrlPattern("/json/data/{category}", DataHandler.class);
         this.urlResolver.addUrlPattern("/json/data/{category}/{subcategory}", DataHandler.class);
 
-        this.urlResolver.addUrlPattern("/json/rooms", RoomHandler.class);
-        this.urlResolver.addUrlPattern("/json/week/{week}", WeekHandler.class);
-        this.urlResolver.addUrlPattern("/json/weeks/{week}", WeekHandler.class);
-        this.urlResolver.addUrlPattern("/json/roomWeeks", RoomWeekHandler.class);
-        this.urlResolver.addUrlPattern("/json/roomWeeks/{roomName}", RoomWeekHandler.class);
-        this.urlResolver.addUrlPattern("/json/bookingInquiries", BookingInquiriesHandler.class);
-
-        this.urlResolver.addUrlPattern("/json/pages", PageHandler.class);
         this.urlResolver.addUrlPattern("/json/courses", CoursesHandler.class);
         this.urlResolver.addUrlPattern("/json/chapters", ChaptersHandler.class);
         this.urlResolver.addUrlPattern("/json/chapters/{chapter}", ChaptersHandler.class);
@@ -79,7 +70,7 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
         //p.addLast("ssl", new SslHandler(engine));
 
         pipeline.addLast("decoder", new HttpRequestDecoder());
-        pipeline.addLast("aggregator", new HttpObjectAggregator(1048576));
+        pipeline.addLast("aggregator", new HttpObjectAggregator(2097152));
         pipeline.addLast("encoder", new HttpResponseEncoder());
         //pipeline.addLast("deflater", new HttpContentCompressor(1));
         pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());

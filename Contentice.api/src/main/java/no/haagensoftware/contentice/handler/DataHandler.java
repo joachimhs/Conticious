@@ -22,38 +22,40 @@ public class DataHandler extends ContenticeHandler {
         String category = getParameter("category");
         String subcategory = getParameter("subcategory");
 
+        if (category != null && category.equals("pages")) {
+            List<String> ids = getQueryStringIds();
 
-        List<String> ids = getQueryStringIds();
+            if (isGet(fullHttpRequest) && category != null && subcategory == null && ids.size() == 0) {
+                //Get all subcategories for category
 
-        if (isGet(fullHttpRequest) && category != null && subcategory == null && ids.size() == 0) {
-            //Get all subcategories for category
+                String categoryName = getUrlResolver().getPluralFor(category);
 
-            String categoryName = getUrlResolver().getPluralFor(category);
+                List<SubCategoryData> subCategoryDataList = getStorage().getSubCategories(category);
+                jsonReturn = DataAssembler.buildJsonFromSubCategoryData(categoryName, subCategoryDataList.toArray(new SubCategoryData[subCategoryDataList.size()])).toString();
+            } else if (isGet(fullHttpRequest) && category != null && subcategory == null && ids.size() > 0) {
+                //Get subcategories with ids for category
 
-            List<SubCategoryData> subCategoryDataList = getStorage().getSubCategories(category);
-            jsonReturn = DataAssembler.buildJsonFromSubCategoryData(categoryName, subCategoryDataList.toArray(new SubCategoryData[subCategoryDataList.size()])).toString();
-        } else if (isGet(fullHttpRequest) && category != null && subcategory == null && ids.size() > 0) {
-            //Get subcategories with ids for category
+                List<SubCategoryData> subCategoryDataList = new ArrayList<>();
+                for (String id : ids) {
+                    SubCategoryData subCategoryData = getStorage().getSubCategory(category, id);
+                    if (subCategoryData != null) {
+                        subCategoryDataList.add(subCategoryData);
+                    }
+                }
+                String categoryName = getUrlResolver().getPluralFor(category);
+                jsonReturn = DataAssembler.buildJsonFromSubCategoryData(categoryName, subCategoryDataList.toArray(new SubCategoryData[subCategoryDataList.size()])).toString();
+            } else if (isGet(fullHttpRequest) && category != null && subcategory != null) {
+                //get a single subcategory
 
-            List<SubCategoryData> subCategoryDataList = new ArrayList<>();
-            for (String id : ids) {
-                SubCategoryData subCategoryData = getStorage().getSubCategory(category, id);
+                String categoryName = getUrlResolver().getSingularFor(category);
+
+                SubCategoryData subCategoryData = getStorage().getSubCategory(category, subcategory);
                 if (subCategoryData != null) {
-                    subCategoryDataList.add(subCategoryData);
+                    jsonReturn = DataAssembler.buildJsonFromSubCategoryData(categoryName, subCategoryData).toString();
                 }
             }
-            String categoryName = getUrlResolver().getPluralFor(category);
-            jsonReturn = DataAssembler.buildJsonFromSubCategoryData(categoryName, subCategoryDataList.toArray(new SubCategoryData[subCategoryDataList.size()])).toString();
-        } else if (isGet(fullHttpRequest) && category != null && subcategory != null) {
-            //get a single subcategory
-
-            String categoryName = getUrlResolver().getSingularFor(category);
-
-            SubCategoryData subCategoryData = getStorage().getSubCategory(category, subcategory);
-            if (subCategoryData != null) {
-                jsonReturn = DataAssembler.buildJsonFromSubCategoryData(categoryName, subCategoryData).toString();
-            }
         }
+
 
         writeContentsToBuffer(channelHandlerContext, jsonReturn, "application/json; charset=UTF-8");
     }

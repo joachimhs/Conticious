@@ -143,6 +143,16 @@ public abstract class ContenticeHandler extends SimpleChannelInboundHandler<Full
         return requestContent;
     }
 
+    public void storeContentAsPng(FullHttpRequest fullHttpRequest) throws IOException {
+        ByteBuf content = fullHttpRequest.content();
+
+        FileOutputStream out = new FileOutputStream(new File("/Users/jhsmbp/Projects/TeknologihusetWeb/site/uploads/test.png"));
+
+        if (content.isReadable()) {
+            content.readBytes(out, content.readableBytes());
+        }
+    }
+
     public void handleIncomingRequest(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
 
     }
