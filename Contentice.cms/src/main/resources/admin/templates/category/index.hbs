@@ -1,4 +1,3 @@
-
 {{#if showNewField}}
     {{#if showNewFieldArea}}
         <table class="table">
@@ -64,3 +63,20 @@
         </tr>
     {{/each}}
 </table>
+
+<h1>Category Settings</h1>
+
+{{controllers.category.public}} -
+<table class="table">
+    <tr>
+        <th>Settings Name</th>
+        <th>Settings Value</th>
+    </tr>
+    <tr>
+        <td>Public</td>
+        <td>{{view Ember.Checkbox checkedBinding="controllers.category.isPublic"}}</td>
+    </tr>
+</table>
+{{#if controllers.category.isDirty}}
+    <button class="btn btn-primary" {{action "saveCategory" controllers.category}}>Save Category Settings</button>
+{{/if}}

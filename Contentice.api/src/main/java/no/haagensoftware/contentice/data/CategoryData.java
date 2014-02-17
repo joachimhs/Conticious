@@ -16,8 +16,9 @@ import java.util.Map;
  */
 public class CategoryData {
     private String id;
-    private List<SubCategoryData> subCategories = new ArrayList<>();
+    private List<SubCategoryData> subcategories = new ArrayList<>();
     private List<CategoryField> defaultFields = new ArrayList<>();
+    private boolean isPublic = false;
 
     public CategoryData() {
 
@@ -35,12 +36,12 @@ public class CategoryData {
         this.id = id;
     }
 
-    public List<SubCategoryData> getSubCategories() {
-        return subCategories;
+    public List<SubCategoryData> getSubcategories() {
+        return subcategories;
     }
 
-    public void addSubCategory(SubCategoryData subCategoryData) {
-        subCategories.add(subCategoryData);
+    public void addSubcategory(SubCategoryData subcategoryData) {
+        subcategories.add(subcategoryData);
     }
 
     public List<CategoryField> getDefaultFields() {
@@ -49,5 +50,13 @@ public class CategoryData {
 
     public void setDefaultFields(List<CategoryField> defaultFields) {
         this.defaultFields = defaultFields;
+    }
+
+    public boolean isPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(boolean isPublic) {
+        this.isPublic = isPublic;
     }
 }

@@ -47,10 +47,9 @@ public class AdminCategoriesHandler extends ContenticeHandler {
 
                 getStorage().setCategory(adminCategory.getCategory().getId(), adminCategory.getCategory());
             }
-
         }
 
-        //Alwasy return the updated categories
+        //Always return the updated categories
         JsonArray categoryArray = new JsonArray();
         JsonArray subCategoriesArray = new JsonArray();
         JsonArray defaultFieldsArray = new JsonArray();
@@ -58,7 +57,7 @@ public class AdminCategoriesHandler extends ContenticeHandler {
 
         for (CategoryData category : categories) {
             for (SubCategoryData subcategoryData : getStorage().getSubCategories(category.getId())) {
-                category.addSubCategory(subcategoryData);
+                category.addSubcategory(subcategoryData);
                 subCategoriesArray.add(AdminSubCategoryAssembler.buildAdminJsonFromSubCategoryData(subcategoryData, category));
 
                 for (CategoryField cf : category.getDefaultFields()) {

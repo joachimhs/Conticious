@@ -87,6 +87,17 @@ public class FileSystemStoragePlugin extends StoragePlugin {
                             categoryData.setDefaultFields(defaultFields);
                         }
                     }
+
+                    String settingsJson = getFileContents(documentsDirectory + File.separatorChar + p.getFileName() + "_settings.json");
+                    if (settingsJson != null) {
+                        JsonElement jsonElement = new JsonParser().parse(settingsJson);
+                        boolean isPublic = false;
+                        if (jsonElement.isJsonObject() && jsonElement.getAsJsonObject().has("isPublic")) {
+                             isPublic = jsonElement.getAsJsonObject().get("isPublic").getAsBoolean();
+                        }
+
+                        categoryData.setPublic(isPublic);
+                    }
                     categories.add(categoryData);
                 }
             }
@@ -126,6 +137,7 @@ public class FileSystemStoragePlugin extends StoragePlugin {
 
         if (Files.exists(path)) {
             Path jsonPath = FileSystems.getDefault().getPath(documentsDirectory + File.separatorChar + category + ".json");
+            Path settingsJsonPath = FileSystems.getDefault().getPath(documentsDirectory + File.separatorChar + category + "_settings.json");
 
             JsonArray fieldArray = new JsonArray();
             for (CategoryField cf : categoryData.getDefaultFields()) {
@@ -133,24 +145,31 @@ public class FileSystemStoragePlugin extends StoragePlugin {
             }
             String jsonContent =  fieldArray.toString();
 
-            BufferedWriter jsonWriter = null;
-            try {
-                jsonWriter = Files.newBufferedWriter(jsonPath, Charset.forName("utf-8"));
-                jsonWriter.write(jsonContent, 0, jsonContent.length());
-                jsonWriter.flush();
-            } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            } finally {
-                if (jsonWriter != null) {
-                    try {
-                        jsonWriter.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+            writeJsonToFile(jsonPath, jsonContent);
+
+            JsonObject settingsObject = new JsonObject();
+            settingsObject.addProperty("isPublic", categoryData.isPublic());
+
+            writeJsonToFile(settingsJsonPath, settingsObject.toString());
+        }
+    }
+
+    private void writeJsonToFile(Path jsonPath, String jsonContent) {
+        BufferedWriter jsonWriter = null;
+        try {
+            jsonWriter = Files.newBufferedWriter(jsonPath, Charset.forName("utf-8"));
+            jsonWriter.write(jsonContent, 0, jsonContent.length());
+            jsonWriter.flush();
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } finally {
+            if (jsonWriter != null) {
+                try {
+                    jsonWriter.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
-
-
         }
     }
 

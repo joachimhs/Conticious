@@ -219,6 +219,12 @@ Contentice.CategoryIndexController = Ember.Controller.extend({
         deleteCategoryField: function(categoryField) {
             categoryField.deleteRecord();
             categoryField.save();
+        },
+
+        saveCategory: function(category) {
+            if (category.get('isDirty')) {
+                category.save();
+            }
         }
     },
 
@@ -279,7 +285,8 @@ Contentice.SubcategoryRoute = Ember.Route.extend({
 
 Contentice.Category = DS.Model.extend({
     subcategories: DS.hasMany('subcategory'),
-    defaultFields: DS.hasMany('categoryField')
+    defaultFields: DS.hasMany('categoryField'),
+    isPublic: DS.attr('boolean')
 });
 
 Contentice.CategoryField = DS.Model.extend({

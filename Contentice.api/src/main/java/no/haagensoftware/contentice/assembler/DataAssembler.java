@@ -9,9 +9,9 @@ import no.haagensoftware.contentice.data.SubCategoryData;
  */
 public class DataAssembler {
 
-    public static JsonObject buildJsonFromSubCategoryData(String categoryName, SubCategoryData ... subCategoryDataList) {
+    public static JsonObject buildJsonFromSubCategoryData(String categoryName, boolean forceArray, SubCategoryData ... subCategoryDataList) {
         JsonObject topLevelObject = new JsonObject();
-        if (subCategoryDataList.length > 1) {
+        if (subCategoryDataList.length > 1 || forceArray) {
             JsonArray subCategoryArray = new JsonArray();
 
             for (SubCategoryData subCategoryData : subCategoryDataList) {

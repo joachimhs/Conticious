@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.util.CharsetUtil;
 import no.haagensoftware.contentice.assembler.CategoryAssembler;
 import no.haagensoftware.contentice.data.CategoryData;
 import no.haagensoftware.contentice.data.CategoryField;
@@ -12,6 +13,8 @@ import no.haagensoftware.contentice.data.SubCategoryData;
 import no.haagensoftware.contentice.data.SubcategoryField;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
 import no.haagensoftware.contentice.handler.ContenticeParameterMap;
+import no.haagensoftware.contentice.plugin.admindata.AdminCategoryObject;
+import no.haagensoftware.contentice.plugin.admindata.AdminCategoryObjectWithIds;
 import no.haagensoftware.contentice.plugin.assembler.AdminCategoryAssembler;
 import no.haagensoftware.contentice.plugin.assembler.AdminSubCategoryAssembler;
 import org.apache.log4j.Logger;
@@ -40,48 +43,67 @@ public class AdminCategoryHandler extends ContenticeHandler  {
 
         } else if (isPut(fullHttpRequest) && category != null) {
             logger.info("PUTTING CATEGORY: " + category);
-            logger.info(getHttpMessageContent(fullHttpRequest));
+            String messageContent = getHttpMessageContent(fullHttpRequest);
+            logger.info(messageContent);
+
+            AdminCategoryObjectWithIds adminCategory = new Gson().fromJson(messageContent, AdminCategoryObjectWithIds.class);
+            CategoryData storedCategory = getStorage().getCategory(category);
+
+            if (adminCategory != null && adminCategory.getCategory() != null && storedCategory != null) {
+                logger.info("Category: " + adminCategory.getCategory().getId());
+
+                storedCategory.setPublic(adminCategory.getCategory().isPublic());
+
+                getStorage().setCategory(storedCategory.getId(), storedCategory);
+            }
+
+            JsonObject topLevelObject = convertCategoryToJson(storedCategory);
+            writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json; charset=UTF-8");
 
         } else if (isGet(fullHttpRequest)) {
             if (categoryData == null) {
                 write404ToBuffer(channelHandlerContext);
             } else {
-                JsonObject topLevelObject = new JsonObject();
-
-
-                JsonArray subCategoriesArray = new JsonArray();
-                JsonArray defaultFieldsArray = new JsonArray();
-                JsonArray subcategoryFieldArray= new JsonArray();
-
-                for (SubCategoryData subcategoryData : getStorage().getSubCategories(categoryData.getId())) {
-                    categoryData.addSubCategory(subcategoryData);
-                    subCategoriesArray.add(AdminSubCategoryAssembler.buildAdminJsonFromSubCategoryData(subcategoryData, categoryData));
-
-                    for (CategoryField cf : categoryData.getDefaultFields()) {
-                        SubcategoryField subField = new SubcategoryField();
-                        subField.setId(categoryData.getId() + "_" + cf.getName());
-                        subField.setRequired(cf.getRequired());
-                        subField.setType(cf.getType());
-                        subField.setName(cf.getName());
-                        if (subcategoryData.getKeyMap().get(cf.getName()) != null) {
-                            subField.setValue(subcategoryData.getKeyMap().get(cf.getName()).getAsString());
-                        }
-
-                        subcategoryFieldArray.add(new Gson().toJsonTree(subField));
-                    }
-                }
-
-                topLevelObject.add("category", AdminCategoryAssembler.buildAdminCategoryJson(categoryData));
-
-                for (CategoryField field : categoryData.getDefaultFields()) {
-                    defaultFieldsArray.add(new Gson().toJsonTree(field));
-                }
-
-                topLevelObject.add("subcategories", subCategoriesArray);
-                topLevelObject.add("categoryFields", defaultFieldsArray);
-                topLevelObject.add("subcategoryFields", subcategoryFieldArray);
+                JsonObject topLevelObject = convertCategoryToJson(categoryData);
                 writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json; charset=UTF-8");
             }
         }
+    }
+
+    private JsonObject convertCategoryToJson(CategoryData categoryData) {
+        JsonObject topLevelObject = new JsonObject();
+
+        JsonArray subCategoriesArray = new JsonArray();
+        JsonArray defaultFieldsArray = new JsonArray();
+        JsonArray subcategoryFieldArray= new JsonArray();
+
+        for (SubCategoryData subcategoryData : getStorage().getSubCategories(categoryData.getId())) {
+            categoryData.addSubcategory(subcategoryData);
+            subCategoriesArray.add(AdminSubCategoryAssembler.buildAdminJsonFromSubCategoryData(subcategoryData, categoryData));
+
+            for (CategoryField cf : categoryData.getDefaultFields()) {
+                SubcategoryField subField = new SubcategoryField();
+                subField.setId(categoryData.getId() + "_" + cf.getName());
+                subField.setRequired(cf.getRequired());
+                subField.setType(cf.getType());
+                subField.setName(cf.getName());
+                if (subcategoryData.getKeyMap().get(cf.getName()) != null) {
+                    subField.setValue(subcategoryData.getKeyMap().get(cf.getName()).getAsString());
+                }
+
+                subcategoryFieldArray.add(new Gson().toJsonTree(subField));
+            }
+        }
+
+        topLevelObject.add("category", AdminCategoryAssembler.buildAdminCategoryJson(categoryData));
+
+        for (CategoryField field : categoryData.getDefaultFields()) {
+            defaultFieldsArray.add(new Gson().toJsonTree(field));
+        }
+
+        topLevelObject.add("subcategories", subCategoriesArray);
+        topLevelObject.add("categoryFields", defaultFieldsArray);
+        topLevelObject.add("subcategoryFields", subcategoryFieldArray);
+        return topLevelObject;
     }
 }

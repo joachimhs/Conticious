@@ -6,6 +6,7 @@ import no.haagensoftware.contentice.spi.RouterPlugin;
 import org.apache.log4j.Logger;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -49,5 +50,10 @@ public class AdminRoutesPlugin extends RouterPlugin {
     @Override
     public Class<? extends ChannelHandler> getHandlerForRoute(String route) {
         return routeMap.get(route);
+    }
+
+    @Override
+    public Map<String, String> getPlurals() {
+        return null;
     }
 }

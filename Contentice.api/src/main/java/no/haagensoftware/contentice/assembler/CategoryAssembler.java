@@ -18,7 +18,7 @@ public class CategoryAssembler {
         categoryObject.addProperty("id", categoryData.getId());
 
         JsonArray subCategories = new JsonArray();
-        for (SubCategoryData subCategoryData : categoryData.getSubCategories()) {
+        for (SubCategoryData subCategoryData : categoryData.getSubcategories()) {
             subCategories.add(new JsonPrimitive(subCategoryData.getId()));
         }
         categoryObject.add("subcategories", subCategories);

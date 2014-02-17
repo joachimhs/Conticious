@@ -21,7 +21,7 @@ public class AdminCategoryAssembler {
         categoryObject.addProperty("id", categoryData.getId());
 
         JsonArray subCategoriesArray = new JsonArray();
-        for (SubCategoryData subCategoryData : categoryData.getSubCategories()) {
+        for (SubCategoryData subCategoryData : categoryData.getSubcategories()) {
             subCategoriesArray.add(new JsonPrimitive(subCategoryData.getId()));
         }
         categoryObject.add("subcategories", subCategoriesArray);
@@ -32,6 +32,8 @@ public class AdminCategoryAssembler {
         }
 
         categoryObject.add("defaultFields", defaultFields);
+
+        categoryObject.addProperty("isPublic", categoryData.isPublic());
         return categoryObject;
     }
 }

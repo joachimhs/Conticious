@@ -34,7 +34,7 @@ public class CategoryHandler extends ContenticeHandler {
             JsonObject topLevelObject = new JsonObject();
 
             List<SubCategoryData> subcategories = getStorage().getSubCategories(categoryData.getId());
-            categoryData.getSubCategories().addAll(subcategories);
+            categoryData.getSubcategories().addAll(subcategories);
             topLevelObject.add("category", CategoryAssembler.buildCategoryJsonFromCategoryData(categoryData));
 
             writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json; charset=UTF-8");

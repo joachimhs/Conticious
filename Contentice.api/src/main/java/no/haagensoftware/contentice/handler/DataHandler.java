@@ -1,10 +1,9 @@
 package no.haagensoftware.contentice.handler;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import no.haagensoftware.contentice.assembler.DataAssembler;
+import no.haagensoftware.contentice.data.CategoryData;
 import no.haagensoftware.contentice.data.SubCategoryData;
 
 import java.util.ArrayList;
@@ -22,17 +21,19 @@ public class DataHandler extends ContenticeHandler {
         String category = getParameter("category");
         String subcategory = getParameter("subcategory");
 
-        if (category != null && category.equals("pages")) {
+        if (category != null) {
+            CategoryData categoryData = getStorage().getCategory(category);
+
             List<String> ids = getQueryStringIds();
 
-            if (isGet(fullHttpRequest) && category != null && subcategory == null && ids.size() == 0) {
+            if (isGet(fullHttpRequest) && category != null && subcategory == null && ids.size() == 0 && categoryData != null && categoryData.isPublic()) {
                 //Get all subcategories for category
 
                 String categoryName = getUrlResolver().getPluralFor(category);
 
                 List<SubCategoryData> subCategoryDataList = getStorage().getSubCategories(category);
-                jsonReturn = DataAssembler.buildJsonFromSubCategoryData(categoryName, subCategoryDataList.toArray(new SubCategoryData[subCategoryDataList.size()])).toString();
-            } else if (isGet(fullHttpRequest) && category != null && subcategory == null && ids.size() > 0) {
+                jsonReturn = DataAssembler.buildJsonFromSubCategoryData(categoryName, true, subCategoryDataList.toArray(new SubCategoryData[subCategoryDataList.size()])).toString();
+            } else if (isGet(fullHttpRequest) && category != null && subcategory == null && ids.size() > 0 && categoryData != null && categoryData.isPublic()) {
                 //Get subcategories with ids for category
 
                 List<SubCategoryData> subCategoryDataList = new ArrayList<>();
@@ -43,19 +44,18 @@ public class DataHandler extends ContenticeHandler {
                     }
                 }
                 String categoryName = getUrlResolver().getPluralFor(category);
-                jsonReturn = DataAssembler.buildJsonFromSubCategoryData(categoryName, subCategoryDataList.toArray(new SubCategoryData[subCategoryDataList.size()])).toString();
-            } else if (isGet(fullHttpRequest) && category != null && subcategory != null) {
+                jsonReturn = DataAssembler.buildJsonFromSubCategoryData(categoryName, false, subCategoryDataList.toArray(new SubCategoryData[subCategoryDataList.size()])).toString();
+            } else if (isGet(fullHttpRequest) && category != null && subcategory != null && categoryData != null && categoryData.isPublic()) {
                 //get a single subcategory
 
                 String categoryName = getUrlResolver().getSingularFor(category);
 
                 SubCategoryData subCategoryData = getStorage().getSubCategory(category, subcategory);
                 if (subCategoryData != null) {
-                    jsonReturn = DataAssembler.buildJsonFromSubCategoryData(categoryName, subCategoryData).toString();
+                    jsonReturn = DataAssembler.buildJsonFromSubCategoryData(categoryName, false, subCategoryData).toString();
                 }
             }
         }
-
 
         writeContentsToBuffer(channelHandlerContext, jsonReturn, "application/json; charset=UTF-8");
     }

@@ -16,10 +16,6 @@ import no.haagensoftware.contentice.plugin.RouterPluginService;
 import no.haagensoftware.contentice.plugin.StoragePluginService;
 import no.haagensoftware.contentice.spi.RouterPlugin;
 import no.haagensoftware.contentice.util.URLResolver;
-import no.kodegenet.handlers.ChaptersHandler;
-import no.kodegenet.handlers.CoursesHandler;
-import no.kodegenet.handlers.OppgaverHandler;
-import no.kodegenet.handlers.RevealHandler;
 import org.apache.log4j.Logger;
 
 /**
@@ -44,18 +40,6 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
 
         this.urlResolver.addUrlPattern("/json/data/{category}", DataHandler.class);
         this.urlResolver.addUrlPattern("/json/data/{category}/{subcategory}", DataHandler.class);
-
-        this.urlResolver.addUrlPattern("/json/courses", CoursesHandler.class);
-        this.urlResolver.addUrlPattern("/json/chapters", ChaptersHandler.class);
-        this.urlResolver.addUrlPattern("/json/chapters/{chapter}", ChaptersHandler.class);
-        this.urlResolver.addUrlPattern("/json/oppgaver", OppgaverHandler.class);
-        this.urlResolver.addUrlPattern("/json/oppgaver/{oppgave}", OppgaverHandler.class);
-
-
-        this.urlResolver.addUrlPattern("/reveal.html", RevealHandler.class);
-
-
-        this.urlResolver.addPlural("oppgave", "oppgaver");
         //Load plugins and add URLs to urlResolver
     }
 
@@ -79,6 +63,12 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
             for (String key : routerPlugin.getRoutes().keySet()) {
                 urlResolver.addUrlPattern(key, routerPlugin.getRoutes().get(key));
             }
+            if (routerPlugin.getPlurals() != null) {
+                for (String singular : routerPlugin.getPlurals().keySet()) {
+                    urlResolver.addPlural(singular, routerPlugin.getPlurals().get(singular));
+                }
+            }
+
         }
 
         //Router Handler

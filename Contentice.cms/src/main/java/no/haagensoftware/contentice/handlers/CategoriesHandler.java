@@ -37,7 +37,7 @@ public class CategoriesHandler extends ContenticeHandler {
         JsonArray categoryArray = new JsonArray();
         for (CategoryData category : categories) {
             List<SubCategoryData> subcategories = getStorage().getSubCategories(category.getId());
-            category.getSubCategories().addAll(subcategories);
+            category.getSubcategories().addAll(subcategories);
             categoryArray.add(CategoryAssembler.buildCategoryJsonFromCategoryData(category));
         }
 
