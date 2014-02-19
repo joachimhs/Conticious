@@ -79,8 +79,10 @@ Contentice.CategoryIndexRoute = Ember.Route.extend({
 
                 category.get('defaultFields').pushObject(newField);
 
-                category.save();
-                newField.save();
+                newField.save().then(function(data) {
+                    console.log('new field saved. saving category');
+                    category.save();
+                });
             }
 
             this.set('controller.newFieldName', null);
@@ -100,8 +102,11 @@ Contentice.CategoryIndexRoute = Ember.Route.extend({
 
                 category.get('subcategories').pushObject(newSubcategory);
 
-                category.save();
-                newSubcategory.save();
+                newSubcategory.save().then(function(data) {
+                    console.log('newSubcategory saved. Saving category')
+                    category.save();
+                });
+
             }
 
             this.set('controller.newSubcategoryName', null);
