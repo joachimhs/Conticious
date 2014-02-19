@@ -42,34 +42,34 @@
             <groupId>no.haagensoftware</groupId>
             <artifactId>kontize-filesystem-plugin</artifactId>
             <version>${project.version}</version>
-
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>no.haagensoftware</groupId>
             <artifactId>kontize-admin-plugin</artifactId>
             <version>${project.version}</version>
-
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>no.haagensoftware</groupId>
             <artifactId>kontize-emberfest-plugin</artifactId>
             <version>2.0</version>
-
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>no.haagensoftware</groupId>
             <artifactId>kontize-kodegenet-plugin</artifactId>
             <version>1.0</version>
-
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>no.haagensoftware</groupId>
             <artifactId>kontize-teknologihuset-plugin</artifactId>
             <version>1.0</version>
-
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -114,6 +114,12 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.4</version>
         </dependency>
 
         <!-- Google Calendar stuff -->

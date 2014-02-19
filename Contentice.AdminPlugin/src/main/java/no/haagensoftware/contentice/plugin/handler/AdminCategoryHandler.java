@@ -58,14 +58,14 @@ public class AdminCategoryHandler extends ContenticeHandler  {
             }
 
             JsonObject topLevelObject = convertCategoryToJson(storedCategory);
-            writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json; charset=UTF-8");
+            writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json");
 
         } else if (isGet(fullHttpRequest)) {
             if (categoryData == null) {
                 write404ToBuffer(channelHandlerContext);
             } else {
                 JsonObject topLevelObject = convertCategoryToJson(categoryData);
-                writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json; charset=UTF-8");
+                writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json");
             }
         }
     }

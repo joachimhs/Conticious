@@ -44,6 +44,6 @@ public class CategoriesHandler extends ContenticeHandler {
         JsonObject topLevelObject = new JsonObject();
         topLevelObject.add("categories", categoryArray);
 
-        writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json; charset=UTF-8");
+        writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json");
     }
 }

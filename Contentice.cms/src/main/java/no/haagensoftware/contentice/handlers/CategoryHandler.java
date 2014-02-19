@@ -37,7 +37,7 @@ public class CategoryHandler extends ContenticeHandler {
             categoryData.getSubcategories().addAll(subcategories);
             topLevelObject.add("category", CategoryAssembler.buildCategoryJsonFromCategoryData(categoryData));
 
-            writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json; charset=UTF-8");
+            writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json");
         }
     }
 }

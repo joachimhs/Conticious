@@ -3,7 +3,8 @@ package no.haagensoftware.contentice.handlers;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.*;
+import io.netty.handler.stream.ChunkedWriteHandler;
 import no.haagensoftware.contentice.data.URLData;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
 import no.haagensoftware.contentice.handler.FileServerHandler;
@@ -47,6 +48,12 @@ public class RouterHandler extends ContenticeHandler {
 
             logger.info("DEFAULT HANDLER");
             //Load default handler
+
+            ChannelHandler handler = defaultHandler.newInstance();
+
+            if (handler instanceof FileServerHandler) {
+                //addFileHandlers(channelHandlerContext, fullHttpRequest);
+            }
             addOrReplaceHandler(channelHandlerContext, defaultHandler.newInstance(), "route-generated", fullHttpRequest);
         } else {
             logger.info("Handler: " + urlData.getChannelHandler());
@@ -55,7 +62,11 @@ public class RouterHandler extends ContenticeHandler {
             if (handler instanceof FileServerHandler) {
                 //Initializer Handler correctly if the handler is a subclass of the FileServerHandler
                 //((FileServerHandler)handler).setFromClasspath(false);
+                //addFileHandlers(channelHandlerContext, fullHttpRequest);
+
             } else if (handler instanceof ContenticeHandler) {
+                //addDataHandlers(channelHandlerContext, fullHttpRequest);
+
                 //Initializer Handler correctly if the handler is a subclass of the ContenticeHandler
                 ((ContenticeHandler)handler).setParameterMap(urlData.getParameters());
                 ((ContenticeHandler)handler).setQueryStringIds(urlData.getQueryStringIds());
@@ -68,6 +79,27 @@ public class RouterHandler extends ContenticeHandler {
         fullHttpRequest.retain();
         logger.info("//channelRead: HttpRequest. File handlers before: " + FileServerHandler.getOpenFileDescriptorCount());
         channelHandlerContext.fireChannelRead(fullHttpRequest);
+    }
+
+    private void addFileHandlers(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) {
+        removeHandler(channelHandlerContext.pipeline(), "codec");
+        removeHandler(channelHandlerContext.pipeline(), "aggregator");
+
+        addOrReplaceHandler(channelHandlerContext, new HttpRequestDecoder(), "decoder", fullHttpRequest);
+        addOrReplaceHandler(channelHandlerContext, new HttpObjectAggregator(65536), "aggregator", fullHttpRequest);
+        addOrReplaceHandler(channelHandlerContext, new HttpResponseEncoder(), "encoder", fullHttpRequest);
+        addOrReplaceHandler(channelHandlerContext, new ChunkedWriteHandler(), "chunkedWriter", fullHttpRequest);
+    }
+
+    private void addDataHandlers(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) {
+        removeHandler(channelHandlerContext.pipeline(), "decoder");
+        removeHandler(channelHandlerContext.pipeline(), "aggregator");
+        removeHandler(channelHandlerContext.pipeline(), "encoder");
+        removeHandler(channelHandlerContext.pipeline(), "chunkedWriter");
+
+        addOrReplaceHandler(channelHandlerContext, new HttpServerCodec(), "codec", fullHttpRequest);
+        addOrReplaceHandler(channelHandlerContext, new HttpObjectAggregator(65536), "aggregator", fullHttpRequest);
+
     }
 
     private void addOrReplaceHandler(ChannelHandlerContext channelHandlerContext, ChannelHandler channelHandler, String handleName, FullHttpRequest fullHttpRequest) {

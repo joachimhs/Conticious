@@ -113,6 +113,6 @@ public class AdminCategoryFieldsHandler extends ContenticeHandler {
             }
         }
 
-        writeContentsToBuffer(channelHandlerContext, returnJson, "application/json; charset=UTF-8");
+        writeContentsToBuffer(channelHandlerContext, returnJson, "application/json");
     }
 }

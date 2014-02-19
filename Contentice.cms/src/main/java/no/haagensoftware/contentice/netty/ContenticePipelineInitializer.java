@@ -2,10 +2,7 @@ package no.haagensoftware.contentice.netty;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.http.HttpContentCompressor;
-import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpRequestDecoder;
-import io.netty.handler.codec.http.HttpResponseEncoder;
+import io.netty.handler.codec.http.*;
 
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.stream.ChunkedWriteHandler;
@@ -53,11 +50,17 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
         //engine.setUseClientMode(false);
         //p.addLast("ssl", new SslHandler(engine));
 
-        pipeline.addLast("decoder", new HttpRequestDecoder());
-        pipeline.addLast("aggregator", new HttpObjectAggregator(2097152));
-        pipeline.addLast("encoder", new HttpResponseEncoder());
-        //pipeline.addLast("deflater", new HttpContentCompressor(1));
+
+        pipeline.addLast("codec", new HttpServerCodec());
+        pipeline.addLast("aggregator", new HttpObjectAggregator(512 * 1024));
         pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
+
+        //pipeline.addLast("decoder", new HttpRequestDecoder());
+        //pipeline.addLast("aggregator", new HttpObjectAggregator(65536));
+        //pipeline.addLast("encoder", new HttpResponseEncoder());
+        //pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
+
+        //pipeline.addLast("codec", new HttpServerCodec());
 
         for (RouterPlugin routerPlugin : RouterPluginService.getInstance().getRouterPlugins()) {
             for (String key : routerPlugin.getRoutes().keySet()) {
