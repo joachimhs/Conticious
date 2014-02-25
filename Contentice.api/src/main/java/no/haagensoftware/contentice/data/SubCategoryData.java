@@ -1,9 +1,11 @@
 package no.haagensoftware.contentice.data;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -58,6 +60,39 @@ public class SubCategoryData {
         this.keyMap = keyMap;
     }
 
+    public List<String> getListForKey(String key) {
+        List<String> retList = new ArrayList<>();
+
+        JsonElement element = getKeyMap().get(key);
+
+        if (element != null && element.isJsonArray()) {
+            JsonArray jsonArray = element.getAsJsonArray();
+
+            for (JsonElement jsonElement : jsonArray) {
+                retList.add(jsonElement.getAsString());
+            }
+        }
+
+        return retList;
+    }
+
+    public List<String> getListForKey(String key, String delimeter) {
+        List<String> retList = new ArrayList<>();
+
+        String value = getValueForKey(key);
+
+        if (value.contains(delimeter)) {
+            String[] values = value.split(delimeter);
+            for (String val : values) {
+                retList.add(val);
+            }
+        } else {
+            retList.add(value);
+        }
+
+        return retList;
+    }
+
     public String getValueForKey(String key) {
         String value = null;
 
@@ -81,5 +116,25 @@ public class SubCategoryData {
         }
 
         return value;
+    }
+
+    public Date getDateForKey(String key) {
+        String dateString = getValueForKey(key);
+
+        Date date = null;
+
+        try {
+            if (dateString != null && dateString.length() == 10 ) {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                date = sdf.parse(dateString);
+            } else if (dateString != null && dateString.length() == 16 ) {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+                date = sdf.parse(dateString);
+            }
+        } catch (ParseException pe) {
+            pe.printStackTrace();
+        }
+
+        return date;
     }
 }

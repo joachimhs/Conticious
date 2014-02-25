@@ -1,9 +1,11 @@
 package no.haagensoftware.contentice.storage;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import junit.framework.Assert;
 import no.haagensoftware.contentice.data.CategoryData;
+import no.haagensoftware.contentice.data.CategoryField;
 import no.haagensoftware.contentice.data.SubCategoryData;
 import org.junit.*;
 
@@ -131,5 +133,54 @@ public class FileSystemStoragePluginTest {
         SubCategoryData subCategoryDataAfterDelete = plugin.getSubCategory("pages", "test");
 
         Assert.assertNull("Expecting Pages/Test to be deleted", subCategoryDataAfterDelete);
+    }
+
+    @Test
+    public void verifyJsonArrayStorage() {
+        CategoryData ticketCategory = new CategoryData();
+        ticketCategory.getDefaultFields().add(new CategoryField("tickets", "tickets", "array", false));
+
+        plugin.setCategory("tickets", ticketCategory);
+
+        SubCategoryData newTicket = new SubCategoryData();
+        newTicket.setId("newTicketId");
+        JsonArray ticketsArray = new JsonArray();
+        ticketsArray.add(new JsonPrimitive("ticketOne"));
+        ticketsArray.add(new JsonPrimitive("ticketTwo"));
+        newTicket.getKeyMap().put("tickets", ticketsArray);
+
+        plugin.setSubCategory("tickets", newTicket.getId(), newTicket);
+
+        SubCategoryData oldTicket = plugin.getSubCategory("tickets", "newTicketId");
+
+        Assert.assertEquals("tickets_newTicketId", oldTicket.getId());
+        System.out.println(oldTicket.getListForKey("tickets").size());
+
+        Assert.assertEquals(new Integer(2), new Integer(oldTicket.getListForKey("tickets").size()));
+        Assert.assertEquals("ticketOne", oldTicket.getListForKey("tickets").get(0));
+        Assert.assertEquals("ticketTwo", oldTicket.getListForKey("tickets").get(1));
+    }
+
+    @Test
+    public void verifyJsonArrayAsStringStorage() {
+        CategoryData ticketCategory = new CategoryData();
+        ticketCategory.getDefaultFields().add(new CategoryField("tickets", "tickets", "array", false));
+
+        plugin.setCategory("tickets", ticketCategory);
+
+        SubCategoryData newTicket = new SubCategoryData();
+        newTicket.setId("secondTicketId");
+        newTicket.getKeyMap().put("tickets", new JsonPrimitive("ticketOne,ticketTwo"));
+
+        plugin.setSubCategory("tickets", newTicket.getId(), newTicket);
+
+        SubCategoryData oldTicket = plugin.getSubCategory("tickets", "secondTicketId");
+
+        Assert.assertEquals("tickets_secondTicketId", oldTicket.getId());
+        System.out.println(oldTicket.getListForKey("tickets").size());
+
+        Assert.assertEquals(new Integer(2), new Integer(oldTicket.getListForKey("tickets", ",").size()));
+        Assert.assertEquals("ticketOne", oldTicket.getListForKey("tickets", ",").get(0));
+        Assert.assertEquals("ticketTwo", oldTicket.getListForKey("tickets", ",").get(1));
     }
 }

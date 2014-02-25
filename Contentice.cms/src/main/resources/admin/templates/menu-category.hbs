@@ -1,0 +1,20 @@
+<div class="list-group">
+    {{#link-to "category" category classNames="list-group-item categoryItem"}}
+        {{#if view.isSelected}}
+            &#x25BC;
+        {{else}}
+            &#x25B6;
+        {{/if}}
+
+        {{category.id}}
+    {{/link-to}}
+
+    {{#if view.isSelected}}
+        {{#each subcategory in category.subcategories}}
+
+            {{#link-to "subcategory" category subcategory classNames="list-group-item subcategoryItem"}}
+                {{view Contentice.MenuSubcategoryView subcategory=subcategory tagName="span"}}
+            {{/link-to}}
+        {{/each}}
+    {{/if}}
+</div>

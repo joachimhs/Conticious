@@ -23,15 +23,7 @@
             </div>
 
             {{#each category in controller}}
-                <div class="list-group">
-                    {{#linkTo "category" category classNames="list-group-item categoryItem"}}{{category.id}}{{/linkTo}}
-                    {{#each subcategory in category.subcategories}}
-
-                        {{#linkTo "subcategory" category subcategory classNames="list-group-item subcategoryItem"}}
-                            <span style="margin-left: 18px;"></span> {{subcategory.name}}
-                        {{/linkTo}}
-                    {{/each}}
-                </div>
+                {{view Contentice.MenuCategoryView category=category}}
             {{/each}}
 
         </div>

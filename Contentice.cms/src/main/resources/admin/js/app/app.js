@@ -26,7 +26,7 @@ Ember.Application.reopen({
 });
 
 var Contentice = Ember.Application.create({
-    templates: ['application', 'categories', 'header', 'category', 'category/index', 'subcategory', 'subcategory/index', 'subcategory/fields', 'subcategory/preview']
+    templates: ['application', 'categories', 'header', 'category', 'category/index', 'subcategory', 'subcategory/index', 'subcategory/fields', 'subcategory/preview', 'menu-category', 'menu-subcategory']
 });
 
 Contentice.Router.map(function() {
@@ -151,8 +151,12 @@ Contentice.SubcategoryPreviewRoute = Ember.Route.extend({
 });
 
 Contentice.CategoriesController = Ember.ArrayController.extend({
+    needs: ['category'],
+
     showNewCategoryField: false,
     newCategoryName: null,
+
+
 
     actions: {
         showNewCategory: function() {
@@ -177,6 +181,35 @@ Contentice.CategoriesController = Ember.ArrayController.extend({
             this.set('newCategoryName', null);
         }
     }
+});
+
+Contentice.MenuCategoryView = Ember.View.extend({
+    templateName: 'menu-category',
+
+    isSelected: function() {
+        return this.get('category.id') === this.get('controller.controllers.category.model.id');
+    }.property('controller.controllers.category.model.idl')
+});
+
+Contentice.MenuSubcategoryView = Ember.View.extend({
+    templateName: 'menu-subcategory'
+
+});
+
+Contentice.CategoriesView = Ember.View.extend({
+    isSelected: function() {
+        console.log(this.get('model.id'));
+        console.log(this.get('controller.model.id'));
+        console.log(this.get('controller'));
+        console.log(this.get('context'));
+        console.log(this);
+
+        return this.get('model.id') === this.get('controller.model.id');
+    }.property('controller.model')
+});
+
+Contentice.CategoryController = Ember.ObjectController.extend({
+
 });
 
 Contentice.CategoryIndexController = Ember.Controller.extend({
