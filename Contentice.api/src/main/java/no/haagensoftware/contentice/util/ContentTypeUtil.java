@@ -8,27 +8,31 @@ public class ContentTypeUtil {
 	static {
 		contentTypeHash.put("png", "image/png");
 		contentTypeHash.put("PNG", "image/png");
-		contentTypeHash.put("txt", "text/plain");
-		contentTypeHash.put("text", "text/plain");
-		contentTypeHash.put("TXT", "text/plain");
-		contentTypeHash.put("js", "application/javascript");
+		contentTypeHash.put("txt", "text/plain; charset=UTF-8");
+		contentTypeHash.put("text", "text/plain; charset=UTF-8");
+		contentTypeHash.put("TXT", "text/plain; charset=UTF-8");
+		contentTypeHash.put("js", "application/javascript; charset=UTF-8");
 		contentTypeHash.put("jpg", "image/jpeg");
 		contentTypeHash.put("jpeg", "image/jpeg");
 		contentTypeHash.put("JPG", "image/jpeg");
 		contentTypeHash.put("JPEG", "image/jpeg");
-		contentTypeHash.put("css", "text/css");
-		contentTypeHash.put("CSS", "text/css");
-		contentTypeHash.put("json", "text/json");
-		contentTypeHash.put("html", "text/html");
-		contentTypeHash.put("htm", "text/html");
+		contentTypeHash.put("css", "text/css; charset=UTF-8");
+		contentTypeHash.put("CSS", "text/css; charset=UTF-8");
+		contentTypeHash.put("json", "text/json; charset=UTF-8");
+		contentTypeHash.put("html", "text/html; charset=UTF-8");
+		contentTypeHash.put("htm", "text/html; charset=UTF-8");
 	}
 	
 	public static String getContentType(String filename) {
+        if (filename.contains("/static/")) {
+            return contentTypeHash.get("html");
+        }
+
 		String fileEnding = filename.substring(filename.lastIndexOf(".")+1);
 		if (contentTypeHash.get(fileEnding) != null) {
 			return contentTypeHash.get(fileEnding);
 		}
 		
-		return "text/plain";
+		return "text/plain; charset=UTF-8";
 	}
 }

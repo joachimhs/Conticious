@@ -6,6 +6,9 @@ import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
 import no.haagensoftware.contentice.util.ContentTypeUtil;
 import org.apache.log4j.Logger;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
@@ -72,6 +75,10 @@ public class FileServerHandler extends ContenticeHandler {
 
         if (uri.endsWith("/")) {
             uri += "index.html";
+        } else if (uri.startsWith("/static/") && !uri.endsWith(".html")) {
+            uri = uri + ".html";
+        } else if (uri.startsWith("/static") && !uri.endsWith(".html")) {
+            uri = uri + "/index.html";
         }
 
         return uri;
@@ -134,7 +141,12 @@ public class FileServerHandler extends ContenticeHandler {
 
             writeContentsToBuffer(channelHandlerContext, fileContent.toString(), ContentTypeUtil.getContentType(path));
         } else {
+            String originalPath = path;
+
             File file = new File(this.rootPath + path);
+
+            File staticFile = new File(rootPath + File.separatorChar + "static" + File.separatorChar + originalPath);
+
             if (!file.exists()) {
                 path = rootPath + File.separatorChar + "index.html";
             } else if (file.isDirectory()) {
@@ -143,7 +155,41 @@ public class FileServerHandler extends ContenticeHandler {
                 path = this.rootPath + path;
             }
 
-            logger.info(path);
+            String staticPath = staticFile.getAbsolutePath();
+
+            if (staticFile.isDirectory() || !staticFile.exists()) {
+                staticPath = staticFile.getAbsolutePath() + ".html";
+            }
+
+            staticFile = new File(staticPath);
+
+            logger.info("path: " + path);
+            logger.info("original path: " + originalPath);
+            logger.info("static path: " + staticPath);
+
+            //Add static contents inside a NOSCRIPT tag
+            if (path.endsWith(".html") && staticFile.exists() && staticFile.isFile()) {
+                logger.info("Adding noscript tag");
+
+                Document htmlDocument = parseHtmlPage(path);
+                Document staticDocument = parseHtmlPage(staticFile.getAbsolutePath());
+
+
+                logger.info(htmlDocument.toString());
+                logger.info("\n\n---\n\n");
+
+                Element noscript = htmlDocument.body().appendElement("noscript");
+
+                for (Element element : staticDocument.getElementsByTag("body").get(0).children()) {
+                    noscript.appendChild(element);
+                }
+
+                logger.info(htmlDocument.toString());
+
+                String contents = htmlDocument.toString();
+                writeContentsToBuffer(channelHandlerContext, contents, ContentTypeUtil.getContentType(path + ".html"));
+            }
+
             writeFileToBuffer(channelHandlerContext, path, ContentTypeUtil.getContentType(path));
         }
     }
@@ -186,5 +232,22 @@ public class FileServerHandler extends ContenticeHandler {
         }
 
         return fileContent;
+    }
+
+    /**
+     * Simple method for parsing the HTML contents
+     *
+     * @param path
+     * @return
+     * @throws IOException
+     */
+    private Document parseHtmlPage(String path) throws IOException {
+        Document htmlDocument = null;
+
+        File input = new File(path);
+        if (input != null && input.exists() && input.isFile()) {
+            htmlDocument = Jsoup.parse(input, "UTF-8");
+        }
+        return htmlDocument;
     }
 }

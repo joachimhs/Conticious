@@ -169,7 +169,7 @@ public abstract class ContenticeHandler extends SimpleChannelInboundHandler<Full
         ChannelFuture lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
 
         // Close the connection when the whole content is written out.
-        //        lastContentFuture.addListener(ChannelFutureListener.CLOSE);
+                lastContentFuture.addListener(ChannelFutureListener.CLOSE);
     }
 
     public void writeFileToBuffer(ChannelHandlerContext ctx, String path, String contentType) {

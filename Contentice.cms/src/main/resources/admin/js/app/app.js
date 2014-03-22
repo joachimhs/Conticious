@@ -188,7 +188,7 @@ Contentice.MenuCategoryView = Ember.View.extend({
 
     isSelected: function() {
         return this.get('category.id') === this.get('controller.controllers.category.model.id');
-    }.property('controller.controllers.category.model.idl')
+    }.property('controller.controllers.category.model.id')
 });
 
 Contentice.MenuSubcategoryView = Ember.View.extend({
