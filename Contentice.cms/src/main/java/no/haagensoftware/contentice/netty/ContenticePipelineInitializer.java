@@ -52,7 +52,7 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
 
 
         pipeline.addLast("codec", new HttpServerCodec());
-        pipeline.addLast("aggregator", new HttpObjectAggregator(512 * 1024));
+        pipeline.addLast("aggregator", new HttpObjectAggregator(5 * 1024 * 1024));
         pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
 
         //pipeline.addLast("decoder", new HttpRequestDecoder());

@@ -105,6 +105,10 @@ Contentice.CategoryIndexRoute = Ember.Route.extend({
                 newSubcategory.save().then(function(data) {
                     console.log('newSubcategory saved. Saving category')
                     category.save();
+                    /*.then(function(data) {
+                        category.reload();
+                        newSubcategory.reload();
+                    });*/
                 });
 
             }

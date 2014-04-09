@@ -32,6 +32,8 @@ public class AdminSubcategoriesHandler extends ContenticeHandler {
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
         logger.info("reading SubCategoriesHandler and writing contents to buffer");
 
+        JsonObject topLevelObject = new JsonObject();
+
         String category = getParameter("category");
 
         if (isPost(fullHttpRequest)) {
@@ -47,45 +49,63 @@ public class AdminSubcategoriesHandler extends ContenticeHandler {
                 logger.info("Category: " + adminSubcategory.getSubcategory().getId());
 
                 getStorage().setSubCategory(category, adminSubcategory.getSubcategory().getName(), adminSubcategory.getSubcategory());
-            }
-        } else if (isPut(fullHttpRequest)) {
 
-        }
 
-        //Always return the updated subcategories
-        List<SubCategoryData> subCategories = getStorage().getSubCategories(category);
-        CategoryData categoryData = getStorage().getCategory(category);
+                CategoryData categoryData = getStorage().getCategory(category);
+                topLevelObject.add("subcategory", AdminSubCategoryAssembler.buildAdminJsonFromSubCategoryData(adminSubcategory.getSubcategory(), categoryData));
 
-        if (subCategories == null) {
-            write404ToBuffer(channelHandlerContext);
-        } else {
-            JsonArray subCategoryArray = new JsonArray();
-
-            JsonArray subcategoryFieldArray= new JsonArray();
-            for (SubCategoryData subCategory : subCategories) {
-                subCategoryArray.add(AdminSubCategoryAssembler.buildAdminJsonFromSubCategoryData(subCategory, categoryData));
-
+                JsonArray subcategoryFieldArray= new JsonArray();
                 for (CategoryField cf : categoryData.getDefaultFields()) {
                     SubcategoryField subField = new SubcategoryField();
                     subField.setId(categoryData.getId() + "_" + cf.getName());
                     subField.setRequired(cf.getRequired());
                     subField.setType(cf.getType());
                     subField.setName(cf.getName());
-                    if (subCategory.getKeyMap().get(cf.getName()) != null) {
-                        subField.setValue(subCategory.getKeyMap().get(cf.getName()).getAsString());
+                    if (adminSubcategory.getSubcategory().getKeyMap().get(cf.getName()) != null) {
+                        subField.setValue(adminSubcategory.getSubcategory().getKeyMap().get(cf.getName()).getAsString());
                     }
 
                     subcategoryFieldArray.add(new Gson().toJsonTree(subField));
                 }
+
+                topLevelObject.add("subcategoryFields", subcategoryFieldArray);
+
             }
+        } else if (isPut(fullHttpRequest)) {
 
-            JsonObject topLevelObject = new JsonObject();
+        } else {
+            //Always return the updated subcategories
+            List<SubCategoryData> subCategories = getStorage().getSubCategories(category);
+            CategoryData categoryData = getStorage().getCategory(category);
 
+            if (subCategories == null) {
+                write404ToBuffer(channelHandlerContext);
+            } else {
+                JsonArray subCategoryArray = new JsonArray();
 
-            topLevelObject.add("subCategories", subCategoryArray);
-            topLevelObject.add("subcategoryFields", subcategoryFieldArray);
+                JsonArray subcategoryFieldArray= new JsonArray();
+                for (SubCategoryData subCategory : subCategories) {
+                    subCategoryArray.add(AdminSubCategoryAssembler.buildAdminJsonFromSubCategoryData(subCategory, categoryData));
 
-            writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json");
+                    for (CategoryField cf : categoryData.getDefaultFields()) {
+                        SubcategoryField subField = new SubcategoryField();
+                        subField.setId(categoryData.getId() + "_" + cf.getName());
+                        subField.setRequired(cf.getRequired());
+                        subField.setType(cf.getType());
+                        subField.setName(cf.getName());
+                        if (subCategory.getKeyMap().get(cf.getName()) != null) {
+                            subField.setValue(subCategory.getKeyMap().get(cf.getName()).getAsString());
+                        }
+
+                        subcategoryFieldArray.add(new Gson().toJsonTree(subField));
+                    }
+                }
+
+                topLevelObject.add("subcategories", subCategoryArray);
+                topLevelObject.add("subcategoryFields", subcategoryFieldArray);
+            }
         }
+
+        writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json");
     }
 }

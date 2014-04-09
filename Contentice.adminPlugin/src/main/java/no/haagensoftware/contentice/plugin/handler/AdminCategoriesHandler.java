@@ -92,6 +92,8 @@ public class AdminCategoriesHandler extends ContenticeHandler {
         topLevelObject.add("categoryFields", defaultFieldsArray);
         topLevelObject.add("subcategoryFields", subcategoryFieldArray);
 
+        logger.info(topLevelObject.toString());
+
         writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json");
     }
 }

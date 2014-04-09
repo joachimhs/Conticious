@@ -39,7 +39,7 @@ public class SubCategoriesHandler extends ContenticeHandler {
             }
 
             JsonObject topLevelObject = new JsonObject();
-            topLevelObject.add("subCategories", subCategoryArray);
+            topLevelObject.add("subcategories", subCategoryArray);
 
             writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json");
         }

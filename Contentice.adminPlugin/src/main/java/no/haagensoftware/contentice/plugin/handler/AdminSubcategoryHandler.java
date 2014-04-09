@@ -30,6 +30,11 @@ public class AdminSubcategoryHandler extends ContenticeHandler {
         String category = getParameter("category");
         String subcategory = getParameter("subcategory");
 
+        if (category == null && subcategory != null && subcategory.contains("_")) {
+            category = subcategory.substring(0, subcategory.indexOf("_"));
+            subcategory = subcategory.substring(subcategory.indexOf("_")+1, subcategory.length());
+        }
+
         if (isPost(fullHttpRequest) || isPut((fullHttpRequest))) {
 
             if (category == null) {
@@ -58,7 +63,7 @@ public class AdminSubcategoryHandler extends ContenticeHandler {
 
         } else {
             JsonObject topLevelObject = new JsonObject();
-            topLevelObject.add("subCategory", AdminSubCategoryAssembler.buildAdminJsonFromSubCategoryData(subCategoryData, categoryData));
+            topLevelObject.add("subcategory", AdminSubCategoryAssembler.buildAdminJsonFromSubCategoryData(subCategoryData, categoryData));
 
             writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json");
         }
