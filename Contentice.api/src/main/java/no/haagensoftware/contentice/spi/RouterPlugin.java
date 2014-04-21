@@ -82,7 +82,11 @@ public abstract class RouterPlugin implements ConticiousPlugin{
             boolean urlMatch = false;
             Map<String, String> propertyMap = new HashMap<>();
 
-            if (urlPattern.equals(urlToFind)) {
+            if (urlPattern.startsWith("classpath:") && url.startsWith(urlPattern.substring(10))) {
+                urlMatch = true;
+            } else if (urlPattern.startsWith("startsWith:") && url.startsWith(urlPattern.substring(11))) {
+                urlMatch = true;
+            } else if (urlPattern.equals(urlToFind)) {
                 //Excact match
                 urlMatch = true;
             } else if (urlPattern.contains("{") && urlPattern.contains("}")) {

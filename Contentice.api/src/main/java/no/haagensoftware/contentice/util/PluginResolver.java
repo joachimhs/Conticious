@@ -149,6 +149,13 @@ public class PluginResolver {
                 key= currUrl;
                 break;
             }
+
+            if (currUrl.startsWith("classpath:") && url.startsWith(currUrl.substring(10))) {
+                key = currUrl;
+            }
+            if (currUrl.startsWith("startsWith:") && url.startsWith(currUrl.substring(11))) {
+                key = currUrl;
+            }
         }
 
         return key;
