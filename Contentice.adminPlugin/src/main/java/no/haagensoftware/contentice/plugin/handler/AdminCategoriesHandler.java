@@ -35,7 +35,7 @@ public class AdminCategoriesHandler extends ContenticeHandler {
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
         logger.info("reading CategoriesHandler and writing contents to buffer");
 
-        List<CategoryData> categories = getStorage().getCategories();
+        List<CategoryData> categories = getStorage().getCategories(getDomain().getWebappName());
         logger.info("Got " + categories.size() + " categories");
 
         if (isPost(fullHttpRequest)) {
@@ -45,7 +45,7 @@ public class AdminCategoriesHandler extends ContenticeHandler {
             if (adminCategory != null && adminCategory.getCategory() != null) {
                 logger.info("Category: " + adminCategory.getCategory().getId());
 
-                getStorage().setCategory(adminCategory.getCategory().getId(), adminCategory.getCategory());
+                getStorage().setCategory(getDomain().getWebappName(), adminCategory.getCategory().getId(), adminCategory.getCategory());
             }
         }
 
@@ -56,7 +56,7 @@ public class AdminCategoriesHandler extends ContenticeHandler {
         JsonArray subcategoryFieldArray= new JsonArray();
 
         for (CategoryData category : categories) {
-            for (SubCategoryData subcategoryData : getStorage().getSubCategories(category.getId())) {
+            for (SubCategoryData subcategoryData : getStorage().getSubCategories(getDomain().getWebappName(), category.getId())) {
                 category.addSubcategory(subcategoryData);
                 subCategoriesArray.add(AdminSubCategoryAssembler.buildAdminJsonFromSubCategoryData(subcategoryData, category));
 

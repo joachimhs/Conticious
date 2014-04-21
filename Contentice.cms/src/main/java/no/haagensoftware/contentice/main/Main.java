@@ -1,11 +1,21 @@
 package no.haagensoftware.contentice.main;
 
+import com.google.gson.Gson;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import no.haagensoftware.contentice.data.ConticiousOptions;
+import no.haagensoftware.contentice.data.Settings;
 import no.haagensoftware.contentice.netty.ContenticePipelineInitializer;
-import no.haagensoftware.contentice.util.URLResolver;
+import no.haagensoftware.contentice.plugin.AuthenticationPluginService;
+import no.haagensoftware.contentice.plugin.RouterPluginService;
+import no.haagensoftware.contentice.plugin.StoragePluginService;
+import no.haagensoftware.contentice.spi.ConticiousPlugin;
+import no.haagensoftware.contentice.spi.RouterPlugin;
+import no.haagensoftware.contentice.spi.StoragePlugin;
+import no.haagensoftware.contentice.util.JsonUtil;
+import no.haagensoftware.contentice.util.PluginResolver;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -15,11 +25,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 public class Main {
     private static final Logger logger = Logger.getLogger(Main.class.getName());
-
     private Integer port;
 
     public static void main(String[] args) throws Exception {
@@ -34,8 +45,49 @@ public class Main {
 
         readProperties();
 
+        String options = JsonUtil.getFileContents(System.getProperty("no.haagensoftware.contentice.storage.file.documentsDirectory") + File.separatorChar + "conticiousOptions.json");
+        if (options != null) {
+            ConticiousOptions conticiousOptions = new Gson().fromJson(options, ConticiousOptions.class);
+            Settings.getInstance().setConticiousOptions(conticiousOptions);
+        }
+
         String pluginsDir = System.getProperty("no.haagensoftware.contentice.pluginDirectory");
         loadPluginsFromDir(pluginsDir);
+
+        //The specified storage plugin will be added as a dependency to all plugins
+        StoragePlugin specifiedStoragePlugin = null;
+
+        Map<String, ConticiousPlugin> loadedPlugins = new HashMap<>();
+
+        for (ConticiousPlugin plugin : AuthenticationPluginService.getInstance().getLoadedPlugins()) {
+            loadedPlugins.put(plugin.getPluginName(), plugin);
+        }
+
+        for (ConticiousPlugin plugin : RouterPluginService.getInstance().getLoadedPlugins()) {
+            loadedPlugins.put(plugin.getPluginName(), plugin);
+        }
+
+        for (ConticiousPlugin plugin : StoragePluginService.getInstance().getLoadedPlugins()) {
+            loadedPlugins.put(plugin.getPluginName(), plugin);
+
+            if (plugin.getPluginName().equals(System.getProperty("no.haagensoftware.contentice.storage.plugin"))) {
+                specifiedStoragePlugin = (StoragePlugin)plugin;
+            }
+
+        }
+
+        for (ConticiousPlugin plugin : loadedPlugins.values()) {
+            //add storage plugin to all non storage plugins
+            if (!(plugin instanceof StoragePlugin)) {
+                plugin.addPlugin(specifiedStoragePlugin);
+            }
+
+            for (String dependantPlugin : plugin.getPluginDependencies()) {
+                if (loadedPlugins.get(dependantPlugin) != null) {
+                    plugin.addPlugin(loadedPlugins.get(dependantPlugin));
+                }
+            }
+        }
     }
 
     private static void loadPluginsFromDir(String dir) {
@@ -52,7 +104,7 @@ public class Main {
     }
 
     public void bootstrap() throws Exception {
-        URLResolver urlResolver = new URLResolver();
+        PluginResolver pluginResolver = new PluginResolver();
 
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -61,7 +113,7 @@ public class Main {
             b.option(ChannelOption.SO_BACKLOG, 1024);
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new ContenticePipelineInitializer(urlResolver));
+                    .childHandler(new ContenticePipelineInitializer(pluginResolver));
 
             Channel ch = b.bind(port).sync().channel();
             ch.closeFuture().sync();

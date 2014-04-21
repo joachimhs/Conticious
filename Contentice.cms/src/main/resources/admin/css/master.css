@@ -80,6 +80,10 @@ a.subcategoryItem:hover.active {
     text-align: center;
 }
 
+.smallMarginBottom {
+    margin-bottom: 10px;
+}
+
 .righthand {
     background-color: rgba(122, 105, 17, 0.28);
     color: #232323;

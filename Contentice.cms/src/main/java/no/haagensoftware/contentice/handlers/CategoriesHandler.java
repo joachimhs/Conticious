@@ -30,13 +30,13 @@ public class CategoriesHandler extends ContenticeHandler {
     public void handleIncomingRequest(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
         logger.info("reading CategoriesHandler and writing contents to buffer");
 
-        List<CategoryData> categories = getStorage().getCategories();
+        List<CategoryData> categories = getStorage().getCategories(getDomain().getWebappName());
 
         logger.info("Got " + categories.size() + " categories");
 
         JsonArray categoryArray = new JsonArray();
         for (CategoryData category : categories) {
-            List<SubCategoryData> subcategories = getStorage().getSubCategories(category.getId());
+            List<SubCategoryData> subcategories = getStorage().getSubCategories(getDomain().getWebappName(), category.getId());
             category.getSubcategories().addAll(subcategories);
             categoryArray.add(CategoryAssembler.buildCategoryJsonFromCategoryData(category));
         }

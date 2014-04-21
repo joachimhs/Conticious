@@ -36,7 +36,7 @@ public class AdminCategoryHandler extends ContenticeHandler  {
         logger.info("reading CategoryHandler and writing contents to buffer");
 
         String category = getParameter("category");
-        CategoryData categoryData = getStorage().getCategory(category);
+        CategoryData categoryData = getStorage().getCategory(getDomain().getWebappName(), category);
 
         if (isPost(fullHttpRequest)) {
             logger.info("POSTING CATEGORY: " + category);
@@ -47,37 +47,37 @@ public class AdminCategoryHandler extends ContenticeHandler  {
             logger.info(messageContent);
 
             AdminCategoryObjectWithIds adminCategory = new Gson().fromJson(messageContent, AdminCategoryObjectWithIds.class);
-            CategoryData storedCategory = getStorage().getCategory(category);
+            CategoryData storedCategory = getStorage().getCategory(getDomain().getWebappName(), category);
 
             if (adminCategory != null && adminCategory.getCategory() != null && storedCategory != null) {
                 logger.info("Category: " + adminCategory.getCategory().getId());
 
                 storedCategory.setPublic(adminCategory.getCategory().isPublic());
 
-                getStorage().setCategory(storedCategory.getId(), storedCategory);
+                getStorage().setCategory(getDomain().getWebappName(), storedCategory.getId(), storedCategory);
             }
 
-            JsonObject topLevelObject = convertCategoryToJson(storedCategory);
+            JsonObject topLevelObject = convertCategoryToJson(getDomain().getWebappName(), storedCategory);
             writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json");
 
         } else if (isGet(fullHttpRequest)) {
             if (categoryData == null) {
                 write404ToBuffer(channelHandlerContext);
             } else {
-                JsonObject topLevelObject = convertCategoryToJson(categoryData);
+                JsonObject topLevelObject = convertCategoryToJson(getDomain().getWebappName(), categoryData);
                 writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json");
             }
         }
     }
 
-    private JsonObject convertCategoryToJson(CategoryData categoryData) {
+    private JsonObject convertCategoryToJson(String host, CategoryData categoryData) {
         JsonObject topLevelObject = new JsonObject();
 
         JsonArray subCategoriesArray = new JsonArray();
         JsonArray defaultFieldsArray = new JsonArray();
         JsonArray subcategoryFieldArray= new JsonArray();
 
-        for (SubCategoryData subcategoryData : getStorage().getSubCategories(categoryData.getId())) {
+        for (SubCategoryData subcategoryData : getStorage().getSubCategories(host, categoryData.getId())) {
             categoryData.addSubcategory(subcategoryData);
             subCategoriesArray.add(AdminSubCategoryAssembler.buildAdminJsonFromSubCategoryData(subcategoryData, categoryData));
 

@@ -6,8 +6,10 @@ import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.stream.ChunkedFile;
 import io.netty.util.CharsetUtil;
+import no.haagensoftware.contentice.data.Domain;
+import no.haagensoftware.contentice.spi.AuthenticationPlugin;
 import no.haagensoftware.contentice.spi.StoragePlugin;
-import no.haagensoftware.contentice.util.URLResolver;
+import no.haagensoftware.contentice.util.PluginResolver;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -33,8 +35,10 @@ public abstract class ContenticeHandler extends SimpleChannelInboundHandler<Full
     private static final Logger logger = Logger.getLogger(ContenticeHandler.class.getName());
     private Map<String, String> parameterMap;
     private List<String> queryStringIds;
-    private URLResolver urlResolver;
-
+    private String browserHost;
+    private Domain domain;
+    private AuthenticationPlugin authenticationPlugin;
+    private PluginResolver pluginResolver;
     private StoragePlugin storage;
 
     @Override
@@ -64,13 +68,25 @@ public abstract class ContenticeHandler extends SimpleChannelInboundHandler<Full
     }
 
     @Override
-    public void setUrlResolver(URLResolver urlResolver) {
-        this.urlResolver = urlResolver;
+    public PluginResolver getPluginResolver() {
+        return pluginResolver;
     }
 
     @Override
-    public URLResolver getUrlResolver() {
-        return this.urlResolver;
+    public void setPluginResolver(PluginResolver pluginResolver) {
+        this.pluginResolver = pluginResolver;
+    }
+
+    public void setAuthenticationPlugin(AuthenticationPlugin authenticationPlugin) {
+        this.authenticationPlugin = authenticationPlugin;
+    }
+
+    public Domain getDomain() {
+        return domain;
+    }
+
+    public void setDomain(Domain domain) {
+        this.domain = domain;
     }
 
     public void setStorage(StoragePlugin storage) {
@@ -94,10 +110,26 @@ public abstract class ContenticeHandler extends SimpleChannelInboundHandler<Full
         return contentType;
     }
 
+    public String getHost(FullHttpRequest fullHttpRequest) {
+        String host = null;
+
+        HttpHeaders httpHeaders = fullHttpRequest.headers();
+        host = httpHeaders.get("Host");
+
+        if (host.contains(":")) {
+            host = host.split(":")[0];
+        }
+
+        return host;
+    }
+
+
+
     public String getCookieValue(FullHttpRequest fullHttpRequest, String cookieName) {
         String cookieValue = null;
 
         HttpHeaders httpHeaders = fullHttpRequest.headers();
+
         String value = httpHeaders.get("Cookie");
         logger.info("cookie header: \n" + value);
         if (value != null) {
@@ -233,6 +265,18 @@ public abstract class ContenticeHandler extends SimpleChannelInboundHandler<Full
         HttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, NOT_FOUND, Unpooled.copiedBuffer("404 Not Found", CharsetUtil.UTF_8));
         ctx.write(response);
         ctx.flush();
+
+        ChannelFuture lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
+        lastContentFuture.addListener(ChannelFutureListener.CLOSE);
+    }
+
+    public void write404DomainNotFoundToBuffer(ChannelHandlerContext ctx) {
+        HttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, NOT_FOUND, Unpooled.copiedBuffer("That domain is not configured in the Conticious administration panel", CharsetUtil.UTF_8));
+        ctx.write(response);
+        ctx.flush();
+
+        ChannelFuture lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
+        lastContentFuture.addListener(ChannelFutureListener.CLOSE);
     }
 
     protected void sendError(ChannelHandlerContext ctx, HttpResponseStatus status) {
@@ -242,5 +286,8 @@ public abstract class ContenticeHandler extends SimpleChannelInboundHandler<Full
         // Close the connection as soon as the error message is sent.
         ctx.write(response);
         ctx.flush();
+
+        ChannelFuture lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
+        lastContentFuture.addListener(ChannelFutureListener.CLOSE);
     }
 }

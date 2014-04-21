@@ -63,22 +63,22 @@ public class FileSystemStoragePluginTest {
 
     @Test
     public void verifyCreateAndDeleteCategory() {
-        plugin.setCategory("newCategory", new CategoryData("newCategory"));
+        plugin.setCategory(null, "newCategory", new CategoryData("newCategory"));
 
-        List<CategoryData> categories = plugin.getCategories();
+        List<CategoryData> categories = plugin.getCategories(null);
 
         Assert.assertEquals("Expecting 1 Categories inside the document directory", 1, categories.size());
         Assert.assertEquals("Expecting the second category to be newCategory", "newCategory", categories.get(0).getId());
 
-        plugin.deleteCategory("newCategory");
+        plugin.deleteCategory(null, "newCategory");
 
-        categories = plugin.getCategories();
+        categories = plugin.getCategories(null);
         Assert.assertEquals("Expecting 0 Categories inside the document directory", 0, categories.size());
     }
 
     @Test
     public void verifyGetSubcategories() {
-        plugin.setCategory("pages", new CategoryData("Pages"));
+        plugin.setCategory(null, "pages", new CategoryData("Pages"));
         SubCategoryData about = new SubCategoryData();
         about.setContent("about");
         about.getKeyMap().put("name", new JsonPrimitive("About"));
@@ -88,10 +88,10 @@ public class FileSystemStoragePluginTest {
         opensource.setContent("open source");
         opensource.getKeyMap().put("name", new JsonPrimitive("About"));
 
-        plugin.setSubCategory("pages", "about", about);
-        plugin.setSubCategory("pages", "opensource", opensource);
+        plugin.setSubCategory(null, "pages", "about", about);
+        plugin.setSubCategory(null, "pages", "opensource", opensource);
 
-        List<SubCategoryData> subCategories = plugin.getSubCategories("pages");
+        List<SubCategoryData> subCategories = plugin.getSubCategories(null, "pages");
 
         Assert.assertEquals("Expecting 2 sub categories inside the pages category", 2, subCategories.size());
         Assert.assertEquals("Expecting the first sub category to be about", "pages_about", subCategories.get(0).getId());
@@ -104,7 +104,7 @@ public class FileSystemStoragePluginTest {
 
     @Test
     public void verifyGetSubCategory() {
-        SubCategoryData subCategory = plugin.getSubCategory("pages", "about");
+        SubCategoryData subCategory = plugin.getSubCategory(null, "pages", "about");
 
         Assert.assertTrue("Expecting the the about sub category to have a content", subCategory.getContent() != null && subCategory.getContent().length() > 0);
         Assert.assertTrue("Expecting the the about sub category to have a json keys", subCategory.getKeyMap() != null && subCategory.getKeyMap().size() > 0);
@@ -119,18 +119,18 @@ public class FileSystemStoragePluginTest {
         keyMap.put("pageTitle", new JsonPrimitive("Test Title Page"));
         subCategoryData.setKeyMap(keyMap);
 
-        plugin.setSubCategory("pages", "test", subCategoryData);
+        plugin.setSubCategory(null, "pages", "test", subCategoryData);
 
-        SubCategoryData subCategoryAfterInsert = plugin.getSubCategory("pages", "test");
+        SubCategoryData subCategoryAfterInsert = plugin.getSubCategory(null, "pages", "test");
         System.out.println(subCategoryAfterInsert.getContent());
 
         Assert.assertTrue("Expecting the the about sub category to have a content", subCategoryAfterInsert.getContent() != null && subCategoryAfterInsert.getContent().equals("This is a test content\n"));
         Assert.assertTrue("Expecting the the about sub category to have 2 json keys", subCategoryAfterInsert.getKeyMap() != null && subCategoryAfterInsert.getKeyMap().size() == 2);
 
 
-        plugin.deleteSubcategory("pages", "test");
+        plugin.deleteSubcategory(null, "pages", "test");
 
-        SubCategoryData subCategoryDataAfterDelete = plugin.getSubCategory("pages", "test");
+        SubCategoryData subCategoryDataAfterDelete = plugin.getSubCategory(null, "pages", "test");
 
         Assert.assertNull("Expecting Pages/Test to be deleted", subCategoryDataAfterDelete);
     }
@@ -140,7 +140,7 @@ public class FileSystemStoragePluginTest {
         CategoryData ticketCategory = new CategoryData();
         ticketCategory.getDefaultFields().add(new CategoryField("tickets", "tickets", "array", false));
 
-        plugin.setCategory("tickets", ticketCategory);
+        plugin.setCategory(null, "tickets", ticketCategory);
 
         SubCategoryData newTicket = new SubCategoryData();
         newTicket.setId("newTicketId");
@@ -149,9 +149,9 @@ public class FileSystemStoragePluginTest {
         ticketsArray.add(new JsonPrimitive("ticketTwo"));
         newTicket.getKeyMap().put("tickets", ticketsArray);
 
-        plugin.setSubCategory("tickets", newTicket.getId(), newTicket);
+        plugin.setSubCategory(null, "tickets", newTicket.getId(), newTicket);
 
-        SubCategoryData oldTicket = plugin.getSubCategory("tickets", "newTicketId");
+        SubCategoryData oldTicket = plugin.getSubCategory(null, "tickets", "newTicketId");
 
         Assert.assertEquals("tickets_newTicketId", oldTicket.getId());
         System.out.println(oldTicket.getListForKey("tickets").size());
@@ -166,15 +166,15 @@ public class FileSystemStoragePluginTest {
         CategoryData ticketCategory = new CategoryData();
         ticketCategory.getDefaultFields().add(new CategoryField("tickets", "tickets", "array", false));
 
-        plugin.setCategory("tickets", ticketCategory);
+        plugin.setCategory(null, "tickets", ticketCategory);
 
         SubCategoryData newTicket = new SubCategoryData();
         newTicket.setId("secondTicketId");
         newTicket.getKeyMap().put("tickets", new JsonPrimitive("ticketOne,ticketTwo"));
 
-        plugin.setSubCategory("tickets", newTicket.getId(), newTicket);
+        plugin.setSubCategory(null, "tickets", newTicket.getId(), newTicket);
 
-        SubCategoryData oldTicket = plugin.getSubCategory("tickets", "secondTicketId");
+        SubCategoryData oldTicket = plugin.getSubCategory(null, "tickets", "secondTicketId");
 
         Assert.assertEquals("tickets_secondTicketId", oldTicket.getId());
         System.out.println(oldTicket.getListForKey("tickets").size());

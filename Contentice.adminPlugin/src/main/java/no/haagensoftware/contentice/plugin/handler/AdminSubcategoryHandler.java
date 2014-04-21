@@ -51,12 +51,12 @@ public class AdminSubcategoryHandler extends ContenticeHandler {
             if (adminSubcategory != null && adminSubcategory.getSubcategory() != null) {
                 logger.info("Subcategory: " + adminSubcategory.getSubcategory().getId());
 
-                getStorage().setSubCategory(category, adminSubcategory.getSubcategory().getName(), adminSubcategory.getSubcategory());
+                getStorage().setSubCategory(getDomain().getWebappName(), category, adminSubcategory.getSubcategory().getName(), adminSubcategory.getSubcategory());
             }
         }
 
-        SubCategoryData subCategoryData = getStorage().getSubCategory(category, subcategory);
-        CategoryData categoryData = getStorage().getCategory(category);
+        SubCategoryData subCategoryData = getStorage().getSubCategory(getDomain().getWebappName(), category, subcategory);
+        CategoryData categoryData = getStorage().getCategory(getDomain().getWebappName(), category);
 
         if (subCategoryData == null) {
             write404ToBuffer(channelHandlerContext);

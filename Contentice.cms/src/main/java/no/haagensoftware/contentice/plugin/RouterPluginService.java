@@ -1,6 +1,8 @@
 package no.haagensoftware.contentice.plugin;
 
 import no.haagensoftware.contentice.main.ClassPathUtil;
+import no.haagensoftware.contentice.spi.AuthenticationPlugin;
+import no.haagensoftware.contentice.spi.ConticiousPlugin;
 import no.haagensoftware.contentice.spi.RouterPlugin;
 import org.apache.log4j.Logger;
 
@@ -16,7 +18,7 @@ import java.util.ServiceLoader;
  * Time: 6:02 PM
  * To change this template use File | Settings | File Templates.
  */
-public class RouterPluginService {
+public class RouterPluginService implements PluginService {
     private static final Logger logger = Logger.getLogger(RouterPluginService.class.getName());
 
     private static RouterPluginService pluginService = null;
@@ -48,5 +50,16 @@ public class RouterPluginService {
         }
 
         return plugins;
+    }
+
+    @Override
+    public List<ConticiousPlugin> getLoadedPlugins() {
+        List<ConticiousPlugin> loadedPlugins = new ArrayList<>();
+
+        for (RouterPlugin plugin: loader) {
+            loadedPlugins.add(plugin);
+        }
+
+        return loadedPlugins;
     }
 }

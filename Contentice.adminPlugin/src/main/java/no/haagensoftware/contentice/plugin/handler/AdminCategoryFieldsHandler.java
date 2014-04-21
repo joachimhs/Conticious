@@ -37,7 +37,7 @@ public class AdminCategoryFieldsHandler extends ContenticeHandler {
 
                 String category = newCategoryField.getId().substring(0, newCategoryField.getId().indexOf("_"));
 
-                CategoryData categoryData = getStorage().getCategory(category);
+                CategoryData categoryData = getStorage().getCategory(getDomain().getWebappName(), category);
                 boolean updated = false;
                 for (CategoryField cf : categoryData.getDefaultFields()) {
                     if (cf.getId().equals(categoryField.getCategoryField().getId())) {
@@ -54,7 +54,7 @@ public class AdminCategoryFieldsHandler extends ContenticeHandler {
                 }
 
                 if (updated) {
-                    getStorage().setCategory(category, categoryData);
+                    getStorage().setCategory(getDomain().getWebappName(), category, categoryData);
                 }
 
                 categoryField = new CategoryFieldObject();
@@ -72,7 +72,7 @@ public class AdminCategoryFieldsHandler extends ContenticeHandler {
             logger.info("Updating fieldid: " + categoryField.getCategoryField().getName() + " with: " + fieldId + " for category: " + category);
 
             CategoryField updatedField = null;
-            CategoryData categoryData = getStorage().getCategory(category);
+            CategoryData categoryData = getStorage().getCategory(getDomain().getWebappName(), category);
             for (CategoryField cf : categoryData.getDefaultFields()) {
                 if (cf.getId().equals(categoryFieldId)) {
                     cf.setName(categoryField.getCategoryField().getName());
@@ -83,7 +83,7 @@ public class AdminCategoryFieldsHandler extends ContenticeHandler {
                 }
             }
 
-            getStorage().setCategory(category, categoryData);
+            getStorage().setCategory(getDomain().getWebappName(), category, categoryData);
 
             CategoryFieldObject cfObject = new CategoryFieldObject();
             cfObject.setCategoryField(updatedField);
@@ -95,7 +95,7 @@ public class AdminCategoryFieldsHandler extends ContenticeHandler {
                 String category = categoryFieldId.substring(0, categoryFieldId.indexOf("_"));
                 String fieldId = categoryFieldId.substring(categoryFieldId.indexOf("_")+1, categoryFieldId.length());
 
-                CategoryData categoryData = getStorage().getCategory(category);
+                CategoryData categoryData = getStorage().getCategory(getDomain().getWebappName(), category);
 
                 CategoryField fieldToDelete = null;
                 for (CategoryField cf : categoryData.getDefaultFields()) {
@@ -109,7 +109,7 @@ public class AdminCategoryFieldsHandler extends ContenticeHandler {
                     categoryData.getDefaultFields().remove(fieldToDelete);
                 }
 
-                getStorage().setCategory(category, categoryData);
+                getStorage().setCategory(getDomain().getWebappName(), category, categoryData);
             }
         }
 

@@ -19,6 +19,7 @@
         <module>Contentice.cms</module>
         <module>Contentice.FilesystemPlugin</module>
         <module>Contentice.AdminPlugin</module>
+        <module>Conticious.dataPlugin</module>
     </modules>
 
 	<build>

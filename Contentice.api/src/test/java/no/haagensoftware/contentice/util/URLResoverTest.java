@@ -4,6 +4,7 @@ import io.netty.channel.ChannelHandler;
 import junit.framework.Assert;
 import no.haagensoftware.contentice.data.URLData;
 
+import no.haagensoftware.contentice.spi.RouterPlugin;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,7 +16,10 @@ import org.junit.Test;
  * To change this template use File | Settings | File Templates.
  */
 public class URLResoverTest {
-    private URLResolver resolver;
+    private PluginResolver resolver;
+    private RouterPlugin plugin1;
+    private RouterPlugin plugin2;
+
     private Class<ChannelHandler> channelHandler1;
     private Class<ChannelHandler> channelHandler2;
     private Class<ChannelHandler> channelHandler3;
@@ -23,22 +27,22 @@ public class URLResoverTest {
     private Class<ChannelHandler> channelHandler5;
     @Before
     public void setup() {
-        resolver = new URLResolver();
+        resolver = new PluginResolver();
 
-        resolver.addUrlPattern("/categories", channelHandler1);
-        resolver.addUrlPattern("/categories/{category}", channelHandler2);
-        resolver.addUrlPattern("/categories/{category}/subcategories", channelHandler3);
-        resolver.addUrlPattern("/categories/{category}/subcategories/{subcategory}", channelHandler4);
-        resolver.addUrlPattern("/json/data/{category}", channelHandler4);
-        resolver.addUrlPattern("/json/data/{category}/{subcategory}", channelHandler4);
-        resolver.addUrlPattern("classpath:/admin", channelHandler5);
+        resolver.addUrlPattern("/categories", plugin1);
+        resolver.addUrlPattern("/categories/{category}", plugin1);
+        resolver.addUrlPattern("/categories/{category}/subcategories", plugin1);
+        resolver.addUrlPattern("/categories/{category}/subcategories/{subcategory}", plugin2);
+        resolver.addUrlPattern("/json/data/{category}", plugin2);
+        resolver.addUrlPattern("/json/data/{category}/{subcategory}", plugin2);
+        resolver.addUrlPattern("classpath:/admin", plugin2);
     }
     @Test
     public void verifyUrlWithoutParameters() {
         URLData urlData = resolver.getValueForUrl("/categories");
         Assert.assertNotNull(urlData);
         Assert.assertEquals("/categories", urlData.getUrlPattern());
-        Assert.assertEquals(channelHandler1, urlData.getChannelHandler());
+        Assert.assertEquals(plugin1, urlData.getPlugin());
 
     }
 
@@ -49,7 +53,7 @@ public class URLResoverTest {
 
         Assert.assertEquals("/categories/{category}", urlData.getUrlPattern());
         Assert.assertEquals("pages", urlData.getParameters().get("category"));
-        Assert.assertEquals(channelHandler2, urlData.getChannelHandler());
+        Assert.assertEquals(plugin1, urlData.getPlugin());
     }
 
     @Test
@@ -59,7 +63,7 @@ public class URLResoverTest {
 
         Assert.assertEquals("/json/data/{category}", urlData.getUrlPattern());
         Assert.assertEquals("pages", urlData.getParameters().get("category"));
-        Assert.assertEquals(channelHandler4, urlData.getChannelHandler());
+        Assert.assertEquals(plugin2, urlData.getPlugin());
     }
 
     @Test
@@ -69,7 +73,7 @@ public class URLResoverTest {
 
         Assert.assertEquals("/categories/{category}/subcategories", urlData.getUrlPattern());
         Assert.assertEquals("pages", urlData.getParameters().get("category"));
-        Assert.assertEquals(channelHandler3, urlData.getChannelHandler());
+        Assert.assertEquals(plugin1, urlData.getPlugin());
 
         urlData = resolver.getValueForUrl("/categories/pages/subcategories/home");
         Assert.assertNotNull(urlData);
@@ -77,7 +81,7 @@ public class URLResoverTest {
         Assert.assertEquals("/categories/{category}/subcategories/{subcategory}", urlData.getUrlPattern());
         Assert.assertEquals("pages", urlData.getParameters().get("category"));
         Assert.assertEquals("home", urlData.getParameters().get("subcategory"));
-        Assert.assertEquals(channelHandler4, urlData.getChannelHandler());
+        Assert.assertEquals(plugin2, urlData.getPlugin());
     }
 
     @Test
@@ -88,7 +92,7 @@ public class URLResoverTest {
         Assert.assertEquals("/json/data/{category}/{subcategory}", urlData.getUrlPattern());
         Assert.assertEquals("pages", urlData.getParameters().get("category"));
         Assert.assertEquals("pageOne", urlData.getParameters().get("subcategory"));
-        Assert.assertEquals(channelHandler4, urlData.getChannelHandler());
+        Assert.assertEquals(plugin2, urlData.getPlugin());
     }
 
     @Test
@@ -98,7 +102,7 @@ public class URLResoverTest {
         Assert.assertNotNull(urlData);
         Assert.assertEquals("classpath:/admin", urlData.getUrlPattern());
         Assert.assertEquals("/admin/index.html", urlData.getRealUrl());
-        Assert.assertEquals(channelHandler5, urlData.getChannelHandler());
+        Assert.assertEquals(plugin2, urlData.getPlugin());
 
     }
 

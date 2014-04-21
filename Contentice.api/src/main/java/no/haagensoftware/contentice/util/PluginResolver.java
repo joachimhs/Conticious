@@ -2,32 +2,29 @@ package no.haagensoftware.contentice.util;
 
 import io.netty.channel.ChannelHandler;
 import no.haagensoftware.contentice.data.URLData;
+import no.haagensoftware.contentice.spi.ConticiousPlugin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Created with IntelliJ IDEA.
- * User: joahaage
- * Date: 16.11.13
- * Time: 16:17
- * To change this template use File | Settings | File Templates.
+ * Created by jhsmbp on 20/04/14.
  */
-public class URLResolver {
-    private Map<String, Class<? extends ChannelHandler>> urlMap;
+public class PluginResolver {
+    private Map<String, ConticiousPlugin> urlMap;
     private Map<String, String> plurals;
     private Map<String, String> singulars;
 
-    public URLResolver() {
+    public PluginResolver() {
         urlMap = new HashMap<>();
         plurals = new HashMap<>();
         singulars = new HashMap<>();
     }
 
-    public void addUrlPattern(String urlPattern, Class<? extends ChannelHandler> channelHandler) {
-        urlMap.put(urlPattern, channelHandler);
+    public void addUrlPattern(String urlPattern, ConticiousPlugin plugin) {
+        urlMap.put(urlPattern, plugin);
     }
 
     public void addPlural(String singular, String plural) {
@@ -65,6 +62,27 @@ public class URLResolver {
         }
 
         return singular;
+    }
+
+    public ConticiousPlugin getPluginForUrl(String url) {
+        ConticiousPlugin foundPlugin = null;
+
+        if (url.endsWith("/")) {
+            url = url.substring(0, url.length()-1);
+        }
+
+        //Try Excact match first
+        String value = getKeyForExactMatch(url);
+        URLData urlData = getValueForUrlWithParameters(url);
+
+        if (value != null) {
+            foundPlugin = urlMap.get(value);
+        } else if (urlData != null) {
+            //No excact match, try pattern
+            foundPlugin = urlData.getPlugin();
+        }
+
+        return foundPlugin;
     }
 
     public URLData getValueForUrl(String url) {
@@ -139,7 +157,6 @@ public class URLResolver {
     protected URLData getValueForUrlWithParameters(String actualUrl) {
         URLData urlData = null;
 
-
         for (String urlPattern : urlMap.keySet()) {
             if (urlPattern.contains("{") && urlPattern.contains("}")) {
                 boolean urlMatch = true;
@@ -171,5 +188,4 @@ public class URLResolver {
 
         return urlData;
     }
-
 }

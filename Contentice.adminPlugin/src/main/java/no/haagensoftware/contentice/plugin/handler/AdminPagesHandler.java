@@ -21,6 +21,8 @@ public class AdminPagesHandler extends FileServerHandler {
         if (System.getProperty("no.haagensoftware.contentice.adminDir") != null && System.getProperty("no.haagensoftware.contentice.adminDir").length() > 3) {
             setRootPath(System.getProperty("no.haagensoftware.contentice.adminDir"));
         }
+
+        setAdmin(true);
     }
 
     @Override

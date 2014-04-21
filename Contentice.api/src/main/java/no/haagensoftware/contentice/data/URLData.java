@@ -1,6 +1,7 @@
 package no.haagensoftware.contentice.data;
 
 import io.netty.channel.ChannelHandler;
+import no.haagensoftware.contentice.spi.ConticiousPlugin;
 
 import java.util.Map;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
 public class URLData {
     private String urlPattern;
     private String realUrl;
-    private Class<? extends ChannelHandler> channelHandler;
+    private ConticiousPlugin plugin;
     private Map<String, String> parameters;
     private List<String> queryStringIds;
 
@@ -25,10 +26,10 @@ public class URLData {
         this.parameters = parameters;
     }
 
-    public URLData(String urlPattern, String realUrl, Map<String, String> parameters, Class<? extends ChannelHandler> channelHandler) {
+    public URLData(String urlPattern, String realUrl, Map<String, String> parameters, ConticiousPlugin plugin) {
         this.urlPattern = urlPattern;
         this.realUrl = realUrl;
-        this.channelHandler = channelHandler;
+        this.plugin = plugin;
         this.parameters = parameters;
     }
 
@@ -44,8 +45,8 @@ public class URLData {
         return parameters;
     }
 
-    public Class<? extends ChannelHandler> getChannelHandler() {
-        return channelHandler;
+    public ConticiousPlugin getPlugin() {
+        return plugin;
     }
 
     public List<String> getQueryStringIds() {

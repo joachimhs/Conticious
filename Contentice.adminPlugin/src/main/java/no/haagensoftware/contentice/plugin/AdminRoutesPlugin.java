@@ -1,11 +1,17 @@
 package no.haagensoftware.contentice.plugin;
 
 import io.netty.channel.ChannelHandler;
+import no.haagensoftware.contentice.handler.ContenticeHandler;
 import no.haagensoftware.contentice.plugin.handler.*;
+import no.haagensoftware.contentice.spi.AuthenticationPlugin;
+import no.haagensoftware.contentice.spi.ConticiousPlugin;
 import no.haagensoftware.contentice.spi.RouterPlugin;
+import no.haagensoftware.contentice.spi.StoragePlugin;
 import org.apache.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,7 +23,6 @@ import java.util.Map;
  */
 public class AdminRoutesPlugin extends RouterPlugin {
     private static final Logger logger = Logger.getLogger(AdminRoutesPlugin.class.getName());
-
     LinkedHashMap<String, Class<? extends ChannelHandler>> routeMap;
 
     public AdminRoutesPlugin() {
@@ -39,7 +44,22 @@ public class AdminRoutesPlugin extends RouterPlugin {
         routeMap.put("/json/admin/subcategoryFields", AdminSubcategoryFieldsHandler.class);
         routeMap.put("/json/admin/subcategoryFields/{subcategoryField}", AdminSubcategoryFieldsHandler.class);
 
+        routeMap.put("/json/admin/settings", SettingsHandler.class);
+        routeMap.put("/json/admin/settings/{setting}", SettingsHandler.class);
+
         routeMap.put("startsWith:/admin", AdminPagesHandler.class);
+    }
+
+    @Override
+    public List<String> getPluginDependencies() {
+        List<String> dependencies = new ArrayList<>();
+        dependencies.add("AdminAuthenticationPlugin");
+        return dependencies;
+    }
+
+    @Override
+    public String getPluginName() {
+        return "AdminRoutesPlugin";
     }
 
     @Override
@@ -48,8 +68,17 @@ public class AdminRoutesPlugin extends RouterPlugin {
     }
 
     @Override
-    public Class<? extends ChannelHandler> getHandlerForRoute(String route) {
-        return routeMap.get(route);
+    public ChannelHandler getHandlerForUrl(String url) {
+        ChannelHandler handler = super.getHandlerForUrl(url);
+
+        if (handler != null && handler instanceof ContenticeHandler) {
+            for (ConticiousPlugin plugin : getDependantPluginsList()) {
+
+            }
+
+        }
+
+        return handler;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package no.haagensoftware.contentice.handler;
 
-import no.haagensoftware.contentice.util.URLResolver;
+import no.haagensoftware.contentice.util.PluginResolver;
 
 import java.util.Map;
 import java.util.List;
@@ -22,7 +22,7 @@ public interface ContenticeParameterMap {
 
     public List<String> getQueryStringIds();
 
-    public void setUrlResolver(URLResolver urlResolver);
+    public void setPluginResolver(PluginResolver pluginResolver);
 
-    public URLResolver getUrlResolver();
+    public PluginResolver getPluginResolver();
 }

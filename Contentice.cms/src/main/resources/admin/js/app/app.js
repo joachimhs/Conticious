@@ -25,11 +25,11 @@ Ember.Application.reopen({
     }
 });
 
-var Contentice = Ember.Application.create({
-    templates: ['application', 'categories', 'header', 'category', 'category/index', 'subcategory', 'subcategory/index', 'subcategory/fields', 'subcategory/preview', 'menu-category', 'menu-subcategory']
+var Conticious = Ember.Application.create({
+    templates: ['application', 'categories', 'header', 'category', 'category/index', 'subcategory', 'subcategory/index', 'subcategory/fields', 'subcategory/preview', 'menu-category', 'menu-subcategory', 'setting']
 });
 
-Contentice.Router.map(function() {
+Conticious.Router.map(function() {
     this.resource("categories", {path: "/"}, function() {
         this.resource('category', {path: "/category/:category_id"}, function() {
             this.resource('subcategory', {path: "/subcategory/:subcategory_id"}, function() {
@@ -38,29 +38,30 @@ Contentice.Router.map(function() {
             });
         });
     });
+    this.resource("setting");
 });
 
 DS.RESTAdapter.reopen({
     namespace: 'json/admin'
 });
 
-Contentice.Store = DS.Store.extend({
+Conticious.Store = DS.Store.extend({
     adapter:  "DS.RESTAdapter"
 });
 
-Contentice.CategoriesRoute = Ember.Route.extend({
+Conticious.CategoriesRoute = Ember.Route.extend({
     model: function() {
         return this.store.find('category');
     }
 });
 
-Contentice.CategoryRoute = Ember.Route.extend({
+Conticious.CategoryRoute = Ember.Route.extend({
     model: function(category) {
         return this.store.find('category', category.category_id);
     }
 });
 
-Contentice.CategoryIndexRoute = Ember.Route.extend({
+Conticious.CategoryIndexRoute = Ember.Route.extend({
     actions: {
 
         addNewField: function() {
@@ -119,18 +120,18 @@ Contentice.CategoryIndexRoute = Ember.Route.extend({
     }
 });
 
-Contentice.SubcategoryIndexRoute = Ember.Route.extend({
+Conticious.SubcategoryIndexRoute = Ember.Route.extend({
 
 });
 
-Contentice.SubcategoryIndexRoute = Ember.Route.extend({
+Conticious.SubcategoryIndexRoute = Ember.Route.extend({
     model: function() {
         var subcategory = this.modelFor('subcategory');
         return subcategory;
     }
 });
 
-Contentice.SubcategoryFieldsRoute = Ember.Route.extend({
+Conticious.SubcategoryFieldsRoute = Ember.Route.extend({
     actions: {
         saveSubcategoryField: function(field) {
             field.save();
@@ -147,14 +148,66 @@ Contentice.SubcategoryFieldsRoute = Ember.Route.extend({
     }
 });
 
-Contentice.SubcategoryPreviewRoute = Ember.Route.extend({
+Conticious.SubcategoryPreviewRoute = Ember.Route.extend({
     model: function() {
         var subcategory = this.modelFor('subcategory');
         return subcategory;
     }
 });
 
-Contentice.CategoriesController = Ember.ArrayController.extend({
+Conticious.SettingRoute = Ember.Route.extend({
+    model: function() {
+        return this.store.find('setting', 'ConticiousSettings');
+    }
+});
+
+Conticious.SettingController = Ember.ObjectController.extend({
+    actions: {
+        addDomain: function() {
+            var domains = this.get('domains');
+
+            var newDomain = this.store.createRecord('domain', {
+
+            });
+
+            domains.pushObject(newDomain);
+        },
+
+        deleteDomain: function(domain) {
+            domain.deleteRecord();
+            this.get('model.domains').removeObject(domain);
+        },
+
+        saveChanges: function() {
+            this.doSaveSettings();
+        }
+    },
+
+    doSaveSettings: function() {
+        var domains = [];
+
+        this.get('model.domains').forEach(function(domain) {
+            domains.pushObject(domain);
+        });
+
+
+        var jsonRequest = {};
+        jsonRequest.domains = domains;
+
+        var controller = this;
+        $.ajax("/json/admin/settings", {
+            data: JSON.stringify(jsonRequest),
+            contentType: 'application/json',
+            type: 'POST',
+            success: function () {
+                console.log('SUCCESS');
+                controller.get('model').reload();
+            }
+        });
+    }
+});
+
+Conticious.CategoriesController = Ember.ArrayController.extend({
     needs: ['category'],
 
     showNewCategoryField: false,
@@ -187,7 +240,7 @@ Contentice.CategoriesController = Ember.ArrayController.extend({
     }
 });
 
-Contentice.MenuCategoryView = Ember.View.extend({
+Conticious.MenuCategoryView = Ember.View.extend({
     templateName: 'menu-category',
 
     isSelected: function() {
@@ -195,12 +248,12 @@ Contentice.MenuCategoryView = Ember.View.extend({
     }.property('controller.controllers.category.model.id')
 });
 
-Contentice.MenuSubcategoryView = Ember.View.extend({
+Conticious.MenuSubcategoryView = Ember.View.extend({
     templateName: 'menu-subcategory'
 
 });
 
-Contentice.CategoriesView = Ember.View.extend({
+Conticious.CategoriesView = Ember.View.extend({
     isSelected: function() {
         console.log(this.get('model.id'));
         console.log(this.get('controller.model.id'));
@@ -212,11 +265,11 @@ Contentice.CategoriesView = Ember.View.extend({
     }.property('controller.model')
 });
 
-Contentice.CategoryController = Ember.ObjectController.extend({
+Conticious.CategoryController = Ember.ObjectController.extend({
 
 });
 
-Contentice.CategoryIndexController = Ember.Controller.extend({
+Conticious.CategoryIndexController = Ember.Controller.extend({
     needs: 'category',
     showNewFieldArea: false,
     showNewSubcategoryArea: false,
@@ -304,11 +357,11 @@ Contentice.CategoryIndexController = Ember.Controller.extend({
     }
 });
 
-Contentice.SubcategoryController = Ember.ObjectController.extend({
+Conticious.SubcategoryController = Ember.ObjectController.extend({
 
 });
 
-Contentice.SubcategoryIndexController = Ember.ObjectController.extend({
+Conticious.SubcategoryIndexController = Ember.ObjectController.extend({
     actions: {
         doSaveSubcategory: function(subcategory) {
             console.log('doSaveSubcategory: ' + subcategory.get('id'));
@@ -319,19 +372,19 @@ Contentice.SubcategoryIndexController = Ember.ObjectController.extend({
     }
 });
 
-Contentice.SubcategoryRoute = Ember.Route.extend({
+Conticious.SubcategoryRoute = Ember.Route.extend({
     model: function(subcategory) {
         return this.store.find('subcategory', subcategory.subcategory_id);
     }
 });
 
-Contentice.Category = DS.Model.extend({
+Conticious.Category = DS.Model.extend({
     subcategories: DS.hasMany('subcategory'),
     defaultFields: DS.hasMany('categoryField'),
     isPublic: DS.attr('boolean')
 });
 
-Contentice.CategoryField = DS.Model.extend({
+Conticious.CategoryField = DS.Model.extend({
     name: DS.attr('string'),
     type: DS.attr('string'),
     required: DS.attr('boolean'),
@@ -349,13 +402,13 @@ Contentice.CategoryField = DS.Model.extend({
     }.property('type')
 });
 
-Contentice.Subcategory = DS.Model.extend({
+Conticious.Subcategory = DS.Model.extend({
     name: DS.attr('string'),
     content: DS.attr('string'),
     fields: DS.hasMany('subcategoryField')
 });
 
-Contentice.SubcategoryField = DS.Model.extend({
+Conticious.SubcategoryField = DS.Model.extend({
     name: DS.attr('string'),
     type: DS.attr('string'),
     required: DS.attr('boolean'),
@@ -376,6 +429,16 @@ Contentice.SubcategoryField = DS.Model.extend({
     isArray: function() {
         return this.get('type') === "array";
     }.property('type')
+});
+
+Conticious.Setting = DS.Model.extend({
+    domains: DS.hasMany('domain')
+});
+
+Conticious.Domain = DS.Model.extend({
+    domainName: DS.attr('string'),
+    webappName: DS.attr('string'),
+    active: DS.attr('boolean')
 });
 
 

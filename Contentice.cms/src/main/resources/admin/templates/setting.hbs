@@ -1,0 +1,32 @@
+<div class="wrap" style="margin-top: 25px;">
+    <h1>Domains</h1>
+
+    <div class="text-right">
+        <button class="btn btn-primary smallMarginBottom" {{action "addDomain"}}>Add Domain</button>
+    </div>
+    <table class="table">
+    <tr>
+        <th>Domain ID</th>
+        <th>Domain name</th>
+        <th>Webapp name</th>
+        <th>Active</th>
+        <th>Action</th>
+    </tr>
+    {{#each domain in controller.model.domains}}
+        <tr>
+            <td>{{domain.id}}</td>
+            <td>{{input type="text" value=domain.domainName}}</td>
+            <td>{{input type="text" value=domain.webappName}}</td>
+            <td>
+                {{view Ember.Checkbox checkedBinding="domain.active"}}
+            </td>
+            <td>
+                <button class="btn btn-danger" {{action "deleteDomain" domain}}>Delete</button>
+            </td>
+        </tr>
+    {{/each}}
+    </table>
+    <div>
+        <button class="btn btn-primary" {{action "saveChanges"}}>Save Changes</button>
+    </div>
+</div>

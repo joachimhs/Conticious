@@ -5,6 +5,7 @@ import no.haagensoftware.contentice.data.FileData;
 import no.haagensoftware.contentice.data.SubCategoryData;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,20 +15,25 @@ import java.util.List;
  * Time: 12:09
  * To change this template use File | Settings | File Templates.
  */
-public abstract class StoragePlugin {
-    public abstract String getStoragePluginName();
+public abstract class StoragePlugin implements ConticiousPlugin {
+    public List<ConticiousPlugin> dependantPluginsList = new ArrayList<>();
 
-    public abstract List<CategoryData> getCategories();
+    @Override
+    public void addPlugin(ConticiousPlugin plugin) {
+        dependantPluginsList.add(plugin);
+    }
 
-    public abstract CategoryData getCategory(String category);
+    public abstract List<CategoryData> getCategories(String host);
 
-    public abstract void setCategory(String category, CategoryData categoryData);
+    public abstract CategoryData getCategory(String host, String category);
 
-    public abstract List<SubCategoryData> getSubCategories(String category);
+    public abstract void setCategory(String host, String category, CategoryData categoryData);
 
-    public abstract SubCategoryData getSubCategory(String category, String subCategory);
+    public abstract List<SubCategoryData> getSubCategories(String host, String category);
 
-    public abstract void setSubCategory(String category, String subCategory, SubCategoryData subCategoryData);
+    public abstract SubCategoryData getSubCategory(String host, String category, String subCategory);
+
+    public abstract void setSubCategory(String host, String category, String subCategory, SubCategoryData subCategoryData);
 
     public abstract void uploadFile(File file, FileData fileData);
 
@@ -35,7 +41,7 @@ public abstract class StoragePlugin {
 
     public abstract FileData getFileData(String filename);
 
-    public abstract void deleteCategory(String category);
+    public abstract void deleteCategory(String host, String category);
 
-    public abstract void deleteSubcategory(String category, String subCategory);
+    public abstract void deleteSubcategory(String host, String category, String subCategory);
 }

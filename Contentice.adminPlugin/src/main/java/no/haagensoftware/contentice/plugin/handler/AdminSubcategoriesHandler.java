@@ -48,10 +48,10 @@ public class AdminSubcategoriesHandler extends ContenticeHandler {
 
                 logger.info("Category: " + adminSubcategory.getSubcategory().getId());
 
-                getStorage().setSubCategory(category, adminSubcategory.getSubcategory().getName(), adminSubcategory.getSubcategory());
+                getStorage().setSubCategory(getDomain().getWebappName(), category, adminSubcategory.getSubcategory().getName(), adminSubcategory.getSubcategory());
 
 
-                CategoryData categoryData = getStorage().getCategory(category);
+                CategoryData categoryData = getStorage().getCategory(getDomain().getWebappName(), category);
                 topLevelObject.add("subcategory", AdminSubCategoryAssembler.buildAdminJsonFromSubCategoryData(adminSubcategory.getSubcategory(), categoryData));
 
                 JsonArray subcategoryFieldArray= new JsonArray();
@@ -75,8 +75,8 @@ public class AdminSubcategoriesHandler extends ContenticeHandler {
 
         } else {
             //Always return the updated subcategories
-            List<SubCategoryData> subCategories = getStorage().getSubCategories(category);
-            CategoryData categoryData = getStorage().getCategory(category);
+            List<SubCategoryData> subCategories = getStorage().getSubCategories(getDomain().getWebappName(), category);
+            CategoryData categoryData = getStorage().getCategory(getDomain().getWebappName(), category);
 
             if (subCategories == null) {
                 write404ToBuffer(channelHandlerContext);

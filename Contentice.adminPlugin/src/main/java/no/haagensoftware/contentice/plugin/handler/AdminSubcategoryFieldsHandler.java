@@ -46,7 +46,7 @@ public class AdminSubcategoryFieldsHandler extends ContenticeHandler {
             if (subcategoryFieldObject != null && subcategoryFieldId != null && subcategoryFieldId.contains("_")) {
                 logger.info("category: " + category + " subcategory: " + subcategory + " fieldName: " + fieldName);
 
-                SubCategoryData subCategoryData = getStorage().getSubCategory(category, subcategory);
+                SubCategoryData subCategoryData = getStorage().getSubCategory(getDomain().getWebappName(), category, subcategory);
 
                 logger.info(new Gson().toJson(subCategoryData).toString());
                 if (subCategoryData != null) {
@@ -70,7 +70,7 @@ public class AdminSubcategoryFieldsHandler extends ContenticeHandler {
                     subcategoryFieldObject.getSubcategoryField().setId(category + "_" + subcategory + "_" + fieldName);
                 }
 
-                getStorage().setSubCategory(category, subcategory, subCategoryData);
+                getStorage().setSubCategory(getDomain().getWebappName(), category, subcategory, subCategoryData);
 
                 returnJson = new Gson().toJson(subcategoryFieldObject);
             }
@@ -127,8 +127,8 @@ public class AdminSubcategoryFieldsHandler extends ContenticeHandler {
 
 
                     if (categoryId != null && subcategoryId != null && fieldId != null) {
-                        CategoryData categoryData = getStorage().getCategory(categoryId);
-                        SubCategoryData subCategoryData = getStorage().getSubCategory(categoryId, subcategoryId);
+                        CategoryData categoryData = getStorage().getCategory(getDomain().getWebappName(), categoryId);
+                        SubCategoryData subCategoryData = getStorage().getSubCategory(getDomain().getWebappName(), categoryId, subcategoryId);
                         for (CategoryField cf :  categoryData.getDefaultFields()) {
                             if (cf.getName().equals(fieldId)) {
                                 SubcategoryField subField = new SubcategoryField();

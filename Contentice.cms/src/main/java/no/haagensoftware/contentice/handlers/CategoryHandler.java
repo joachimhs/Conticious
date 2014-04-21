@@ -27,13 +27,13 @@ public class CategoryHandler extends ContenticeHandler {
 
         String category = getParameter("category");
 
-        CategoryData categoryData = getStorage().getCategory(category);
+        CategoryData categoryData = getStorage().getCategory(getDomain().getWebappName(), category);
         if (categoryData == null) {
             write404ToBuffer(channelHandlerContext);
         } else {
             JsonObject topLevelObject = new JsonObject();
 
-            List<SubCategoryData> subcategories = getStorage().getSubCategories(categoryData.getId());
+            List<SubCategoryData> subcategories = getStorage().getSubCategories(getDomain().getWebappName(), categoryData.getId());
             categoryData.getSubcategories().addAll(subcategories);
             topLevelObject.add("category", CategoryAssembler.buildCategoryJsonFromCategoryData(categoryData));
 

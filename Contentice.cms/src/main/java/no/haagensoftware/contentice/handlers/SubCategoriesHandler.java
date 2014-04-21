@@ -28,7 +28,7 @@ public class SubCategoriesHandler extends ContenticeHandler {
 
         String category = getParameter("category");
 
-        List<SubCategoryData> subCategories = getStorage().getSubCategories(category);
+        List<SubCategoryData> subCategories = getStorage().getSubCategories(getDomain().getWebappName(), category);
 
         if (subCategories == null) {
             write404ToBuffer(channelHandlerContext);

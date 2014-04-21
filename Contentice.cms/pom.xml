@@ -40,6 +40,11 @@
         </dependency>
         <dependency>
             <groupId>no.haagensoftware</groupId>
+            <artifactId>conticious-data-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>no.haagensoftware</groupId>
             <artifactId>kontize-filesystem-plugin</artifactId>
             <version>${project.version}</version>
 

@@ -6,6 +6,7 @@ import no.haagensoftware.contentice.data.CategoryField;
 import no.haagensoftware.contentice.data.FileData;
 import no.haagensoftware.contentice.data.SubCategoryData;
 import no.haagensoftware.contentice.spi.StoragePlugin;
+import no.haagensoftware.contentice.util.JsonUtil;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
@@ -31,7 +32,12 @@ public class FileSystemStoragePlugin extends StoragePlugin {
     private String documentsDirectory;
 
     @Override
-    public String getStoragePluginName() {
+    public List<String> getPluginDependencies() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public String getPluginName() {
         return "FileSystemStoragePlugin";
     }
 
@@ -50,16 +56,28 @@ public class FileSystemStoragePlugin extends StoragePlugin {
         //if we got here, we have a valid documents directory
         this.documentsDirectory = docDirectory;
     }
+    
+    private String getDocDir(String host) {
+        String docDir = documentsDirectory;
+        
+        if (host != null) {
+            docDir = documentsDirectory + File.separatorChar + host;
+        }
+        
+        return docDir;
+    }
 
     @Override
-    public List<CategoryData> getCategories() {
+    public List<CategoryData> getCategories(String host) {
         List<CategoryData> categories = new ArrayList<>();
 
-        try (DirectoryStream<Path> ds = Files.newDirectoryStream(FileSystems.getDefault().getPath(documentsDirectory))) {
+        String docDir = getDocDir(host);
+
+        try (DirectoryStream<Path> ds = Files.newDirectoryStream(FileSystems.getDefault().getPath(docDir))) {
             for (Path p : ds) {
                 if (Files.isDirectory(p)) {
                     CategoryData categoryData = new CategoryData(p.getFileName().toString());
-                    String json = getFileContents(documentsDirectory + File.separatorChar + p.getFileName() + ".json");
+                    String json = JsonUtil.getFileContents(docDir + File.separatorChar + p.getFileName() + ".json");
                     if (json != null) {
                         JsonElement jsonElement = new JsonParser().parse(json);
                         if (jsonElement.isJsonArray()) {
@@ -88,7 +106,7 @@ public class FileSystemStoragePlugin extends StoragePlugin {
                         }
                     }
 
-                    String settingsJson = getFileContents(documentsDirectory + File.separatorChar + p.getFileName() + "_settings.json");
+                    String settingsJson = JsonUtil.getFileContents(docDir + File.separatorChar + p.getFileName() + "_settings.json");
                     if (settingsJson != null) {
                         JsonElement jsonElement = new JsonParser().parse(settingsJson);
                         boolean isPublic = false;
@@ -110,10 +128,10 @@ public class FileSystemStoragePlugin extends StoragePlugin {
     }
 
     @Override
-    public CategoryData getCategory(String category) {
+    public CategoryData getCategory(String host,String category) {
         CategoryData categoryData = null;
 
-        for (CategoryData currCategory : getCategories()) {
+        for (CategoryData currCategory : getCategories(host)) {
             if (currCategory.getId().equals(category)) {
                 categoryData = currCategory;
                 break;
@@ -124,8 +142,10 @@ public class FileSystemStoragePlugin extends StoragePlugin {
     }
 
     @Override
-    public void setCategory(String category, CategoryData categoryData) {
-        Path path = FileSystems.getDefault().getPath(documentsDirectory + File.separatorChar + category);
+    public void setCategory(String host, String category, CategoryData categoryData) {
+        String docDir = getDocDir(host);
+
+        Path path = FileSystems.getDefault().getPath(docDir + File.separatorChar + category);
 
         if (!Files.exists(path)) {
             try {
@@ -136,8 +156,8 @@ public class FileSystemStoragePlugin extends StoragePlugin {
         }
 
         if (Files.exists(path)) {
-            Path jsonPath = FileSystems.getDefault().getPath(documentsDirectory + File.separatorChar + category + ".json");
-            Path settingsJsonPath = FileSystems.getDefault().getPath(documentsDirectory + File.separatorChar + category + "_settings.json");
+            Path jsonPath = FileSystems.getDefault().getPath(docDir + File.separatorChar + category + ".json");
+            Path settingsJsonPath = FileSystems.getDefault().getPath(docDir + File.separatorChar + category + "_settings.json");
 
             JsonArray fieldArray = new JsonArray();
             for (CategoryField cf : categoryData.getDefaultFields()) {
@@ -145,37 +165,20 @@ public class FileSystemStoragePlugin extends StoragePlugin {
             }
             String jsonContent =  fieldArray.toString();
 
-            writeJsonToFile(jsonPath, jsonContent);
+            JsonUtil.writeJsonToFile(jsonPath, jsonContent);
 
             JsonObject settingsObject = new JsonObject();
             settingsObject.addProperty("isPublic", categoryData.isPublic());
 
-            writeJsonToFile(settingsJsonPath, settingsObject.toString());
-        }
-    }
-
-    private void writeJsonToFile(Path jsonPath, String jsonContent) {
-        BufferedWriter jsonWriter = null;
-        try {
-            jsonWriter = Files.newBufferedWriter(jsonPath, Charset.forName("utf-8"));
-            jsonWriter.write(jsonContent, 0, jsonContent.length());
-            jsonWriter.flush();
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } finally {
-            if (jsonWriter != null) {
-                try {
-                    jsonWriter.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            JsonUtil.writeJsonToFile(settingsJsonPath, settingsObject.toString());
         }
     }
 
     @Override
-    public void deleteCategory(String category) {
-        Path path = FileSystems.getDefault().getPath(documentsDirectory + File.separatorChar + category);
+    public void deleteCategory(String host, String category) {
+        String docDir = documentsDirectory + File.separatorChar + host;
+
+        Path path = FileSystems.getDefault().getPath(docDir + File.separatorChar + category);
 
         if (Files.exists(path)) {
             try {
@@ -187,12 +190,13 @@ public class FileSystemStoragePlugin extends StoragePlugin {
     }
 
     @Override
-    public List<SubCategoryData> getSubCategories(String category) {
+    public List<SubCategoryData> getSubCategories(String host, String category) {
+        String docDir = documentsDirectory + File.separatorChar + host;
         List<SubCategoryData> subCategories = new ArrayList<>();
 
-        try (DirectoryStream<Path> ds = Files.newDirectoryStream(FileSystems.getDefault().getPath(documentsDirectory + File.separatorChar + category), "*.md")) {
+        try (DirectoryStream<Path> ds = Files.newDirectoryStream(FileSystems.getDefault().getPath(docDir + File.separatorChar + category), "*.md")) {
             for (Path p : ds) {
-                subCategories.add(getSubCategoryData(category, subCategories, p));
+                subCategories.add(getSubCategoryData(host, category, subCategories, p));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -201,7 +205,7 @@ public class FileSystemStoragePlugin extends StoragePlugin {
         return subCategories;
     }
 
-    private SubCategoryData getSubCategoryData(String category, List<SubCategoryData> subCategories, Path p) throws IOException {
+    private SubCategoryData getSubCategoryData(String host, String category, List<SubCategoryData> subCategories, Path p) throws IOException {
         SubCategoryData subCategory = null;
 
         if (Files.isRegularFile(p)) {
@@ -218,19 +222,21 @@ public class FileSystemStoragePlugin extends StoragePlugin {
                 subCategory.setName(filename);
             }
 
-            subCategory.setContent(getMarkdownContent(category, subCategory));
-            subCategory.setKeyMap(getJsonContent(category, subCategory));
+            subCategory.setContent(getMarkdownContent(host, category, subCategory));
+            subCategory.setKeyMap(getJsonContent(host, category, subCategory));
         }
 
         return subCategory;
     }
 
-    private String getMarkdownContent(String category, SubCategoryData subCategory) throws IOException {
-        return getFileContents(documentsDirectory + File.separatorChar + category + File.separatorChar + subCategory.getName() + ".md");
+    private String getMarkdownContent(String host, String category, SubCategoryData subCategory) throws IOException {
+        String docDir = documentsDirectory + File.separatorChar + host;
+        return JsonUtil.getFileContents(docDir + File.separatorChar + category + File.separatorChar + subCategory.getName() + ".md");
     }
 
-    private Map<String, JsonElement> getJsonContent(String category, SubCategoryData subCategory) throws IOException {
-        String jsonContent = getFileContents(documentsDirectory + File.separatorChar + category + File.separatorChar + subCategory.getName() + ".json");
+    private Map<String, JsonElement> getJsonContent(String host, String category, SubCategoryData subCategory) throws IOException {
+        String docDir = documentsDirectory + File.separatorChar + host;
+        String jsonContent = JsonUtil.getFileContents(docDir + File.separatorChar + category + File.separatorChar + subCategory.getName() + ".json");
 
         return buildKeysMapFromJsonObject(jsonContent);
     }
@@ -271,45 +277,19 @@ public class FileSystemStoragePlugin extends StoragePlugin {
         }
     }
 
-    private String getFileContents(String path) throws IOException {
-        String returnString = null;
-        File file = new File(path);
-        if (file.exists() && file.isFile()) {
-            BufferedReader fileBufferedReader = null;
-            try {
-                fileBufferedReader = Files.newBufferedReader((FileSystems.getDefault().getPath(path)), Charset.forName("utf-8"));
-
-                StringBuffer sb = new StringBuffer();
-                String line = null;
-                while ((line = fileBufferedReader.readLine()) != null) {
-                    sb.append(line).append("\n");
-                }
-
-                if (sb.length() > 0) {
-                    returnString = sb.toString();
-                }
-            } finally {
-                if (fileBufferedReader != null) {
-                    fileBufferedReader.close();
-                }
-            }
-        }
-
-        return returnString;
-    }
-
     @Override
-    public SubCategoryData getSubCategory(String category, String subCategory) {
+    public SubCategoryData getSubCategory(String host, String category, String subCategory) {
+        String docDir = documentsDirectory + File.separatorChar + host;
         String useSubcategory = subCategory;
 
         if (useSubcategory.startsWith(category + "_")) {
-            useSubcategory = useSubcategory.substring(9);
+            useSubcategory = useSubcategory.substring(category.length() + 1);
         }
 
-        Path path = FileSystems.getDefault().getPath(documentsDirectory + File.separatorChar + category + File.separatorChar + useSubcategory + ".md");
+        Path path = FileSystems.getDefault().getPath(docDir + File.separatorChar + category + File.separatorChar + useSubcategory + ".md");
         SubCategoryData subCategoryData = null;
         try {
-            subCategoryData = this.getSubCategoryData(category, getSubCategories(category), path);
+            subCategoryData = this.getSubCategoryData(host, category, getSubCategories(host, category), path);
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
@@ -318,9 +298,11 @@ public class FileSystemStoragePlugin extends StoragePlugin {
     }
 
     @Override
-    public void setSubCategory(String category, String subCategory, SubCategoryData subCategoryData) {
-        Path markdownPath = FileSystems.getDefault().getPath(documentsDirectory + File.separatorChar + category + File.separatorChar + subCategory + ".md");
-        Path jsonPath = FileSystems.getDefault().getPath(documentsDirectory + File.separatorChar + category + File.separatorChar + subCategory + ".json");
+    public void setSubCategory(String host, String category, String subCategory, SubCategoryData subCategoryData) {
+        String docDir = documentsDirectory + File.separatorChar + host;
+
+        Path markdownPath = FileSystems.getDefault().getPath(docDir + File.separatorChar + category + File.separatorChar + subCategory + ".md");
+        Path jsonPath = FileSystems.getDefault().getPath(docDir + File.separatorChar + category + File.separatorChar + subCategory + ".json");
 
         BufferedWriter markdownWriter = null;
         BufferedWriter jsonWriter = null;
@@ -372,9 +354,11 @@ public class FileSystemStoragePlugin extends StoragePlugin {
     }
 
     @Override
-    public void deleteSubcategory(String category, String subCategory) {
-        Path markdownPath = FileSystems.getDefault().getPath(documentsDirectory + File.separatorChar + category + File.separatorChar + subCategory + ".md");
-        Path jsonPath = FileSystems.getDefault().getPath(documentsDirectory + File.separatorChar + category + File.separatorChar + subCategory + ".json");
+    public void deleteSubcategory(String host, String category, String subCategory) {
+        String docDir = documentsDirectory + File.separatorChar + host;
+
+        Path markdownPath = FileSystems.getDefault().getPath(docDir + File.separatorChar + category + File.separatorChar + subCategory + ".md");
+        Path jsonPath = FileSystems.getDefault().getPath(docDir + File.separatorChar + category + File.separatorChar + subCategory + ".json");
 
         try {
             Files.deleteIfExists(markdownPath);

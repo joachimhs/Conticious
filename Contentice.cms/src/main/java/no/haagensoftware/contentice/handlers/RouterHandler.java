@@ -5,11 +5,14 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.stream.ChunkedWriteHandler;
-import no.haagensoftware.contentice.data.URLData;
+import no.haagensoftware.contentice.data.Domain;
+import no.haagensoftware.contentice.data.Settings;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
 import no.haagensoftware.contentice.handler.FileServerHandler;
+import no.haagensoftware.contentice.spi.ConticiousPlugin;
+import no.haagensoftware.contentice.spi.RouterPlugin;
 import no.haagensoftware.contentice.spi.StoragePlugin;
-import no.haagensoftware.contentice.util.URLResolver;
+import no.haagensoftware.contentice.util.PluginResolver;
 import org.apache.log4j.Logger;
 
 /**
@@ -23,11 +26,11 @@ public class RouterHandler extends ContenticeHandler {
     private static final Logger logger = Logger.getLogger(RouterHandler.class.getName());
     private StoragePlugin storage;
 
-    private URLResolver urlResolver;
+    private PluginResolver pluginResolver;
     private Class<? extends ChannelHandler> defaultHandler;
 
-    public RouterHandler(URLResolver urlResolver,Class<? extends ChannelHandler> defaultHandler, StoragePlugin storage) {
-        this.urlResolver = urlResolver;
+    public RouterHandler(PluginResolver pluginResolver,Class<? extends ChannelHandler> defaultHandler, StoragePlugin storage) {
+        this.pluginResolver = pluginResolver;
         this.defaultHandler = defaultHandler;
         this.storage = storage;
     }
@@ -35,13 +38,25 @@ public class RouterHandler extends ContenticeHandler {
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
         logger.info("channelRead: HttpRequest. File handlers before: " + FileServerHandler.getOpenFileDescriptorCount());
+
         String url = fullHttpRequest.getUri();
         logger.info("URL: " + url);
-        URLData urlData = urlResolver.getValueForUrl(url);
 
-        logger.info("urlData: " + urlData);
+        Domain domain = Settings.getInstance().getConticiousOptions().getWebappForHost(getHost(fullHttpRequest));
 
-        if (urlData == null) {
+        ChannelHandler channelHandler = null;
+        ConticiousPlugin plugin = pluginResolver.getPluginForUrl(url);
+
+        if (plugin != null) {
+            if (plugin instanceof RouterPlugin) {
+                RouterPlugin routerPlugin = (RouterPlugin)plugin;
+                channelHandler = ((RouterPlugin) plugin).getHandlerForUrl(url);
+            }
+        }
+
+        logger.info("channelHandler: " + channelHandler);
+
+        if (channelHandler == null) {
             if (defaultHandler == null) {
                 defaultHandler = NotFoundHandler.class;
             }
@@ -53,27 +68,24 @@ public class RouterHandler extends ContenticeHandler {
 
             if (handler instanceof FileServerHandler) {
                 //addFileHandlers(channelHandlerContext, fullHttpRequest);
+                ((FileServerHandler)handler).setDomain(domain);
             }
-            addOrReplaceHandler(channelHandlerContext, defaultHandler.newInstance(), "route-generated", fullHttpRequest);
+            addOrReplaceHandler(channelHandlerContext, handler, "route-generated", fullHttpRequest);
         } else {
-            logger.info("Handler: " + urlData.getChannelHandler());
 
-            ChannelHandler handler = urlData.getChannelHandler().newInstance();
-            if (handler instanceof FileServerHandler) {
+            if (channelHandler instanceof FileServerHandler) {
                 //Initializer Handler correctly if the handler is a subclass of the FileServerHandler
                 //((FileServerHandler)handler).setFromClasspath(false);
                 //addFileHandlers(channelHandlerContext, fullHttpRequest);
-
-            } else if (handler instanceof ContenticeHandler) {
+                ((FileServerHandler)channelHandler).setDomain(domain);
+            } else if (channelHandler instanceof ContenticeHandler) {
                 //addDataHandlers(channelHandlerContext, fullHttpRequest);
 
                 //Initializer Handler correctly if the handler is a subclass of the ContenticeHandler
-                ((ContenticeHandler)handler).setParameterMap(urlData.getParameters());
-                ((ContenticeHandler)handler).setQueryStringIds(urlData.getQueryStringIds());
-                ((ContenticeHandler)handler).setStorage(storage);
-                ((ContenticeHandler)handler).setUrlResolver(urlResolver);
+                ((ContenticeHandler)channelHandler).setDomain(domain);
+                ((ContenticeHandler)channelHandler).setPluginResolver(pluginResolver);
             }
-            addOrReplaceHandler(channelHandlerContext, handler, "route-generated", fullHttpRequest);
+            addOrReplaceHandler(channelHandlerContext, channelHandler, "route-generated", fullHttpRequest);
         }
 
         fullHttpRequest.retain();
