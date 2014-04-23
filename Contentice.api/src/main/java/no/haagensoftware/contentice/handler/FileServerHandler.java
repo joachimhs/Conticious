@@ -163,10 +163,10 @@ public class FileServerHandler extends ContenticeHandler {
 
                 File file = new File(this.rootPath + path);
 
-                File staticFile = new File(rootPath + File.separatorChar + "static" + File.separatorChar + originalPath);
+                File staticFile = new File(rootPath + File.separatorChar + webappName + File.separatorChar + "static" + File.separatorChar + originalPath);
 
                 if (!file.exists()) {
-                    path = rootPath + File.separatorChar + "index.html";
+                    path = rootPath + File.separatorChar + webappName + File.separatorChar + "index.html";
                 } else if (file.isDirectory()) {
                     path = this.rootPath + path + File.separatorChar + "index.html";
                 } else {

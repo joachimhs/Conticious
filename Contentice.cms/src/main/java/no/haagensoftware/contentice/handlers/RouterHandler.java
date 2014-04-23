@@ -43,6 +43,7 @@ public class RouterHandler extends ContenticeHandler {
         logger.info("URL: " + url);
 
         Domain domain = Settings.getInstance().getConticiousOptions().getWebappForHost(getHost(fullHttpRequest));
+        logger.info("domain: " + domain.getDomainName());
 
         ChannelHandler channelHandler = null;
         ConticiousPlugin plugin = pluginResolver.getPluginForUrl(url);
