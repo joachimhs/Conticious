@@ -45,7 +45,7 @@ public class Main {
 
         readProperties();
 
-        String options = JsonUtil.getFileContents(System.getProperty("no.haagensoftware.contentice.storage.file.documentsDirectory") + File.separatorChar + "conticiousOptions.json");
+        String options = JsonUtil.getFileContents(System.getProperty("no.haagensoftware.contentice.storage.file.documentsDirectory") + File.separatorChar + "admin" + File.separatorChar + "conticiousOptions.json");
         if (options != null) {
             ConticiousOptions conticiousOptions = new Gson().fromJson(options, ConticiousOptions.class);
             Settings.getInstance().setConticiousOptions(conticiousOptions);
@@ -163,10 +163,6 @@ public class Main {
 
         if (properties.get("no.haagensoftware.contentice.pluginDirectory") == null) {
 //            throw new RuntimeException("Plugin directory is missing from configuration. Please ensure that no.haagensoftware.contentice.pluginDirectory is defined in config.properties");
-        }
-
-        if (properties.get("no.haagensoftware.contentice.adminDir") == null) {
-            throw new RuntimeException("Admin Dir directory is missing from configuration. Please ensure that no.haagensoftware.contentice.adminDir is defined in config.properties");
         }
 
         if (properties.get("no.haagensoftware.contentice.storage.plugin") == null) {

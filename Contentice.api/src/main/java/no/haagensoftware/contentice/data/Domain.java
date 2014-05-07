@@ -8,6 +8,7 @@ public class Domain {
     private String domainName;
     private String webappName;
     private Boolean active;
+    private Boolean minified;
 
     public String getId() {
         return id;
@@ -39,5 +40,13 @@ public class Domain {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public Boolean getMinified() {
+        return minified;
+    }
+
+    public void setMinified(Boolean minified) {
+        this.minified = minified;
     }
 }

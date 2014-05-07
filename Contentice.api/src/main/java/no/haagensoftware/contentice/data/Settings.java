@@ -1,5 +1,6 @@
 package no.haagensoftware.contentice.data;
 
+import java.util.ArrayList;
 import java.util.List;
 /**
  * Created by jhsmbp on 19/04/14.
@@ -7,6 +8,11 @@ import java.util.List;
 public class Settings {
     private static Settings instance = null;
     private ConticiousOptions conticiousOptions;
+
+    private Settings() {
+        conticiousOptions = new ConticiousOptions();
+        conticiousOptions.setDomains(new ArrayList<Domain>());
+    }
 
     public static Settings getInstance() {
         if (instance == null) {

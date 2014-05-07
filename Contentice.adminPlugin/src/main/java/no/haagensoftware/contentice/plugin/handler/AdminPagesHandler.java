@@ -5,6 +5,8 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import no.haagensoftware.contentice.handler.FileServerHandler;
 import org.apache.log4j.Logger;
 
+import java.io.File;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jhsmbp
@@ -18,8 +20,8 @@ public class AdminPagesHandler extends FileServerHandler {
     public AdminPagesHandler() {
         setFromClasspath(false);
 
-        if (System.getProperty("no.haagensoftware.contentice.adminDir") != null && System.getProperty("no.haagensoftware.contentice.adminDir").length() > 3) {
-            setRootPath(System.getProperty("no.haagensoftware.contentice.adminDir"));
+        if (System.getProperty("no.haagensoftware.contentice.webappDir") != null && System.getProperty("no.haagensoftware.contentice.webappDir").length() > 3) {
+            setRootPath(System.getProperty("no.haagensoftware.contentice.webappDir"));
         }
 
         setAdmin(true);

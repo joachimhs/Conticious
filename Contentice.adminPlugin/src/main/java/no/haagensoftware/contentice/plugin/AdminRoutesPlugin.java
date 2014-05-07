@@ -47,6 +47,13 @@ public class AdminRoutesPlugin extends RouterPlugin {
         routeMap.put("/json/admin/settings", SettingsHandler.class);
         routeMap.put("/json/admin/settings/{setting}", SettingsHandler.class);
 
+        routeMap.put("/json/admin/users", AdminUserHandler.class);
+        routeMap.put("/json/admin/users/{user}", AdminUserHandler.class);
+
+        routeMap.put("/json/admin/auth", AdminAuthHandler.class);
+
+        routeMap.put("/json/admin/spg/{domain}", SpgHandler.class);
+
         routeMap.put("startsWith:/admin", AdminPagesHandler.class);
     }
 

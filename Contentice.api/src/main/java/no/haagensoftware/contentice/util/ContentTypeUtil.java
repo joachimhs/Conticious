@@ -21,6 +21,9 @@ public class ContentTypeUtil {
 		contentTypeHash.put("json", "text/json; charset=UTF-8");
 		contentTypeHash.put("html", "text/html; charset=UTF-8");
 		contentTypeHash.put("htm", "text/html; charset=UTF-8");
+		contentTypeHash.put("pdf", "application/pdf");
+		contentTypeHash.put("PDF", "application/pdf");
+
 	}
 	
 	public static String getContentType(String filename) {

@@ -1,5 +1,7 @@
 package no.haagensoftware.contentice.spi;
 
+import no.haagensoftware.contentice.data.auth.Session;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,7 +9,7 @@ import java.util.List;
  * Created by jhsmbp on 20/04/14.
  */
 public abstract class AuthenticationPlugin implements ConticiousPlugin {
-    public List<ConticiousPlugin> dependantPluginsList = new ArrayList<>();
+    protected List<ConticiousPlugin> dependantPluginsList = new ArrayList<>();
 
     @Override
     public void addPlugin(ConticiousPlugin plugin) {
@@ -19,4 +21,6 @@ public abstract class AuthenticationPlugin implements ConticiousPlugin {
     public abstract boolean isUuidAuthenticated(String uuid);
 
     public abstract boolean logOutUserWithUuid(String uuid);
+
+    public abstract Session getSession(String uuid);
 }

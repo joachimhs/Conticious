@@ -3,11 +3,14 @@ package no.haagensoftware.contentice.plugin.handler;
 import com.google.gson.Gson;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
 import no.haagensoftware.contentice.data.CategoryData;
 import no.haagensoftware.contentice.data.CategoryField;
+import no.haagensoftware.contentice.data.auth.Session;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
 import no.haagensoftware.contentice.plugin.admindata.CategoryFieldObject;
+import no.haagensoftware.contentice.spi.AuthenticationPlugin;
 import org.apache.log4j.Logger;
 
 /**
@@ -22,6 +25,23 @@ public class AdminCategoryFieldsHandler extends ContenticeHandler {
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
+        AuthenticationPlugin authenticationPlugin = getAuthenticationPlugin();
+
+        if (authenticationPlugin == null) {
+            sendError(channelHandlerContext, HttpResponseStatus.UNAUTHORIZED);
+        } else {
+            String cookieUuidToken = getCookieValue(fullHttpRequest, "uuidAdminToken");
+            Session session = authenticationPlugin.getSession(cookieUuidToken);
+
+            if (session != null && ("admin".equals(session.getUser().getRole()) || "super".equals(session.getUser().getRole()))) {
+                handleRequest(channelHandlerContext, fullHttpRequest);
+            } else {
+
+            }
+        }
+    }
+
+    private void handleRequest(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) {
         logger.info("Post/Put CategoryField");
 
         String returnJson = "";

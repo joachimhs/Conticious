@@ -6,16 +6,23 @@ import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
 import no.haagensoftware.contentice.data.Domain;
 import no.haagensoftware.contentice.util.ContentTypeUtil;
+import no.haagensoftware.conticious.scriptcache.ScriptCache;
+import no.haagensoftware.conticious.scriptcache.ScriptFile;
+import no.haagensoftware.conticious.scriptcache.ScriptHash;
 import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.net.*;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A file server that can serve files from file system and class path.
@@ -28,13 +35,15 @@ public class FileServerHandler extends ContenticeHandler {
 
     private static final String HTTP_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss zzz";
 
-    private String rootPath;
+    protected String rootPath;
 
     private String stripFromUri;
     private int cacheMaxAge = -1;
     private boolean fromClasspath = false;
     private boolean isAdmin = false;
     private MimetypesFileTypeMap fileTypeMap = new MimetypesFileTypeMap();
+
+    private int maxCacheSeconds = 10;
 
     public FileServerHandler() {
         if (System.getProperty("no.haagensoftware.contentice.webappDir") != null && System.getProperty("no.haagensoftware.contentice.webappDir").length() > 3) {
@@ -150,13 +159,19 @@ public class FileServerHandler extends ContenticeHandler {
         } else {
             String originalPath = path;
 
+            String webappName = null;
+
             Domain domain = getDomain();
 
-            if (domain == null) {
+            if (domain == null && originalPath.startsWith("/admin")) {
+                webappName = "admin";
+            } else if (domain != null) {
+                webappName = domain.getWebappName();
+            }
+
+            if (webappName == null) {
                 write404DomainNotFoundToBuffer(channelHandlerContext);
             } else {
-                String webappName = getDomain().getWebappName();
-
                 if (webappName != null && !isAdmin) {
                     path = "/" + webappName + path;
                 }
@@ -185,32 +200,91 @@ public class FileServerHandler extends ContenticeHandler {
                 logger.info("original path: " + originalPath);
                 logger.info("static path: " + staticPath);
 
-                //Add static contents inside a NOSCRIPT tag
-                if (path.endsWith(".html") && staticFile.exists() && staticFile.isFile()) {
-                    logger.info("Adding noscript tag");
-
-                    Document htmlDocument = parseHtmlPage(path);
-                    Document staticDocument = parseHtmlPage(staticFile.getAbsolutePath());
-
-
-                    logger.info(htmlDocument.toString());
-                    logger.info("\n\n---\n\n");
-
-                    Element noscript = htmlDocument.body().appendElement("noscript");
-
-                    for (Element element : staticDocument.getElementsByTag("body").get(0).children()) {
-                        noscript.appendChild(element);
+                if (path.endsWith(".html")) {
+                    ScriptCache cache = ScriptHash.getScriptCache(path);
+                    if (cache == null || cache.isExpired()) {
+                        //If file is not cached, or cache is expired, update the cache.
+                        logger.info("Updating index.html from filesystem path: " + path);
+                        cache = updateScriptCacheForPath(getDomain().getWebappName(), path);
                     }
 
-                    logger.info(htmlDocument.toString());
+                    String htmlContents = cache.getHtmlContents();
 
-                    String contents = htmlDocument.toString();
-                    writeContentsToBuffer(channelHandlerContext, contents, ContentTypeUtil.getContentType(path + ".html"));
+                    //Add static contents inside a NOSCRIPT tag
+                    if (path.endsWith(".html") && staticFile.exists() && staticFile.isFile()) {
+                        logger.info("Adding noscript tag");
+
+                        Document htmlDocument = Jsoup.parse(htmlContents, "UTF-8");
+                        Document staticDocument = parseHtmlPage(staticFile.getAbsolutePath());
+
+                        logger.info(htmlDocument.toString());
+                        logger.info("\n\n---\n\n");
+
+                        Element noscript = htmlDocument.body().appendElement("noscript");
+
+                        for (Element element : staticDocument.getElementsByTag("body").get(0).children()) {
+                            noscript.appendChild(element);
+                        }
+
+                        htmlContents = htmlDocument.toString();
+                    }
+
+                    writeContentsToBuffer(channelHandlerContext, htmlContents, ContentTypeUtil.getContentType(path));
+                } else {
+                    writeFileToBuffer(channelHandlerContext, path, ContentTypeUtil.getContentType(path));
                 }
-
-                writeFileToBuffer(channelHandlerContext, path, ContentTypeUtil.getContentType(path));
             }
         }
+    }
+
+    private ScriptCache updateScriptCacheForPath(String host, String path) throws IOException {
+        Long before = System.currentTimeMillis();
+        List<ScriptFile> scriptPathList = new ArrayList<ScriptFile>();
+
+        Document htmlDocument = parseHtmlPage(path);
+
+        //extract out the JavaScript tags with src attribute and replace with a single
+        //call to a cached minified script file
+        if (htmlDocument != null) {
+            Elements elements = htmlDocument.select("body");
+            Element headElement = elements.get(0);
+
+            Elements scriptElements = headElement.getElementsByTag("script");
+            for (Element scriptElement : scriptElements) {
+                String scriptSrc = scriptElement.attr("src");
+                if (scriptSrc == null || scriptSrc.startsWith("http")) {
+                    //Keep the script as-is
+                } else if (scriptSrc != null && scriptSrc.endsWith(".js")) {
+                    File minifiedScriptFile = new File(rootPath + File.separatorChar + host + File.separatorChar + scriptSrc.substring(0, scriptSrc.length() - 3) + "min.js");
+                    String fileContent = null;
+
+                    if (minifiedScriptFile != null && minifiedScriptFile.isFile()) {
+                        fileContent = getFileContent(minifiedScriptFile.getAbsolutePath());
+                    } else {
+                        fileContent = getFileContent(rootPath + File.separatorChar +  host + File.separatorChar + scriptSrc);
+                    }
+
+                    //cache and remove this <script src tag from the DOM
+                    if (fileContent != null) {
+                        scriptPathList.add(new ScriptFile(scriptSrc, fileContent));
+                    }
+                    scriptElement.remove();
+                }
+            }
+
+            //Append a new script element to the head-tag representing the cached and
+            //minified script
+            headElement.appendElement("script")
+                    .attr("src", "/cachedScript" + path + ".js")
+                    .attr("type", "text/javascript")
+                    .attr("charset", "utf-8");
+        }
+
+        //Create or update the script contents for this HTML file path
+        ScriptCache cache = ScriptHash.updateScriptContents(path, scriptPathList, htmlDocument.html(), System.currentTimeMillis() + (maxCacheSeconds * 1000));
+        logger.info("Finished extracting script contents took: " + (System.currentTimeMillis() - before) + " ms.");
+
+        return cache;
     }
 
     @Override

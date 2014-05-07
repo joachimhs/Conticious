@@ -5,18 +5,21 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
 import no.haagensoftware.contentice.assembler.CategoryAssembler;
 import no.haagensoftware.contentice.data.CategoryData;
 import no.haagensoftware.contentice.data.CategoryField;
 import no.haagensoftware.contentice.data.SubCategoryData;
 import no.haagensoftware.contentice.data.SubcategoryField;
+import no.haagensoftware.contentice.data.auth.Session;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
 import no.haagensoftware.contentice.handler.ContenticeParameterMap;
 import no.haagensoftware.contentice.plugin.admindata.AdminCategoryObject;
 import no.haagensoftware.contentice.plugin.admindata.AdminCategoryObjectWithIds;
 import no.haagensoftware.contentice.plugin.assembler.AdminCategoryAssembler;
 import no.haagensoftware.contentice.plugin.assembler.AdminSubCategoryAssembler;
+import no.haagensoftware.contentice.spi.AuthenticationPlugin;
 import org.apache.log4j.Logger;
 
 import java.util.Map;
@@ -33,6 +36,32 @@ public class AdminCategoryHandler extends ContenticeHandler  {
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
+        AuthenticationPlugin authenticationPlugin = getAuthenticationPlugin();
+
+        if (authenticationPlugin == null) {
+            sendError(channelHandlerContext, HttpResponseStatus.UNAUTHORIZED);
+        } else {
+            String cookieUuidToken = getCookieValue(fullHttpRequest, "uuidAdminToken");
+            Session session = authenticationPlugin.getSession(cookieUuidToken);
+
+            String category = getParameter("category");
+
+            if (session != null && "admin".equals(session.getUser().getRole())) {
+                handleRequest(channelHandlerContext, fullHttpRequest);
+            } else {
+                JsonObject categoryObject = new JsonObject();
+                categoryObject.addProperty("id", category);
+
+                JsonObject toplevelObject = new JsonObject();
+                toplevelObject.add("category", categoryObject);
+
+                writeContentsToBuffer(channelHandlerContext, toplevelObject.toString(), "application/json");
+            }
+        }
+
+    }
+
+    private void handleRequest(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) {
         logger.info("reading CategoryHandler and writing contents to buffer");
 
         String category = getParameter("category");

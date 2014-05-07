@@ -216,7 +216,7 @@ public class FileSystemStoragePlugin extends StoragePlugin {
                 subCategory.setName(filename.substring(0, filename.length() - 3));
             } else if (filename.endsWith(".json")) {
                 subCategory = new SubCategoryData(category + "_" + filename.substring(0, filename.length() - 5));
-                subCategory.setName(filename.substring(0, filename.length() - 4));
+                subCategory.setName(filename.substring(0, filename.length() - 5));
             } else {
                 subCategory = new SubCategoryData(category + "_" + filename);
                 subCategory.setName(filename);
@@ -292,6 +292,15 @@ public class FileSystemStoragePlugin extends StoragePlugin {
             subCategoryData = this.getSubCategoryData(host, category, getSubCategories(host, category), path);
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        if (subCategoryData == null) {
+            path = FileSystems.getDefault().getPath(docDir + File.separatorChar + category + File.separatorChar + useSubcategory + ".json");
+            try {
+                subCategoryData = this.getSubCategoryData(host, category, getSubCategories(host, category), path);
+            } catch (IOException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
         }
 
         return subCategoryData;

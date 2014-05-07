@@ -4,6 +4,7 @@ import io.netty.channel.ChannelHandler;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
 import no.haagensoftware.contentice.spi.ConticiousPlugin;
 import no.haagensoftware.contentice.spi.RouterPlugin;
+import no.haagensoftware.conticious.plugin.handler.CachedScriptHandler;
 import no.haagensoftware.conticious.plugin.handler.DataHandler;
 import org.apache.log4j.Logger;
 
@@ -27,6 +28,7 @@ public class DataRoutesPlugin extends RouterPlugin {
         routeMap.put("/json/data/{category}", DataHandler.class);
         routeMap.put("/json/data/{category}/{subcategory}", DataHandler.class);
 
+        routeMap.put("startsWith:/cachedScript", CachedScriptHandler.class);
     }
 
     @Override

@@ -118,6 +118,36 @@ public class SubCategoryData {
         return value;
     }
 
+    public Double getDoubleValueForKey(String key) {
+        String valueString = getValueForKey(key);
+        Double value = null;
+
+        try {
+            value = Double.parseDouble(valueString);
+        } catch (NumberFormatException nfe) {
+            //Nothing to do, really
+        }
+
+        return value;
+    }
+
+    public Boolean getBooleanValueForKey(String key) {
+        String valueString = getValueForKey(key);
+        Boolean value = null;
+
+        try {
+            value = Boolean.parseBoolean(valueString);
+        } catch (NumberFormatException nfe) {
+            //Nothing to do, really
+        }
+
+        if (value == null) {
+            value = new Boolean(false);
+        }
+
+        return value;
+    }
+
     public Date getDateForKey(String key) {
         String dateString = getValueForKey(key);
 

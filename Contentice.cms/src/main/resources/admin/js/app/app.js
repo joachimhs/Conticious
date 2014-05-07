@@ -26,7 +26,32 @@ Ember.Application.reopen({
 });
 
 var Conticious = Ember.Application.create({
-    templates: ['application', 'categories', 'header', 'category', 'category/index', 'subcategory', 'subcategory/index', 'subcategory/fields', 'subcategory/preview', 'menu-category', 'menu-subcategory', 'setting']
+    templates: ['application', 'categories', 'header', 'category', 'category/index', 'subcategory', 'subcategory/index', 'subcategory/fields', 'subcategory/preview', 'menu-category', 'menu-subcategory', 'setting', 'components/log-in'],
+
+    createCookie: function(name, value, days) {
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime()+(days*24*60*60*1000));
+            var expires = "; expires="+date.toGMTString();
+        }
+        else var expires = "";
+        document.cookie = name+"="+value+expires+"; path=/";
+    },
+
+    readCookie:function (name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    },
+
+    eraseCookie:function (name) {
+        this.createCookie(name, "", -1);
+    }
 });
 
 Conticious.Router.map(function() {
@@ -49,6 +74,18 @@ Conticious.Store = DS.Store.extend({
     adapter:  "DS.RESTAdapter"
 });
 
+Conticious.HeaderController = Ember.Controller.extend({
+    needs: ['user'],
+
+    actions: {
+        logOut: function() {
+            Conticious.eraseCookie('uuidAdminToken');
+            this.set('controllers.user.uuidAdminToken', null);
+            Conticious.reset();
+        }
+    }
+});
+
 Conticious.CategoriesRoute = Ember.Route.extend({
     model: function() {
         return this.store.find('category');
@@ -58,6 +95,79 @@ Conticious.CategoriesRoute = Ember.Route.extend({
 Conticious.CategoryRoute = Ember.Route.extend({
     model: function(category) {
         return this.store.find('category', category.category_id);
+    }
+});
+
+Conticious.UserController = Ember.Controller.extend({
+    init: function() {
+        console.log('UserController init');
+        var controller = this;
+
+        var cookie = Conticious.readCookie("uuidAdminToken");
+        if (cookie) {
+            this.set('uuidAdminToken', cookie);
+        }
+    },
+
+    uuidObserver: function() {
+        console.log('uuidAdminTokenObserver: ' + this.get('uuidAdminToken'));
+        if (this.get('uuidAdminToken')) {
+            console.log('Fetching Admin User');
+
+            var controller = this;
+            this.store.find('user', this.get('uuidAdminToken')).then(function(data) {
+                if (data.get('role') === 'admin' || data.get('role') === 'super') {
+                    console.log('Creating uuidAdminToken cookie!');
+                    Conticious.createCookie("uuidAdminToken", data.get('id'), 30);
+                    controller.set('content', data);
+                } else {
+                    console.log('UUID Token is no longer valid, erasing cookie!');
+                    Conticious.eraseCookie("uuidAdminToken");
+                }
+            });
+        }
+    }.observes('uuidAdminToken').on('init'),
+
+    isAdminLoggedIn: function() {
+        var isAdmin = false;
+        console.log('roleObserver: ' + this.get('content.role'));
+
+        if (this.get('content.role') === 'admin' || this.get('content.role') === 'super') {
+            isAdmin = true;
+        }
+
+        return isAdmin;
+    }.property('content.role')
+});
+
+Conticious.LogInComponent = Ember.Component.extend({
+    actions: {
+        loginButtonAction: function() {
+            console.log('attempting to log in with username: ' + this.get('username') + ' and password: ' + this.get('password'))
+
+            var data = {
+                username: this.get('username'),
+                password: this.get('password')
+            };
+
+            var component = this;
+
+            $.ajax({
+                type: "POST",
+                url: "/json/admin/auth",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(res, status, xhr) {
+                    console.log("success: " + JSON.stringify(res));
+                    if (res.uuidAdminToken) {
+                        component.set('uuidAdminToken', res.uuidAdminToken);
+                    }
+                }, error: function(res, status, err) {
+                    console.log("error: " + JSON.stringify(res));
+                    console.log("error: " + status + " error: " + err);
+                }
+            });
+        }
     }
 });
 
@@ -162,6 +272,8 @@ Conticious.SettingRoute = Ember.Route.extend({
 });
 
 Conticious.SettingController = Ember.ObjectController.extend({
+    needs: ['user'],
+
     actions: {
         addDomain: function() {
             var domains = this.get('domains');
@@ -180,6 +292,32 @@ Conticious.SettingController = Ember.ObjectController.extend({
 
         saveChanges: function() {
             this.doSaveSettings();
+        },
+
+        userChanged: function() {
+            console.log('user changed. Refreshing settings!');
+            this.get('model').reload();
+        },
+
+        generateStatic: function(domain) {
+            var full = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '');
+
+            var payload = {};
+            payload.hostname = window.location.hostname;
+            payload.port = location.port ? location.port: '';
+            payload.domain = domain.get('domainName');
+
+            console.log('hostname: '  + window.location.hostname);
+            console.log('port: ')
+
+            $.ajax("/json/admin/spg/" + domain.get('domainName'), {
+                data: JSON.stringify(payload),
+                contentType: 'application/json',
+                type: 'POST',
+                success: function () {
+                    console.log('SUCCESS');
+                }
+            });
         }
     },
 
@@ -195,25 +333,29 @@ Conticious.SettingController = Ember.ObjectController.extend({
         jsonRequest.domains = domains;
 
         var controller = this;
+
         $.ajax("/json/admin/settings", {
             data: JSON.stringify(jsonRequest),
             contentType: 'application/json',
             type: 'POST',
             success: function () {
                 console.log('SUCCESS');
+                console.log(controller.get('model'));
                 controller.get('model').reload();
             }
         });
-    }
+    },
+
+    observeID: function(){
+        this.send("userChanged");
+    }.observes("controllers.user.content.id")
 });
 
 Conticious.CategoriesController = Ember.ArrayController.extend({
-    needs: ['category'],
+    needs: ['category', 'user'],
 
     showNewCategoryField: false,
     newCategoryName: null,
-
-
 
     actions: {
         showNewCategory: function() {
@@ -236,8 +378,17 @@ Conticious.CategoriesController = Ember.ArrayController.extend({
 
             this.set('showNewCategoryField', false);
             this.set('newCategoryName', null);
+        },
+
+        userChanged: function() {
+            console.log('user changed. Refreshing categories!');
+            this.set('model', this.store.find('category'));
         }
-    }
+    },
+
+    observeID: function(){
+        this.send("userChanged");
+    }.observes("controllers.user.content.id")
 });
 
 Conticious.MenuCategoryView = Ember.View.extend({
@@ -438,7 +589,13 @@ Conticious.Setting = DS.Model.extend({
 Conticious.Domain = DS.Model.extend({
     domainName: DS.attr('string'),
     webappName: DS.attr('string'),
-    active: DS.attr('boolean')
+    active: DS.attr('boolean'),
+    minified: DS.attr('boolean')
+});
+
+Conticious.User = DS.Model.extend({
+    username: DS.attr('string'),
+    role: DS.attr('string')
 });
 
 

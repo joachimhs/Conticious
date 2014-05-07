@@ -77,6 +77,10 @@ public abstract class ContenticeHandler extends SimpleChannelInboundHandler<Full
         this.pluginResolver = pluginResolver;
     }
 
+    public AuthenticationPlugin getAuthenticationPlugin() {
+        return authenticationPlugin;
+    }
+
     public void setAuthenticationPlugin(AuthenticationPlugin authenticationPlugin) {
         this.authenticationPlugin = authenticationPlugin;
     }
