@@ -46,7 +46,7 @@ public class AdminCategoryHandler extends ContenticeHandler  {
 
             String category = getParameter("category");
 
-            if (session != null && "admin".equals(session.getUser().getRole())) {
+            if (session != null && ("admin".equals(session.getUser().getRole()) || "super".equals(session.getUser().getRole()))) {
                 handleRequest(channelHandlerContext, fullHttpRequest);
             } else {
                 JsonObject categoryObject = new JsonObject();

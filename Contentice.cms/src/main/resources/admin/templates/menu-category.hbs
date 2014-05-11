@@ -1,4 +1,5 @@
 <div class="list-group">
+
     {{#link-to "category" category classNames="list-group-item categoryItem"}}
         {{#if view.isSelected}}
             &#x25BC;
@@ -6,15 +7,49 @@
             &#x25B6;
         {{/if}}
 
-        {{category.id}} ({{category.subcategories.length}})
+        {{category.id}}
+
+        <span class="pull-right">
+            <span class="badge">{{category.subcategories.length}}</span>&nbsp;
+        </span>
     {{/link-to}}
 
     {{#if view.isSelected}}
-        {{#each subcategory in category.subcategories}}
+        <div class="list-group-item">
+            <span class="glyphicon glyphicon-filter pull-right" {{action "toggleSortAndFilter" target="view"}}></span>&nbsp;
+        </div>
 
-            {{#link-to "subcategory" category subcategory classNames="list-group-item subcategoryItem"}}
-                {{view Conticious.MenuSubcategoryView subcategory=subcategory tagName="span"}}
-            {{/link-to}}
-        {{/each}}
+        {{#if view.sortAndFilterShowing}}
+            <div class="list-group-item">
+                Sort: {{view Ember.Select
+                            contentBinding="category.defaultFields"
+                            valueBinding="view.selectedSortColumn"
+                            optionValuePath="content.name"
+                            optionLabelPath="content.name"
+                            prompt="Sort by field"
+                            class="form-control"
+            }}
+            </div>
+            <div class="list-group-item">
+                Filter: {{view Ember.Select
+                            contentBinding="category.defaultFields"
+                            valueBinding="view.selectedFilterColumn"
+                            optionValuePath="content.name"
+                            optionLabelPath="content.name"
+                            prompt="Filter by field"
+                            class="form-control"
+            }}
+                {{input type="text" value=view.selectedFilterString class="form-control"}}
+            </div>
+        {{/if}}
     {{/if}}
 </div>
+
+<div class="list-group categoryList">
+{{#if view.isSelected}}
+    {{#each subcategory in view.sortedSubcategories}}
+        {{#link-to "subcategory" category subcategory classNames="list-group-item subcategoryItem"}}
+            {{view Conticious.MenuSubcategoryView subcategory=subcategory tagName="span"}}
+        {{/link-to}}
+    {{/each}}
+{{/if}}

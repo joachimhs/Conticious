@@ -215,11 +215,10 @@ Conticious.CategoryIndexRoute = Ember.Route.extend({
 
                 newSubcategory.save().then(function(data) {
                     console.log('newSubcategory saved. Saving category')
-                    category.save();
-                    /*.then(function(data) {
+                    category.save().then(function(data) {
                         category.reload();
                         newSubcategory.reload();
-                    });*/
+                    });
                 });
 
             }
@@ -393,10 +392,96 @@ Conticious.CategoriesController = Ember.ArrayController.extend({
 
 Conticious.MenuCategoryView = Ember.View.extend({
     templateName: 'menu-category',
+    selectedSortColumn: null,
+    selectedFilterString: null,
+    selectedFilterColumn: null,
+    sortAndFilterShowing: false,
+
+    actions: {
+        toggleSortAndFilter: function() {
+            this.toggleProperty('sortAndFilterShowing');
+            console.log('toggleSortAndFilter: ' + this.get('sortAndFilterShowing'));
+        }
+    },
 
     isSelected: function() {
         return this.get('category.id') === this.get('controller.controllers.category.model.id');
-    }.property('controller.controllers.category.model.id')
+    }.property('controller.controllers.category.model.id'),
+
+    selectedSortColumnObserver: function() {
+        console.log('New Sort Columnn: ' + this.get('selectedSortColumn'));
+        this.sortOrFilter();
+    }.observes('selectedSortColumn'),
+
+    selectedFilterStringObserver: function() {
+        console.log('New Filter String: ' + this.get('selectedFilterString'));
+        this.sortOrFilter();
+    }.observes('selectedFilterString'),
+
+    selectedFilterColumnObserver: function() {
+        console.log('New Filter Column: ' + this.get('selectedFilterColumn'));
+        this.sortOrFilter();
+    }.observes('selectedFilterColumn'),
+
+    subcategoriesObserver: function() {
+        this.set('sortedSubcategories', this.get('category.subcategories'));
+    }.observes('category.subcategories').on('init'),
+
+    sortOrFilter: function() {
+        console.log('Sorting subcategories');
+        var columnToSortBy = this.get('selectedSortColumn');
+        var columnToFilterBy = this.get('selectedFilterColumn');
+        var columnFilter = this.get('selectedFilterString');
+
+        var subcategories = [];
+        var sortProp = 'id';
+
+        if (columnToSortBy && subcategories) {
+            sortProp = "sortValue";
+        }
+
+        this.get('category.subcategories').forEach(function(subcat) {
+            var showColumn = true;
+
+            subcat.get('fields').forEach(function(field) {
+                if (field.get('name') === columnToSortBy) {
+                    subcat.set('sortValue', field.get('value'));
+                }
+
+                if (columnToFilterBy && columnFilter && field.get('name') === columnToFilterBy) {
+                    showColumn = field.get('value') && field.get('value').indexOf(columnFilter) > -1;
+                    console.log('    Filtering away: ' + subcat.get('id'));
+                } else if (columnToFilterBy === null && columnFilter) {
+                    showColumn = subcat.get('id').indexOf(columnFilter) > -1;
+                }
+            });
+
+            if (!columnToSortBy) {
+                subcat.set('sortValue', subcat.get('id'));
+            }
+
+            if (showColumn) {
+                subcategories.push(subcat);
+            }
+        });
+
+        console.log('sortProp: ' + sortProp);
+        console.log(sortProp);
+
+        var sortedResult = Em.ArrayProxy.createWithMixins(
+            Ember.SortableMixin,
+            { content:subcategories, sortProperties: ['sortValue'] }
+        );
+
+        console.log(sortedResult.getEach('id'));
+
+        this.set('sortedSubcategories', sortedResult)
+    },
+
+    sortedSubcategoriesObserver: function() {
+        console.log('sortedSubcategories changed!');
+        console.log(this.get('sortedSubcategories').getEach('id'));
+    }.observes('sortedSubcategories.@each.id')
 });
 
 Conticious.MenuSubcategoryView = Ember.View.extend({
