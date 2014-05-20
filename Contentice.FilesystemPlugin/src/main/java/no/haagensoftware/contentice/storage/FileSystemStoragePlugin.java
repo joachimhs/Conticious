@@ -92,14 +92,19 @@ public class FileSystemStoragePlugin extends StoragePlugin {
                                         fieldId = elemObj.get("id").getAsString();
                                     }
                                     if (elemObj.has("name") && elemObj.has("type") && elemObj.has("required")) {
-                                        defaultFields.add(new CategoryField(
+                                        CategoryField newField = new CategoryField(
                                                 fieldId,
                                                 elemObj.get("name").getAsString(),
                                                 elemObj.get("type").getAsString(),
                                                 elemObj.get("required").getAsBoolean()
-                                        ));
-                                    }
+                                        );
 
+                                        if (elemObj.has("relation")) {
+                                            newField.setRelation(elemObj.get("relation").getAsString());
+                                        }
+
+                                        defaultFields.add(newField);
+                                    }
                                 }
                             }
                             categoryData.setDefaultFields(defaultFields);

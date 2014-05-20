@@ -32,7 +32,7 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class ContenticeHandler extends SimpleChannelInboundHandler<FullHttpRequest> implements ContenticeParameterMap {
-    private static final Logger logger = Logger.getLogger(ContenticeHandler.class.getName());
+
     private Map<String, String> parameterMap;
     private List<String> queryStringIds;
     private String browserHost;
@@ -135,7 +135,7 @@ public abstract class ContenticeHandler extends SimpleChannelInboundHandler<Full
         HttpHeaders httpHeaders = fullHttpRequest.headers();
 
         String value = httpHeaders.get("Cookie");
-        logger.info("cookie header: \n" + value);
+
         if (value != null) {
 
             Set<Cookie> cookies = CookieDecoder.decode(value);
@@ -199,7 +199,7 @@ public abstract class ContenticeHandler extends SimpleChannelInboundHandler<Full
         response.headers().set(CONTENT_LENGTH, response.content().readableBytes());
         response.headers().set(CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
 
-        logger.info("writing response: " + response.content().readableBytes());
+
 
         ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
     }

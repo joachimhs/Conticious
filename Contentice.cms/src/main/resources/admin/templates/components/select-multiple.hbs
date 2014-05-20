@@ -1,0 +1,14 @@
+
+<div>
+    {{view Ember.Select contentBinding="items" valueBinding="selectedValue" optionValuePath="content" optionLabelPath="content.id" prompt="Add Item"}}
+    <button class="btn btn-primary btn-xs pull-right" {{action "addItem"}}>Add</button>
+</div>
+
+<div class="list-group">
+    {{#each item in addedItems}}
+        <div class="list-group-item">
+            {{item.id}}
+            <button class="btn btn-danger btn-xs pull-right" {{action "deleteItem" item}}>Delete</button>
+        </div>
+    {{/each}}
+</div>

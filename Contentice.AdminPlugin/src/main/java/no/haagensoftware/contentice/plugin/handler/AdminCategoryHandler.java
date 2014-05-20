@@ -99,7 +99,7 @@ public class AdminCategoryHandler extends ContenticeHandler  {
         }
     }
 
-    private JsonObject convertCategoryToJson(String host, CategoryData categoryData) {
+    private JsonObject  convertCategoryToJson(String host, CategoryData categoryData) {
         JsonObject topLevelObject = new JsonObject();
 
         JsonArray subCategoriesArray = new JsonArray();
@@ -116,6 +116,7 @@ public class AdminCategoryHandler extends ContenticeHandler  {
                 subField.setRequired(cf.getRequired());
                 subField.setType(cf.getType());
                 subField.setName(cf.getName());
+                subField.setRelation(cf.getRelation());
                 if (subcategoryData.getKeyMap().get(cf.getName()) != null) {
                     subField.setValue(subcategoryData.getKeyMap().get(cf.getName()).getAsString());
                 }

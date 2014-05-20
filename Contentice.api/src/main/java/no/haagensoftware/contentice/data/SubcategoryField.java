@@ -1,5 +1,7 @@
 package no.haagensoftware.contentice.data;
 
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: joahaage
@@ -13,6 +15,8 @@ public class SubcategoryField {
     private String type;
     private boolean required;
     private String value;
+    private String relation;
+    private List<String> relations;
 
     public SubcategoryField() {
     }
@@ -56,5 +60,21 @@ public class SubcategoryField {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public String getRelation() {
+        return relation;
+    }
+
+    public void setRelation(String relation) {
+        this.relation = relation;
+    }
+
+    public List<String> getRelations() {
+        return relations;
+    }
+
+    public void setRelations(List<String> relations) {
+        this.relations = relations;
     }
 }

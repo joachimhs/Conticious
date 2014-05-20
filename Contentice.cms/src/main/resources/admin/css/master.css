@@ -36,6 +36,35 @@ p { margin-top: 0.95em; }
     text-align: right;
 }
 
+.categoryList {
+    max-height: 400px;
+    overflow: scroll;
+}
+
+.menuBadge {
+    background: #fff;
+    color: #000;
+}
+
+.list-group {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.smallBottomMargin {
+    margin-bottom: 5px;
+}
+
+.categoryListGroup {
+    max-width: 200px;
+}
+
 a.categoryItem {
     background: #0c675e;
     color: #f4f4f4;

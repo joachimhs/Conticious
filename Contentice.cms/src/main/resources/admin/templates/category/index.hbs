@@ -3,11 +3,16 @@
         <table class="table">
         <table class="table">
             <tr>
-                <th colspan="4" class="tableHeader">Add new Field</th>
+                <th colspan="5" class="tableHeader">Add new Field</th>
             </tr>
             <tr>
                 <td>{{view Ember.TextField valueBinding="newFieldName" classNames="form-control" placeholder="Field Name"}}</td>
                 <td>{{view Ember.Select contentBinding="fieldTypes" valueBinding="newFieldType" prompt="Select a field type" classNames="form-control"}}</td>
+                <td>
+                    {{#if newFieldIsAssociation}}
+                        {{view Ember.Select contentBinding="controller.controllers.categories.model" value=field.relation optionValuePath="content.id" optionLabelPath="content.id" prompt="Select Category" classNames="form-control"}}
+                    {{/if}}
+                </td>
                 <td><label class="checkbox-inline">{{view Ember.Checkbox checkedBinding="newFieldRequired"}}Required</label></td>
                 <td style="text-align: right;">
                     <button class="btn btn-primary" style="margin-right: 10px;" {{action "addNewField"}}>Add Field</button>
@@ -45,13 +50,28 @@
     <tr>
         <th>Field Name</th>
         <th>Field Type</th>
+        <th>Relationship</th>
         <th>Required</th>
         <th>Field Action</th>
     </tr>
     {{#each field in controllers.category.defaultFields}}
         <tr>
             <td>{{view Ember.TextField valueBinding="field.name" classNames="form-control"}}</td>
-            <td>{{view Ember.Select contentBinding="controller.fieldTypes" valueBinding="field.type" prompt="Select a field type" classNames="form-control"}}</td>
+            <td>
+                {{view Ember.Select contentBinding="controller.fieldTypes" valueBinding="field.type" prompt="Select a field type" classNames="form-control"}}
+            </td>
+
+
+            <td>
+                {{#if field.isToOne}}
+                    {{view Ember.Select contentBinding="controller.controllers.categories.model" value=field.relation optionValuePath="content.id" optionLabelPath="content.id" prompt="Select Category" classNames="form-control"}}
+                {{/if}}
+
+                {{#if field.isToMany}}
+                    {{view Ember.Select contentBinding="controller.controllers.categories.model" value=field.relation optionValuePath="content.id" optionLabelPath="content.id" prompt="Select Category" classNames="form-control"}}
+                {{/if}}
+            </td>
+
             <td><label class="checkbox-inline">{{view Ember.Checkbox checkedBinding="field.required"}}Required</label></td>
             <td>
                 {{#if field.isDirty}}

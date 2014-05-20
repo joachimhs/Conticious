@@ -12,6 +12,7 @@ public class CategoryField {
     private String name;
     private String type;
     private boolean required;
+    private String relation;
 
     public CategoryField() {
     }
@@ -53,5 +54,13 @@ public class CategoryField {
 
     public void setRequired(boolean required) {
         this.required = required;
+    }
+
+    public String getRelation() {
+        return relation;
+    }
+
+    public void setRelation(String relation) {
+        this.relation = relation;
     }
 }

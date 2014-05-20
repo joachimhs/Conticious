@@ -64,6 +64,7 @@ public class AdminCategoryFieldsHandler extends ContenticeHandler {
                         cf.setName(newCategoryField.getName());
                         cf.setType(newCategoryField.getType());
                         cf.setRequired(newCategoryField.getRequired());
+                        cf.setRelation(newCategoryField.getRelation());
                         updated = true;
                     }
                 }
@@ -98,6 +99,7 @@ public class AdminCategoryFieldsHandler extends ContenticeHandler {
                     cf.setName(categoryField.getCategoryField().getName());
                     cf.setType(categoryField.getCategoryField().getType());
                     cf.setRequired(categoryField.getCategoryField().getRequired());
+                    cf.setRelation(categoryField.getCategoryField().getRelation());
                     updatedField = cf;
                     break;
                 }

@@ -1,4 +1,3 @@
-{{id}} -<br />
 <table class="table subcategoryFields">
     <tr>
         <th>Name</th>
@@ -25,9 +24,22 @@
             {{#if field.isArray}}
                 {{view Ember.TextField valueBinding="field.value"}} <br />
             {{/if}}
+
+            {{#if field.isToOne}}
+                {{view Ember.Select contentBinding="field.relation.subcategories" valueBinding="field.value" optionValuePath="content.id" optionLabelPath="content.id" prompt="Select Subcategory" classNames="form-control"}}
+            {{/if}}
+
+            {{#if field.isToMany}}
+                {{select-multiple items=field.relation.subcategories addedItems=field.relations model=field}}
+            {{/if}}
         </td>
         <td>
             {{#if field.isDirty}}
+                <button class="btn btn-primary" style="width: 75px;" {{action "saveSubcategoryField" field}}>Save</button>
+                <button class="btn btn-default" style="width: 75px;" {{action "revertSubcategoryField" field}}>Revert</button>
+            {{/if}}
+
+            {{#if field.relations.isDirty}}
                 <button class="btn btn-primary" style="width: 75px;" {{action "saveSubcategoryField" field}}>Save</button>
                 <button class="btn btn-default" style="width: 75px;" {{action "revertSubcategoryField" field}}>Revert</button>
             {{/if}}

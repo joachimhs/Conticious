@@ -26,7 +26,7 @@ Ember.Application.reopen({
 });
 
 var Conticious = Ember.Application.create({
-    templates: ['application', 'categories', 'header', 'category', 'category/index', 'subcategory', 'subcategory/index', 'subcategory/fields', 'subcategory/preview', 'menu-category', 'menu-subcategory', 'setting', 'components/log-in'],
+    templates: ['application', 'categories', 'header', 'category', 'category/index', 'subcategory', 'subcategory/index', 'subcategory/fields', 'subcategory/preview', 'menu-category', 'menu-subcategory', 'setting', 'components/log-in', 'components/select-multiple'],
 
     createCookie: function(name, value, days) {
         if (days) {
@@ -171,6 +171,37 @@ Conticious.LogInComponent = Ember.Component.extend({
     }
 });
 
+Conticious.SelectMultipleComponent = Ember.Component.extend({
+    actions: {
+        addItem: function() {
+            var selectedValue = this.get('selectedValue');
+            var addedItems = this.get('addedItems');
+
+            console.log('selectedValue: ' + selectedValue);
+            console.log('addedItems: ' + addedItems);
+
+            if (!addedItems) {
+                addedItems = [];
+                this.set('addedItems', addedItems);
+            }
+
+            addedItems.pushObject(selectedValue);
+
+            this.get('model').send('becomeDirty');
+
+            console.log('addedItems: ' + addedItems);
+        },
+
+        deleteItem: function(item) {
+            console.log('deleteItem: ' + item);
+            if (item) {
+                this.get('addedItems').removeObject(item);
+                this.get('model').send('becomeDirty');
+            }
+        }
+    }
+});
+
 Conticious.CategoryIndexRoute = Ember.Route.extend({
     actions: {
 
@@ -255,6 +286,11 @@ Conticious.SubcategoryFieldsRoute = Ember.Route.extend({
         var subcategory = this.modelFor('subcategory');
         return subcategory;
     }
+});
+
+
+Conticious.SubcategoryFieldsController = Ember.ObjectController.extend({
+    needs: ['category']
 });
 
 Conticious.SubcategoryPreviewRoute = Ember.Route.extend({
@@ -396,11 +432,49 @@ Conticious.MenuCategoryView = Ember.View.extend({
     selectedFilterString: null,
     selectedFilterColumn: null,
     sortAndFilterShowing: false,
+    numSubcategoriesShown: 0,
+    showNewSubcategoryArea: false,
+    newSubcategoryName: null,
 
     actions: {
         toggleSortAndFilter: function() {
             this.toggleProperty('sortAndFilterShowing');
             console.log('toggleSortAndFilter: ' + this.get('sortAndFilterShowing'));
+        },
+
+        openNewSubcategory: function() {
+            this.set('showNewSubcategoryArea', true);
+        },
+
+        cancelNewSubcategory: function() {
+            this.set('showNewSubcategoryArea', false);
+            this.set('newSubcategoryName', null);
+        },
+
+        addNewSubcategory: function() {
+            var category = this.get('category');
+            var newSubcategoryName = this.get('newSubcategoryName');
+
+            if (newSubcategoryName) {
+                var newSubcategory = this.get('controller').store.createRecord('subcategory', {
+                    id: category.get('id') + "_" + newSubcategoryName,
+                    name: newSubcategoryName
+                });
+
+                category.get('subcategories').pushObject(newSubcategory);
+
+                newSubcategory.save().then(function(data) {
+                    console.log('newSubcategory saved. Saving category')
+                    category.save().then(function(data) {
+                        category.reload();
+                        newSubcategory.reload();
+                    });
+                });
+
+            }
+
+            this.set('newSubcategoryName', null);
+            this.set('showNewSubcategoryArea', false);
         }
     },
 
@@ -475,6 +549,8 @@ Conticious.MenuCategoryView = Ember.View.extend({
 
         console.log(sortedResult.getEach('id'));
 
+        this.set('numSubcategoriesShown', subcategories.get('length'));
+
         this.set('sortedSubcategories', sortedResult)
     },
 
@@ -506,7 +582,7 @@ Conticious.CategoryController = Ember.ObjectController.extend({
 });
 
 Conticious.CategoryIndexController = Ember.Controller.extend({
-    needs: 'category',
+    needs: ['category', 'categories'],
     showNewFieldArea: false,
     showNewSubcategoryArea: false,
 
@@ -580,6 +656,10 @@ Conticious.CategoryIndexController = Ember.Controller.extend({
         }
     },
 
+    newFieldIsAssociation: function() {
+        return this.get('newFieldType') && (this.get('newFieldType') === "toOne" || this.get('newFieldType') === "toMany");
+    }.property('newFieldType'),
+
     init: function() {
         this._super();
 
@@ -588,6 +668,8 @@ Conticious.CategoryIndexController = Ember.Controller.extend({
         fieldTypes.pushObject('textfield');
         fieldTypes.pushObject('boolean');
         fieldTypes.pushObject('array');
+        fieldTypes.pushObject('toOne');
+        fieldTypes.pushObject('toMany');
 
         this.set('fieldTypes', fieldTypes);
     }
@@ -624,6 +706,7 @@ Conticious.CategoryField = DS.Model.extend({
     name: DS.attr('string'),
     type: DS.attr('string'),
     required: DS.attr('boolean'),
+    relation: DS.attr('string'),
 
     isTextfield: function() {
         return this.get('type') === 'textfield'
@@ -635,6 +718,14 @@ Conticious.CategoryField = DS.Model.extend({
 
     isBoolean: function() {
         return this.get('type') === 'boolean'
+    }.property('type'),
+
+    isToOne: function() {
+        return this.get('type') === 'toOne'
+    }.property('type'),
+
+    isToMany: function() {
+        return this.get('type') === 'toMany'
     }.property('type')
 });
 
@@ -649,6 +740,8 @@ Conticious.SubcategoryField = DS.Model.extend({
     type: DS.attr('string'),
     required: DS.attr('boolean'),
     value: DS.attr('string'),
+    relation: DS.belongsTo('category'),
+    relations: DS.hasMany('subcategory', {async: true}),
 
     isTextfield: function() {
         return this.get('type') === 'textfield';
@@ -664,6 +757,14 @@ Conticious.SubcategoryField = DS.Model.extend({
 
     isArray: function() {
         return this.get('type') === "array";
+    }.property('type'),
+
+    isToOne: function() {
+        return this.get('type') === 'toOne'
+    }.property('type'),
+
+    isToMany: function() {
+        return this.get('type') === 'toMany'
     }.property('type')
 });
 

@@ -1,7 +1,7 @@
 {{#if controllers.user.isAdminLoggedIn}}
     <div class="wrap" style="margin-top: 25px;">
         <div class="row" style="height: 100%;">
-            <div class="col-md-4">
+            <div class="col-sm-12 col-md-4">
                 {{#if showNewCategoryField}}
                     <table class="table">
                         <tr>
@@ -28,7 +28,7 @@
                 {{/each}}
 
             </div>
-            <div class="col-md-8" style="height: 100%">
+            <div class="col-sm-12 col-md-8" style="height: 100%">
                 {{outlet}}
             </div>
         </div>

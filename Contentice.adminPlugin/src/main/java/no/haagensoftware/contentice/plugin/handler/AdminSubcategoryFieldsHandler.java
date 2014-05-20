@@ -1,6 +1,7 @@
 package no.haagensoftware.contentice.plugin.handler;
 
 import com.google.gson.*;
+import com.sun.tools.javac.util.ArrayUtils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.util.CharsetUtil;
@@ -10,6 +11,7 @@ import no.haagensoftware.contentice.data.SubCategoryData;
 import no.haagensoftware.contentice.data.SubcategoryField;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
 import no.haagensoftware.contentice.plugin.admindata.SubcategoryFieldObject;
+import no.haagensoftware.contentice.util.ListToString;
 import org.apache.log4j.Logger;
 import java.util.List;
 
@@ -50,11 +52,16 @@ public class AdminSubcategoryFieldsHandler extends ContenticeHandler {
 
                 logger.info(new Gson().toJson(subCategoryData).toString());
                 if (subCategoryData != null) {
-                    if (subcategoryFieldObject.getSubcategoryField().getType().equals("textfield") || subcategoryFieldObject.getSubcategoryField().getType().equals("textarea")) {
+                    if (subcategoryFieldObject.getSubcategoryField().getType().equals("textfield") || subcategoryFieldObject.getSubcategoryField().getType().equals("textarea") || subcategoryFieldObject.getSubcategoryField().getType().equals("toOne")) {
                         subCategoryData.getKeyMap().put(subcategoryFieldObject.getSubcategoryField().getName(), new JsonPrimitive(subcategoryFieldObject.getSubcategoryField().getValue()));
                     } else if (subcategoryFieldObject.getSubcategoryField().getType().equals("array")) {
                         logger.info("array: " + subcategoryFieldObject.getSubcategoryField().getValue());
                         String value = subcategoryFieldObject.getSubcategoryField().getValue();
+
+                        if (value.contains(",") && !value.startsWith("[") && !value.endsWith("]")) {
+                            value = "[" + value + "]";
+                        }
+
                         JsonElement jsonElement = new com.google.gson.JsonParser().parse(value);
                         if (jsonElement.isJsonArray()) {
                             subCategoryData.getKeyMap().put(subcategoryFieldObject.getSubcategoryField().getName(), jsonElement.getAsJsonArray());
@@ -65,6 +72,19 @@ public class AdminSubcategoryFieldsHandler extends ContenticeHandler {
                         }
                     } else if (subcategoryFieldObject.getSubcategoryField().getType().equals("boolean")) {
                         subCategoryData.getKeyMap().put(subcategoryFieldObject.getSubcategoryField().getName(), new JsonPrimitive(Boolean.parseBoolean(subcategoryFieldObject.getSubcategoryField().getValue())));
+                    } else if (subcategoryFieldObject.getSubcategoryField().getType().equals("toMany")) {
+                        List<String> values = subcategoryFieldObject.getSubcategoryField().getRelations();
+
+                        JsonArray valueArray = new JsonArray();
+
+                        if (values != null && values.size() > 0) {
+                            for (String val : values) {
+                                valueArray.add(new JsonPrimitive(val));
+                            }
+                        }
+
+                        subCategoryData.getKeyMap().put(subcategoryFieldObject.getSubcategoryField().getName(), valueArray);
+
                     }
 
                     subcategoryFieldObject.getSubcategoryField().setId(category + "_" + subcategory + "_" + fieldName);
@@ -119,10 +139,26 @@ public class AdminSubcategoryFieldsHandler extends ContenticeHandler {
                     String subcategoryId = null;
                     String fieldId = null;
 
-                    if (idParts.length >= 3) {
+                    if (idParts.length == 3) {
                         categoryId = idParts[0];
                         subcategoryId = idParts[1];
                         fieldId = idParts[2];
+                    } else if (idParts.length > 3) {
+                        categoryId = idParts[0];
+
+
+                        subcategoryId = "";
+                        boolean firstRun = true;
+                        for (int index = 1; index < idParts.length-1; index++) {
+                            if (firstRun) {
+                                firstRun = false;
+                                subcategoryId += idParts[index];
+                            } else {
+                                subcategoryId += "_" + idParts[index];
+                            }
+                        }
+
+                        fieldId = idParts[idParts.length-1];
                     }
 
 
@@ -136,6 +172,7 @@ public class AdminSubcategoryFieldsHandler extends ContenticeHandler {
                                 subField.setRequired(cf.getRequired());
                                 subField.setType(cf.getType());
                                 subField.setName(cf.getName());
+                                subField.setRelation(cf.getRelation());
                                 if (subCategoryData.getKeyMap().get(cf.getName()) != null) {
                                     subField.setValue(subCategoryData.getKeyMap().get(cf.getName()).getAsString());
                                 }

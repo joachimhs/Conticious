@@ -97,6 +97,19 @@ public class AdminCategoriesHandler extends ContenticeHandler {
                     subField.setRequired(cf.getRequired());
                     subField.setType(cf.getType());
                     subField.setName(cf.getName());
+                    subField.setRelation(cf.getRelation());
+                    if (cf.getType().equals("toMany")) {
+                        JsonElement element = subcategoryData.getKeyMap().get(cf.getName());
+                        if (element != null && element.isJsonArray()) {
+                            JsonArray jsonArray = element.getAsJsonArray();
+
+                            List<String> relationsList = new ArrayList<>();
+                            for (int index = 0; index < jsonArray.size(); index++) {
+                                relationsList.add(jsonArray.get(index).getAsString());
+                            }
+                            subField.setRelations(relationsList);
+                        }
+                    }
                     if (subcategoryData.getKeyMap().get(cf.getName()) != null) {
                         JsonElement element = subcategoryData.getKeyMap().get(cf.getName());
                         if (element.isJsonArray()) {
