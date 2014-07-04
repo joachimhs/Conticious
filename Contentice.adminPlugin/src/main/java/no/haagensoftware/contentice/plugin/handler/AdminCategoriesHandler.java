@@ -49,7 +49,6 @@ public class AdminCategoriesHandler extends ContenticeHandler {
                 handleRequest(channelHandlerContext, fullHttpRequest);
             } else {
                 JsonObject topLevelObject = buildResponse(new ArrayList<CategoryData>());
-                logger.info(topLevelObject.toString());
 
                 writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json");
             }
@@ -74,7 +73,6 @@ public class AdminCategoriesHandler extends ContenticeHandler {
         }
 
         JsonObject topLevelObject = buildResponse(categories);
-        logger.info(topLevelObject.toString());
 
         writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json");
     }

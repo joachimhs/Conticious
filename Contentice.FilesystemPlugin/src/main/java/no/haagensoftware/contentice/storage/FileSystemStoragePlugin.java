@@ -184,6 +184,8 @@ public class FileSystemStoragePlugin extends StoragePlugin {
         String docDir = documentsDirectory + File.separatorChar + host;
 
         Path path = FileSystems.getDefault().getPath(docDir + File.separatorChar + category);
+        Path jsonPath = FileSystems.getDefault().getPath(docDir + File.separatorChar + category + ".json");
+        Path settingsPath = FileSystems.getDefault().getPath(docDir + File.separatorChar + category + "_settings.json");
 
         if (Files.exists(path)) {
             try {
@@ -192,6 +194,24 @@ public class FileSystemStoragePlugin extends StoragePlugin {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
         }
+
+        if (Files.exists(jsonPath)) {
+            try {
+                Files.deleteIfExists(jsonPath);
+            } catch (IOException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        }
+
+        if (Files.exists(settingsPath)) {
+            try {
+                Files.deleteIfExists(settingsPath);
+            } catch (IOException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        }
+
+
     }
 
     @Override

@@ -43,7 +43,7 @@ public class FileServerHandler extends ContenticeHandler {
     private boolean isAdmin = false;
     private MimetypesFileTypeMap fileTypeMap = new MimetypesFileTypeMap();
 
-    private int maxCacheSeconds = 10;
+    private int maxCacheSeconds = 0;
 
     public FileServerHandler() {
         if (System.getProperty("no.haagensoftware.contentice.webappDir") != null && System.getProperty("no.haagensoftware.contentice.webappDir").length() > 3) {
@@ -274,8 +274,10 @@ public class FileServerHandler extends ContenticeHandler {
 
             //Append a new script element to the head-tag representing the cached and
             //minified script
+            int randomnum = (int)(Math.random() * 1000d);
+
             headElement.appendElement("script")
-                    .attr("src", "/cachedScript" + path + ".js")
+                    .attr("src", "/cachedScript" + path + ".js?" + "id=" + randomnum)
                     .attr("type", "text/javascript")
                     .attr("charset", "utf-8");
         }

@@ -1,7 +1,6 @@
 package no.haagensoftware.contentice.plugin.handler;
 
 import com.google.gson.*;
-import com.sun.tools.javac.util.ArrayUtils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.util.CharsetUtil;

@@ -49,11 +49,13 @@
             <groupId>no.haagensoftware</groupId>
             <artifactId>kontize-filesystem-plugin</artifactId>
             <version>${project.version}</version>
+
         </dependency>
         <dependency>
             <groupId>no.haagensoftware</groupId>
             <artifactId>kontize-admin-plugin</artifactId>
             <version>${project.version}</version>
+
         </dependency>
         <dependency>
             <groupId>no.haagensoftware</groupId>
@@ -65,12 +67,20 @@
             <groupId>no.haagensoftware</groupId>
             <artifactId>kontize-kodegenet-plugin</artifactId>
             <version>1.0</version>
-
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>no.haagensoftware</groupId>
             <artifactId>kontize-teknologihuset-plugin</artifactId>
             <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>no.haagensoftware</groupId>
+            <artifactId>conticious-spira-plugin</artifactId>
+            <version>1.0</version>
+
         </dependency>
 
 

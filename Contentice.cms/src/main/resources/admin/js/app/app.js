@@ -390,6 +390,7 @@ Conticious.CategoriesController = Ember.ArrayController.extend({
     needs: ['category', 'user'],
 
     showNewCategoryField: false,
+    showUploadField: false,
     newCategoryName: null,
 
     actions: {
@@ -415,15 +416,44 @@ Conticious.CategoriesController = Ember.ArrayController.extend({
             this.set('newCategoryName', null);
         },
 
+        showFileUpload: function() {
+            this.set('showUploadField', true);
+        },
+
+        cancelFileUpload: function() {
+            this.set('showUploadField', false);
+        },
+
         userChanged: function() {
             console.log('user changed. Refreshing categories!');
             this.set('model', this.store.find('category'));
         }
     },
 
+    reloadCategories: function() {
+        console.log('reloadCategories');
+        console.log(this.get('model'));
+
+        this.get('model').forEach(function(category) {
+            console.log('category: ' + category.get('id'));
+            if (category.get('id') === 'uploads') {
+                category.reload();
+            }
+        });
+
+        //this.store.find('category', 'uploads').reload();
+    },
+
     observeID: function(){
         this.send("userChanged");
     }.observes("controllers.user.content.id")
+});
+
+Conticious.MarkdownTextArea = Ember.TextArea.extend({
+    didInsertElement: function() {
+        var elementId = this.get('elementId');
+        $("#" + elementId).markdown({autofocus:false,savable:false});
+    }
 });
 
 Conticious.MenuCategoryView = Ember.View.extend({
@@ -558,6 +588,60 @@ Conticious.MenuCategoryView = Ember.View.extend({
         console.log('sortedSubcategories changed!');
         console.log(this.get('sortedSubcategories').getEach('id'));
     }.observes('sortedSubcategories.@each.id')
+});
+
+
+Conticious.FileReaderView = Ember.View.extend({
+    tagName: 'input',
+    attributeBindings: ['type', 'id', 'name'],
+    type: 'file',
+
+    didInsertElement: function() {
+        console.log('FileReaderView didInsertElement');
+
+        var view = this;
+        Ember.run.schedule("afterRender", function() {
+            var uploadButton = $("#uploadFileButton");
+
+            $('#' + view.get('elementId')).fileupload({
+                url: '/json/spiraUpload/',
+                dataType: 'json',
+                add: function (e, data) {
+                    $('#progressText').html('Uploading: ' + data.files[0].name);
+                    uploadButton.click(function () {
+                        data.submit();
+                    });
+                },
+                done: function (e, data) {
+                    console.log('done');
+                    console.log(data);
+                    console.log(data.result.filename);
+
+                    //view.set('controller.user.photo', data.result.filename);
+
+                    $('#progress .bar').css(
+                        'width',
+                         '0%'
+                    );
+
+                    console.log('Reloading Uploads');
+                    $('#progressText').html('Done: ' + data.files[0].name);
+                    view.get('controller').reloadCategories();
+
+                },
+                progressall: function (e, data) {
+                    console.log('progressall');
+                    console.log(data);
+                    var progress = parseInt(data.loaded / data.total * 100, 10);
+                    $('#progress .bar').css(
+                        'width',
+                        progress + '%'
+                    );
+                }
+            }).prop('disabled', !$.support.fileInput)
+                .parent().addClass($.support.fileInput ? undefined : 'disabled');
+        });
+    }
 });
 
 Conticious.MenuSubcategoryView = Ember.View.extend({

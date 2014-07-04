@@ -137,6 +137,7 @@ public abstract class RouterPlugin implements ConticiousPlugin{
 
             queryString = queryString.replaceAll("%5B", "");
             queryString = queryString.replaceAll("%5D", "");
+            queryString = queryString.replaceAll("%40", "@");
 
             for (String query : queryString.split("&")) {
                 if (query.startsWith("ids=")) {

@@ -25,16 +25,17 @@ import java.util.Map;
  */
 public class FileSystemStoragePluginTest {
     private FileSystemStoragePlugin plugin;
+    private static final String HOST = "testdomain.com";
 
     @BeforeClass
     public static void setupDirectory() throws IOException {
-        File contenticeDir = new File("/srv/contenticeDocumentsTest");
+        File contenticeDir = new File("/srv/contenticeDocumentsTest/" + HOST);
         if (contenticeDir == null || !contenticeDir.exists()) {
             contenticeDir.mkdirs();
         } else {
             //delete it and all its contents
             delete(contenticeDir);
-            contenticeDir = new File("/srv/contenticeDocumentsTest");
+            contenticeDir = new File("/srv/contenticeDocumentsTest/" + HOST);
             contenticeDir.mkdir();
         }
     }
@@ -57,28 +58,26 @@ public class FileSystemStoragePluginTest {
     public void setup() {
         System.setProperty("no.haagensoftware.contentice.storage.file.documentsDirectory", "/srv/contenticeDocumentsTest");
         plugin = new FileSystemStoragePlugin();
-
-
     }
 
     @Test
     public void verifyCreateAndDeleteCategory() {
-        plugin.setCategory(null, "newCategory", new CategoryData("newCategory"));
+        plugin.setCategory(HOST, "newCategory", new CategoryData("newCategory"));
 
-        List<CategoryData> categories = plugin.getCategories(null);
+        List<CategoryData> categories = plugin.getCategories(HOST);
 
         Assert.assertEquals("Expecting 1 Categories inside the document directory", 1, categories.size());
         Assert.assertEquals("Expecting the second category to be newCategory", "newCategory", categories.get(0).getId());
 
-        plugin.deleteCategory(null, "newCategory");
+        plugin.deleteCategory(HOST, "newCategory");
 
-        categories = plugin.getCategories(null);
+        categories = plugin.getCategories(HOST);
         Assert.assertEquals("Expecting 0 Categories inside the document directory", 0, categories.size());
     }
 
     @Test
     public void verifyGetSubcategories() {
-        plugin.setCategory(null, "pages", new CategoryData("Pages"));
+        plugin.setCategory(HOST, "pages", new CategoryData("Pages"));
         SubCategoryData about = new SubCategoryData();
         about.setContent("about");
         about.getKeyMap().put("name", new JsonPrimitive("About"));
@@ -88,10 +87,10 @@ public class FileSystemStoragePluginTest {
         opensource.setContent("open source");
         opensource.getKeyMap().put("name", new JsonPrimitive("About"));
 
-        plugin.setSubCategory(null, "pages", "about", about);
-        plugin.setSubCategory(null, "pages", "opensource", opensource);
+        plugin.setSubCategory(HOST, "pages", "about", about);
+        plugin.setSubCategory(HOST, "pages", "opensource", opensource);
 
-        List<SubCategoryData> subCategories = plugin.getSubCategories(null, "pages");
+        List<SubCategoryData> subCategories = plugin.getSubCategories(HOST, "pages");
 
         Assert.assertEquals("Expecting 2 sub categories inside the pages category", 2, subCategories.size());
         Assert.assertEquals("Expecting the first sub category to be about", "pages_about", subCategories.get(0).getId());
@@ -100,18 +99,37 @@ public class FileSystemStoragePluginTest {
         Assert.assertTrue("Expecting the the opensource sub category to have a content", subCategories.get(1).getContent() != null && subCategories.get(1).getContent().length() > 0);
         Assert.assertTrue("Expecting the the about sub category to have a json keys", subCategories.get(0).getKeyMap() != null && subCategories.get(0).getKeyMap().size() > 0);
         Assert.assertTrue("Expecting the the opensource sub category to have a json keys", subCategories.get(1).getKeyMap() != null && subCategories.get(1).getKeyMap().size() > 0);
+
+        //Cleaning up after test
+        plugin.deleteSubcategory(HOST, "pages", "about");
+        plugin.deleteSubcategory(HOST, "pages", "opensource");
+        plugin.deleteCategory(HOST, "pages");
+        plugin.deleteCategory(HOST, "about");
     }
 
     @Test
     public void verifyGetSubCategory() {
-        SubCategoryData subCategory = plugin.getSubCategory(null, "pages", "about");
+        plugin.setCategory(HOST, "pages", new CategoryData("Pages"));
+        SubCategoryData about = new SubCategoryData();
+        about.setContent("about");
+        about.getKeyMap().put("name", new JsonPrimitive("About"));
+
+        plugin.setSubCategory(HOST, "pages", "about", about);
+
+        SubCategoryData subCategory = plugin.getSubCategory(HOST, "pages", "about");
+
 
         Assert.assertTrue("Expecting the the about sub category to have a content", subCategory.getContent() != null && subCategory.getContent().length() > 0);
         Assert.assertTrue("Expecting the the about sub category to have a json keys", subCategory.getKeyMap() != null && subCategory.getKeyMap().size() > 0);
+
+        plugin.deleteSubcategory(HOST, "pages", "about");
+        plugin.deleteCategory(HOST, "pages");
     }
 
     @Test
     public void setSubCategory() {
+        plugin.setCategory(HOST, "pages", new CategoryData("Pages"));
+
         SubCategoryData subCategoryData = new SubCategoryData("test");
         subCategoryData.setContent("This is a test content");
         Map<String, JsonElement> keyMap = new HashMap<>();
@@ -119,20 +137,22 @@ public class FileSystemStoragePluginTest {
         keyMap.put("pageTitle", new JsonPrimitive("Test Title Page"));
         subCategoryData.setKeyMap(keyMap);
 
-        plugin.setSubCategory(null, "pages", "test", subCategoryData);
+        plugin.setSubCategory(HOST, "pages", "test", subCategoryData);
 
-        SubCategoryData subCategoryAfterInsert = plugin.getSubCategory(null, "pages", "test");
+        SubCategoryData subCategoryAfterInsert = plugin.getSubCategory(HOST, "pages", "test");
         System.out.println(subCategoryAfterInsert.getContent());
 
         Assert.assertTrue("Expecting the the about sub category to have a content", subCategoryAfterInsert.getContent() != null && subCategoryAfterInsert.getContent().equals("This is a test content\n"));
         Assert.assertTrue("Expecting the the about sub category to have 2 json keys", subCategoryAfterInsert.getKeyMap() != null && subCategoryAfterInsert.getKeyMap().size() == 2);
 
 
-        plugin.deleteSubcategory(null, "pages", "test");
+        plugin.deleteSubcategory(HOST, "pages", "test");
 
-        SubCategoryData subCategoryDataAfterDelete = plugin.getSubCategory(null, "pages", "test");
+        SubCategoryData subCategoryDataAfterDelete = plugin.getSubCategory(HOST, "pages", "test");
 
         Assert.assertNull("Expecting Pages/Test to be deleted", subCategoryDataAfterDelete);
+
+        plugin.deleteCategory(HOST, "pages");
     }
 
     @Test
@@ -140,7 +160,7 @@ public class FileSystemStoragePluginTest {
         CategoryData ticketCategory = new CategoryData();
         ticketCategory.getDefaultFields().add(new CategoryField("tickets", "tickets", "array", false));
 
-        plugin.setCategory(null, "tickets", ticketCategory);
+        plugin.setCategory(HOST, "tickets", ticketCategory);
 
         SubCategoryData newTicket = new SubCategoryData();
         newTicket.setId("newTicketId");
@@ -149,9 +169,9 @@ public class FileSystemStoragePluginTest {
         ticketsArray.add(new JsonPrimitive("ticketTwo"));
         newTicket.getKeyMap().put("tickets", ticketsArray);
 
-        plugin.setSubCategory(null, "tickets", newTicket.getId(), newTicket);
+        plugin.setSubCategory(HOST, "tickets", newTicket.getId(), newTicket);
 
-        SubCategoryData oldTicket = plugin.getSubCategory(null, "tickets", "newTicketId");
+        SubCategoryData oldTicket = plugin.getSubCategory(HOST, "tickets", "newTicketId");
 
         Assert.assertEquals("tickets_newTicketId", oldTicket.getId());
         System.out.println(oldTicket.getListForKey("tickets").size());
@@ -159,6 +179,9 @@ public class FileSystemStoragePluginTest {
         Assert.assertEquals(new Integer(2), new Integer(oldTicket.getListForKey("tickets").size()));
         Assert.assertEquals("ticketOne", oldTicket.getListForKey("tickets").get(0));
         Assert.assertEquals("ticketTwo", oldTicket.getListForKey("tickets").get(1));
+
+        plugin.deleteSubcategory(HOST, "tickets", "newTicketId");
+        plugin.deleteCategory(HOST, "tickets");
     }
 
     @Test
@@ -166,15 +189,15 @@ public class FileSystemStoragePluginTest {
         CategoryData ticketCategory = new CategoryData();
         ticketCategory.getDefaultFields().add(new CategoryField("tickets", "tickets", "array", false));
 
-        plugin.setCategory(null, "tickets", ticketCategory);
+        plugin.setCategory(HOST, "tickets", ticketCategory);
 
         SubCategoryData newTicket = new SubCategoryData();
         newTicket.setId("secondTicketId");
         newTicket.getKeyMap().put("tickets", new JsonPrimitive("ticketOne,ticketTwo"));
 
-        plugin.setSubCategory(null, "tickets", newTicket.getId(), newTicket);
+        plugin.setSubCategory(HOST, "tickets", newTicket.getId(), newTicket);
 
-        SubCategoryData oldTicket = plugin.getSubCategory(null, "tickets", "secondTicketId");
+        SubCategoryData oldTicket = plugin.getSubCategory(HOST, "tickets", "secondTicketId");
 
         Assert.assertEquals("tickets_secondTicketId", oldTicket.getId());
         System.out.println(oldTicket.getListForKey("tickets").size());
@@ -182,5 +205,8 @@ public class FileSystemStoragePluginTest {
         Assert.assertEquals(new Integer(2), new Integer(oldTicket.getListForKey("tickets", ",").size()));
         Assert.assertEquals("ticketOne", oldTicket.getListForKey("tickets", ",").get(0));
         Assert.assertEquals("ticketTwo", oldTicket.getListForKey("tickets", ",").get(1));
+
+        plugin.deleteSubcategory(HOST, "tickets", "secondTicketId");
+        plugin.deleteCategory(HOST, "tickets");
     }
 }

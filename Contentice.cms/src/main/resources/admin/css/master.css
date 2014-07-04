@@ -151,3 +151,8 @@ h1 {
     height:250px;
     width: 100%;
 }
+
+.bar {
+    height: 24px;
+    background: green;
+}

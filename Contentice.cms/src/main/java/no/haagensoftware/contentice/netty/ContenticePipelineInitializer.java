@@ -43,7 +43,8 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
         ChannelPipeline pipeline = ch.pipeline();
 
         pipeline.addLast("codec", new HttpServerCodec());
-        pipeline.addLast("aggregator", new HttpObjectAggregator(5 * 1024 * 1024));
+
+        pipeline.addLast("aggregator", new HttpObjectAggregator(400 * 1024 * 1024));
         pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
 
         for (RouterPlugin routerPlugin : RouterPluginService.getInstance().getRouterPlugins()) {
