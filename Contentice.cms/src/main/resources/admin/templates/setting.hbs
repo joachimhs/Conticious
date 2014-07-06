@@ -1,37 +1,50 @@
 {{#if controllers.user.isAdminLoggedIn}}
     <div class="wrap" style="margin-top: 25px;">
-        <h1>Domains</h1>
 
         <div class="text-right">
             <button class="btn btn-primary smallMarginBottom" {{action "addDomain"}}>Add Domain</button>
         </div>
-        <table class="table">
-        <tr>
-            <th>Domain ID</th>
-            <th>Domain name</th>
-            <th>Webapp name</th>
-            <th>Active</th>
-            <th>Minified</th>
-            <th>Action</th>
-        </tr>
-        {{#each domain in controller.model.domains}}
-            <tr>
-                <td>{{domain.id}}</td>
-                <td>{{input type="text" value=domain.domainName}}</td>
-                <td>{{input type="text" value=domain.webappName}}</td>
-                <td>
-                    {{view Ember.Checkbox checkedBinding="domain.active"}}
-                </td>
-                <td>
-                    {{view Ember.Checkbox checkedBinding="domain.minified"}}
-                </td>
-                <td>
-                    <button class="btn btn-danger" {{action "deleteDomain" domain}}>Delete</button>
-                    <button class="btn btn-primary" {{action "generateStatic" domain}}>SPG</button>
-                </td>
-            </tr>
-        {{/each}}
-        </table>
+
+        <div class="row">
+            {{#each domain in controller.model.domains}}
+                <div class="col-md-4">
+                    <h3 class="text-center">{{domain.id}}</h3>
+                    <table class="table table-bordered">
+                        <tr>
+                            <td>Domain Name:</td>
+                            <td>{{input type="text" value=domain.domainName class="form-control" placeholder="The Conticious domain name"}}</td>
+                        </tr>
+                        <tr>
+                            <td>Webapp Name:</td>
+                            <td>{{input type="text" value=domain.webappName class="form-control" placeholder="The hostname of the live site"}}</td>
+                        </tr>
+                        <tr>
+                            <td>UploadURL: </td>
+                            <td>{{input type="text" value=domain.uploadUrl class="form-control" placeholder="URL to call when uploading files"}}</td>
+                        </tr>
+                        <tr>
+                            <td>UploadPath: </td>
+                            <td>{{input type="text" value=domain.uploadPath class="form-control" placeholder="Path to the uploaded files on the server"}}</td>
+                        </tr>
+                        <tr>
+                            <td>Active: </td>
+                            <td>{{view Ember.Checkbox checkedBinding="domain.active"}}</td>
+                        </tr>
+                        <tr>
+                            <td>Minified: </td>
+                            <td>{{view Ember.Checkbox checkedBinding="domain.minified"}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-center">
+                                <button class="btn btn-danger" {{action "deleteDomain" domain}}>Delete</button>
+                                <button class="btn btn-primary" {{action "generateStatic" domain}}>SPG</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            {{/each}}
+        </div>
+
         <div>
             <button class="btn btn-primary" {{action "saveChanges"}}>Save Changes</button>
         </div>

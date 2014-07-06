@@ -120,6 +120,24 @@ Conticious.UserController = Ember.Controller.extend({
                     console.log('Creating uuidAdminToken cookie!');
                     Conticious.createCookie("uuidAdminToken", data.get('id'), 30);
                     controller.set('content', data);
+
+                    controller.store.find('setting', 'ConticiousSettings').then(function(setting) {
+                        console.log('settings: ' + setting);
+                        console.log('settings: ' + setting.get('domains'));
+
+                        if (setting.get('domains')) {
+                            console.log('domain!');
+                            setting.get('domains').forEach(function(domain) {
+                                console.log(domain.get('id') + ' === ' + window.location.hostname);
+
+                                if (domain.get('id') === window.location.hostname) {
+                                    controller.set('domain', domain);
+                                }
+                            });
+                        }
+                    });
+
+
                 } else {
                     console.log('UUID Token is no longer valid, erasing cookie!');
                     Conticious.eraseCookie("uuidAdminToken");
@@ -444,6 +462,10 @@ Conticious.CategoriesController = Ember.ArrayController.extend({
         //this.store.find('category', 'uploads').reload();
     },
 
+    domainHaveUpload: function() {
+        return this.get('controllers.user.domain.uploadUrl') !== undefined && this.get('controllers.user.domain.uploadUrl') !== null;
+    }.property('controllers.user.domain.uploadUrl'),
+
     observeID: function(){
         this.send("userChanged");
     }.observes("controllers.user.content.id")
@@ -597,14 +619,13 @@ Conticious.FileReaderView = Ember.View.extend({
     type: 'file',
 
     didInsertElement: function() {
-        console.log('FileReaderView didInsertElement');
-
         var view = this;
         Ember.run.schedule("afterRender", function() {
             var uploadButton = $("#uploadFileButton");
 
+            var uploadUrl = view.get('controller.controllers.user.domain.uploadUrl');
             $('#' + view.get('elementId')).fileupload({
-                url: '/json/spiraUpload/',
+                url: uploadUrl,
                 dataType: 'json',
                 add: function (e, data) {
                     $('#progressText').html('Uploading: ' + data.files[0].name);
@@ -860,7 +881,9 @@ Conticious.Domain = DS.Model.extend({
     domainName: DS.attr('string'),
     webappName: DS.attr('string'),
     active: DS.attr('boolean'),
-    minified: DS.attr('boolean')
+    minified: DS.attr('boolean'),
+    uploadUrl: DS.attr('string'),
+    uploadPath: DS.attr('string')
 });
 
 Conticious.User = DS.Model.extend({

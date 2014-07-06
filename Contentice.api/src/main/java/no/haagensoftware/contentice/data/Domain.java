@@ -7,6 +7,8 @@ public class Domain {
     private String id;
     private String domainName;
     private String webappName;
+    private String uploadUrl;
+    private String uploadPath;
     private Boolean active;
     private Boolean minified;
 
@@ -32,6 +34,22 @@ public class Domain {
 
     public void setWebappName(String webappName) {
         this.webappName = webappName;
+    }
+
+    public String getUploadUrl() {
+        return uploadUrl;
+    }
+
+    public void setUploadUrl(String uploadUrl) {
+        this.uploadUrl = uploadUrl;
+    }
+
+    public String getUploadPath() {
+        return uploadPath;
+    }
+
+    public void setUploadPath(String uploadPath) {
+        this.uploadPath = uploadPath;
     }
 
     public Boolean getActive() {
