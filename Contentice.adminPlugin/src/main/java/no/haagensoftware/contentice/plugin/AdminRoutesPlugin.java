@@ -54,6 +54,8 @@ public class AdminRoutesPlugin extends RouterPlugin {
 
         routeMap.put("/json/admin/spg/{domain}", SpgHandler.class);
 
+        routeMap.put("/json/admin/fileUpload", AdminUploadHandler.class);
+
         routeMap.put("startsWith:/admin", AdminPagesHandler.class);
     }
 

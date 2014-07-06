@@ -82,6 +82,7 @@ public class SettingsHandler extends ContenticeHandler {
     private JsonObject buildDomainObject(List<Domain> domains) {
         JsonArray domainArray = new JsonArray();
         JsonArray domainStringArray = new JsonArray();
+
         for (Domain domain : domains) {
             JsonElement domainObject = new Gson().toJsonTree(domain);
             domainArray.add(domainObject);

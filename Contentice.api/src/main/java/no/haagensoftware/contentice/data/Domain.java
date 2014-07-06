@@ -7,8 +7,12 @@ public class Domain {
     private String id;
     private String domainName;
     private String webappName;
+
+    //file upload
     private String uploadUrl;
     private String uploadPath;
+    private String createCategory;
+
     private Boolean active;
     private Boolean minified;
 
@@ -50,6 +54,14 @@ public class Domain {
 
     public void setUploadPath(String uploadPath) {
         this.uploadPath = uploadPath;
+    }
+
+    public String getCreateCategory() {
+        return createCategory;
+    }
+
+    public void setCreateCategory(String createCategory) {
+        this.createCategory = createCategory;
     }
 
     public Boolean getActive() {

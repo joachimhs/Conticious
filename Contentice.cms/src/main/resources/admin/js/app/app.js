@@ -122,14 +122,9 @@ Conticious.UserController = Ember.Controller.extend({
                     controller.set('content', data);
 
                     controller.store.find('setting', 'ConticiousSettings').then(function(setting) {
-                        console.log('settings: ' + setting);
-                        console.log('settings: ' + setting.get('domains'));
 
                         if (setting.get('domains')) {
-                            console.log('domain!');
                             setting.get('domains').forEach(function(domain) {
-                                console.log(domain.get('id') + ' === ' + window.location.hostname);
-
                                 if (domain.get('id') === window.location.hostname) {
                                     controller.set('domain', domain);
                                 }
@@ -452,6 +447,8 @@ Conticious.CategoriesController = Ember.ArrayController.extend({
         console.log('reloadCategories');
         console.log(this.get('model'));
 
+        this.store.find('category');
+
         this.get('model').forEach(function(category) {
             console.log('category: ' + category.get('id'));
             if (category.get('id') === 'uploads') {
@@ -475,6 +472,17 @@ Conticious.MarkdownTextArea = Ember.TextArea.extend({
     didInsertElement: function() {
         var elementId = this.get('elementId');
         $("#" + elementId).markdown({autofocus:false,savable:false});
+    }
+});
+
+Conticious.PopOverComponent = Ember.Component.extend({
+    classNames: ['glyphicon','glyphicon-question-sign','pull-right', 'popover-dismiss'],
+    attributeBindings: ['dataToggle:data-toggle', 'title', 'dataContent:data-content'],
+    tagName: 'span',
+
+    didInsertElement: function() {
+        var elementId = this.get('elementId');
+        $("#" + elementId).popover({ trigger: 'hover' });
     }
 });
 
@@ -883,7 +891,8 @@ Conticious.Domain = DS.Model.extend({
     active: DS.attr('boolean'),
     minified: DS.attr('boolean'),
     uploadUrl: DS.attr('string'),
-    uploadPath: DS.attr('string')
+    uploadPath: DS.attr('string'),
+    createCategory: DS.attr('string')
 });
 
 Conticious.User = DS.Model.extend({
