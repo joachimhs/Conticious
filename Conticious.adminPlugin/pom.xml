@@ -7,8 +7,8 @@
 		<artifactId>conticious-parent</artifactId>
 		<version>0.1</version>
 	</parent>
-	<artifactId>conticious-data-plugin</artifactId>
-	<name>Conticious Data Plugin</name>
+	<artifactId>conticious-admin-plugin</artifactId>
+	<name>Conticious Admin Plugin</name>
 	<packaging>jar</packaging>
 
 	<build>

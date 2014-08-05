@@ -1,0 +1,69 @@
+<div class="list-group">
+
+    {{#link-to "category" category classNames="list-group-item categoryItem"}}
+        {{#if view.isSelected}}
+            &#x25BC;
+        {{else}}
+            &#x25B6;
+        {{/if}}
+
+        {{category.id}}
+
+        <span class="pull-right">
+            <span class="badge menuBadge">
+                {{view.sortedSubcategories.length}} / {{category.subcategories.length}}
+            </span>
+        </span>
+    {{/link-to}}
+
+    {{#if view.isSelected}}
+        <div class="list-group-item text-right menuFilterItem">
+            <span class="glyphicon glyphicon-filter pointer" {{action "toggleSortAndFilter" target="view"}}></span>&nbsp;
+            <span class="glyphicon glyphicon-plus pointer" {{action "openNewSubcategory" target="view"}}></span>&nbsp;
+        </div>
+
+        {{#if view.showNewSubcategoryArea}}
+            <div id="showNewSubcategoryArea" class="list-group-item text-left menuFilterItem">
+                <h4 class="text-center">Add new Subcategory</h4>
+                {{view Ember.TextField valueBinding="view.newSubcategoryName" classNames="form-control" placeholder="Subcategory Name"}}
+                <div style="margin-top: 5px;">
+                    <button class="btn btn-primary" style="margin-right: 10px;" {{action "addNewSubcategory" target="view"}}>Add Subcategory</button>
+                    <button class="btn btn-default" {{action "cancelNewSubcategory" target="view"}}>Cancel</button>
+                </div>
+            </div>
+    {{/if}}
+
+        {{#if view.sortAndFilterShowing}}
+            <div id="sortAndFilterArea" class="list-group-item menuFilterItem">
+                <h4 class="text-center">Sort and Filter</h4>
+                {{view Ember.Select
+                            contentBinding="category.defaultFields"
+                            valueBinding="view.selectedSortColumn"
+                            optionValuePath="content.name"
+                            optionLabelPath="content.name"
+                            prompt="Sort by ID"
+                            class="form-control smallBottomMargin"
+                }}
+
+                {{view Ember.Select
+                            contentBinding="category.defaultFields"
+                            valueBinding="view.selectedFilterColumn"
+                            optionValuePath="content.name"
+                            optionLabelPath="content.name"
+                            prompt="Filter by ID"
+                            class="form-control smallBottomMargin"
+                }}
+
+                {{input type="text" value=view.selectedFilterString class="form-control smallBottomMargin"}}
+            </div>
+        {{/if}}
+    {{/if}}
+</div>
+
+{{#if view.isSelected}}
+    <div id="subcategoryArea" class="list-group categoryList">
+        {{#each subcategory in view.sortedSubcategories}}
+            {{view Conticious.MenuSubcategoryView subcategory=subcategory}}
+        {{/each}}
+    </div>
+{{/if}}

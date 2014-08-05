@@ -3,9 +3,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>no.haagensoftware</groupId>
-	<artifactId>kontize-parent</artifactId>
+	<artifactId>conticious-parent</artifactId>
 	<version>0.1</version>
-	<name>Kontize Parent</name>
+	<name>Conticious Parent</name>
 	<packaging>pom</packaging>
 
 	<properties>
@@ -15,10 +15,10 @@
 	</properties>
 
     <modules>
-        <module>Contentice.api</module>
-        <module>Contentice.cms</module>
-        <module>Contentice.FilesystemPlugin</module>
-        <module>Contentice.AdminPlugin</module>
+        <module>Conticious.api</module>
+        <module>Conticious.cms</module>
+        <module>Conticious.FilesystemPlugin</module>
+        <module>Conticious.AdminPlugin</module>
         <module>Conticious.dataPlugin</module>
     </modules>
 
