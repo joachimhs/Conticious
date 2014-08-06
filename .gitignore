@@ -5,3 +5,4 @@ target
 .settings
 *.iml
 .DS_Store
+Conticious.cms/src/main/resources/admin/node_modules/
