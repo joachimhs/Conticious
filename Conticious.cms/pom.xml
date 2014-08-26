@@ -9,6 +9,7 @@
     </parent>
     <artifactId>conticious-cms</artifactId>
     <name>Conticious CMS</name>
+    <version>0.1.1</version>
     <packaging>jar</packaging>
 
     <build>
@@ -36,14 +37,14 @@
         <dependency>
             <groupId>no.haagensoftware</groupId>
             <artifactId>conticious-api</artifactId>
-            <version>${project.version}</version>
+            <version>0.1</version>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>no.haagensoftware</groupId>
-            <artifactId>conticious-data-plugin</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
+            <artifactId>conticious-data-plugin-dev</artifactId>
+            <version>0.1</version>
+
+        </dependency-->
 
         <!--dependency>
             <groupId>no.haagensoftware</groupId>
@@ -56,13 +57,13 @@
         <dependency>
             <groupId>no.haagensoftware</groupId>
             <artifactId>conticious-filesystem-plugin</artifactId>
-            <version>${project.version}</version>
+            <version>0.1</version>
         </dependency>
 
         <dependency>
             <groupId>no.haagensoftware</groupId>
             <artifactId>conticious-admin-plugin</artifactId>
-            <version>${project.version}</version>
+            <version>0.1</version>
 
         </dependency>
 
