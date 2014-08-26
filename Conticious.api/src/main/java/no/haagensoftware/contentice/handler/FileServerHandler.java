@@ -278,7 +278,7 @@ public class FileServerHandler extends ContenticeHandler {
             int randomnum = (int)(Math.random() * 1000d);
 
             headElement.appendElement("script")
-                    .attr("src", "/cachedScript" + path + ".js?" + "id=" + randomnum)
+                    .attr("src", "/cachedScript" + path + ".js")
                     .attr("type", "text/javascript")
                     .attr("charset", "utf-8");
         }
