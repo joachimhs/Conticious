@@ -201,7 +201,9 @@ public class FileServerHandler extends ContenticeHandler {
                 logger.info("original path: " + originalPath);
                 logger.info("static path: " + staticPath);
 
-                if (path.endsWith(".html")) {
+                writeFileToBuffer(channelHandlerContext, path, ContentTypeUtil.getContentType(path));
+
+/*                if (path.endsWith(".html")) {
                     ScriptCache cache = ScriptHash.getScriptCache(path);
                     if (cache == null || cache.isExpired()) {
                         //If file is not cached, or cache is expired, update the cache.
@@ -233,7 +235,7 @@ public class FileServerHandler extends ContenticeHandler {
                     writeContentsToBuffer(channelHandlerContext, htmlContents, ContentTypeUtil.getContentType(path));
                 } else {
                     writeFileToBuffer(channelHandlerContext, path, ContentTypeUtil.getContentType(path));
-                }
+                }*/
             }
         }
     }
