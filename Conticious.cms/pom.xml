@@ -45,12 +45,12 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
+        <!--dependency>
             <groupId>no.haagensoftware</groupId>
             <artifactId>conticious-kodegenet-plugin</artifactId>
             <version>1.0</version>
             <scope>provided</scope>
-        </dependency>
+        </dependency-->
 
 
         <dependency>
