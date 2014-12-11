@@ -1,3 +1,4 @@
+/* ##--->: js/app/app.js */
 var Conticious = Ember.Application.create({
     createCookie: function(name, value, days) {
         var expires = null;
@@ -26,6 +27,70 @@ var Conticious = Ember.Application.create({
         this.createCookie(name, "", -1);
     }
 });
+
+/* ##--->: js/app/router.js */
+Conticious.Router.map(function() {
+    this.resource("categories", {path: "/"}, function() {
+        this.resource('category', {path: "/category/:category_id"}, function() {
+            this.resource('subcategory', {path: "/subcategory/:subcategory_id"}, function() {
+                this.route('fields');
+                this.route('preview');
+            });
+        });
+    });
+    this.resource("setting");
+});
+
+/* ##--->: js/app/store.js */
+DS.RESTAdapter.reopen({
+    namespace: 'json/admin'
+});
+
+Conticious.Store = DS.Store.extend({
+    adapter:  "DS.RESTAdapter"
+});
+
+/* ##--->: js/app/mixins/dragable_mixin.js */
+Conticious.DraggableViewMixin = Ember.Mixin.create({
+    classNames: ['draggable'],
+    classNameBindings: ['isDragging'],
+
+    attributeBindings: ['draggable'],
+    draggable: 'true', // must be the string 'true'
+    isDraggable: true,
+
+    dragStart: function(event) {
+        this.set('isDragging', true);
+    },
+
+    dragEnd: function() {
+        this.set('isDragging', false);
+    }
+});
+
+/* ##--->: js/app/mixins/droppable_mixin.js */
+Conticious.DroppableViewMixin = Ember.Mixin.create({
+    classNames: ['droppable'],
+    classNameBindings: ['isDragOver'],
+
+    dragEnter: function() {
+        this.set('isDragOver', true);
+    },
+    dragLeave: function() {
+        this.set('isDragOver', false);
+    },
+
+    drop: function(event) {
+        console.log("DROP");
+        this.set('isDragOver', false);
+        this.set('didReceiveDrop', true);
+    },
+
+    isDroppable: true
+
+});
+
+/* ##--->: js/app/categories/categories_controller.js */
 Conticious.CategoriesController = Ember.ArrayController.extend({
     needs: ['category', 'user', "subcategory"],
 
@@ -111,9 +176,29 @@ Conticious.CategoriesController = Ember.ArrayController.extend({
         },
 
         renameSubcategory: function(subcategory) {
+            var self = this;
             console.log(this.get('newId'));
 
-            var newId = this.get('newId');
+            var newId = this.get('controllers.category.model.id') + "_" + this.get('newId');
+            var oldId = subcategory.get('id');
+
+            console.log("Renaming " + oldId + " to " + newId);
+
+            var url = "/json/admin/renameSubcategory/" + oldId + "/" + newId;
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: "",
+                success: function() {
+                    self.transitionToRoute("categories");
+                    self.reloadCategories();
+                },
+                dataType: "json"
+            });
+
+            /* This is the old way, which needs to handle fields, etc. This is now implemnted with a single
+             * call to the server, as renaming is a lot easier there!
 
             if (newId && this.get('controllers.category.model.id')) {
                 var name = newId;
@@ -122,7 +207,14 @@ Conticious.CategoriesController = Ember.ArrayController.extend({
                     id: newId,
                     name: name,
                     content: subcategory.get('content'),
-                    fields: subcategory.get('fields')
+                    fields: []
+
+                });
+
+                var fieldsToCopy = [];
+
+                subcategory.get('fields').forEach(function(field) {
+                    fieldsToCopy.pushObject(field);
                 });
 
                 subcategory.deleteRecord();
@@ -132,12 +224,24 @@ Conticious.CategoriesController = Ember.ArrayController.extend({
 
                 var controller = this;
                 newSubcategory.save().then(function(d) {
-                    controller.transitionToRoute("categories");
-                    controller.reloadCategories();
+                    console.log('saving fields');
+                    fieldsToCopy.forEach(function(fieldToCopy) {
+                        console.log('fields to save: ' + newSubcategory.get('fields.length'));
+                       newSubcategory.get('fields').forEach(function(oldField) {
+                           console.log("verifying: " + oldField.get('name') + " agains: " + ieldToCopy.get('name'));
+                           if (oldField.get('name') === fieldToCopy.get('name')) {
+                               console.log("updating: " + oldField.get('id'));
+                               oldField.set('value', fieldToCopy.get('value'));
+                               oldField.save();
+                           }
+                       });
+                    });
+
+
                 });
             } else {
                 console.log('newId is not valid: ' + newId);
-            }
+            }*/
 
         }
     },
@@ -166,11 +270,15 @@ Conticious.CategoriesController = Ember.ArrayController.extend({
         this.send("userChanged");
     }.observes("controllers.user.content.id")
 });
+
+/* ##--->: js/app/categories/categories_route.js */
 Conticious.CategoriesRoute = Ember.Route.extend({
     model: function() {
         return this.store.find('category');
     }
 });
+
+/* ##--->: js/app/categories/categories_view.js */
 Conticious.CategoriesView = Ember.View.extend({
     isSelected: function() {
         console.log(this.get('model.id'));
@@ -182,9 +290,13 @@ Conticious.CategoriesView = Ember.View.extend({
         return this.get('model.id') === this.get('controller.model.id');
     }.property('controller.model')
 });
+
+/* ##--->: js/app/category/category_controller.js */
 Conticious.CategoryController = Ember.ObjectController.extend({
 
 });
+
+/* ##--->: js/app/category/category_index_controller.js */
 Conticious.CategoryIndexController = Ember.Controller.extend({
     needs: ['category', 'categories'],
     showNewFieldArea: false,
@@ -272,6 +384,8 @@ Conticious.CategoryIndexController = Ember.Controller.extend({
         this.set('fieldTypes', fieldTypes);
     }
 });
+
+/* ##--->: js/app/category/category_index_route.js */
 Conticious.CategoryIndexRoute = Ember.Route.extend({
     actions: {
 
@@ -329,14 +443,46 @@ Conticious.CategoryIndexRoute = Ember.Route.extend({
         }
     }
 });
+
+/* ##--->: js/app/category/category_route.js */
 Conticious.CategoryRoute = Ember.Route.extend({
     model: function(category) {
         return this.store.find('category', category.category_id);
     }
 });
+
+/* ##--->: js/app/category/subcategory/fields/subcategory_fields_controller.js */
 Conticious.SubcategoryFieldsController = Ember.ObjectController.extend({
-    needs: ['category']
+    needs: ['category', 'subcategory', 'categories'],
+
+    actions: {
+        addSubcategoryToRelation: function(addToSubcategoryId, addToSubcategoryFieldId) {
+            var self = this;
+
+            var subcategoryId = this.get('controllers.subcategory.model.id');
+            var url = "/json/admin/addSubcategoryToRelation/" + subcategoryId + "/" + addToSubcategoryId + "_" + addToSubcategoryFieldId;
+
+            console.log("POSTING to: " + url);
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: "",
+                success: function() {
+                    //self.transitionToRoute("categories");
+                    //self.reloadCategories();
+                    console.log("POSTED");
+                    if (self.get('controllers.categories')) {
+                        self.get('controllers.categories').reloadCategories();
+                    }
+                },
+                dataType: "json"
+            });
+        }
+    }
 });
+
+/* ##--->: js/app/category/subcategory/fields/subcategory_fields_route.js */
 Conticious.SubcategoryFieldsRoute = Ember.Route.extend({
     actions: {
         saveSubcategoryField: function(field) {
@@ -349,10 +495,58 @@ Conticious.SubcategoryFieldsRoute = Ember.Route.extend({
     },
 
     model: function() {
+        var self = this;
         var subcategory = this.modelFor('subcategory');
+
+        var cfs = Conticious.__container__.lookup('store:main').all('categoryField');
+        var toManys = cfs.filter(function(cf) { if (cf.get('type') === 'toMany') { return true; } });
+
+        var subcategoryType = subcategory.get('id').split("_");
+        if (subcategoryType.length > 0) {
+            subcategoryType = subcategoryType[0];
+        }
+
+        var relations = [];
+
+        toManys.forEach(function(cf) {
+            if (cf.get('relation') === subcategoryType) {
+                var catId = null;
+                var catField = null;
+
+                var idParts = cf.get('id').split("_");
+                if (idParts.length >= 2) {
+                    catId = idParts[0];
+                    catField = idParts[1];
+                }
+
+                if (catId && catField) {
+                    console.log('Related to category: ' + catId + " through field: " + catField);
+
+                    var relatedCategory = self.store.getById("category", catId);
+
+                    console.log("category: " + relatedCategory.get('id'));
+                    console.log(relatedCategory);
+
+                    var relatedSubcategories = relatedCategory.get('subcategories');
+
+                    console.log("subcategories: " + relatedSubcategories);
+
+                    relations.pushObject(Ember.Object.create({
+                        relatedToCategory: catId,
+                        throughField: catField,
+                        relatedSubcategories: relatedSubcategories
+                    }));
+                }
+            }
+        });
+
+        subcategory.set('relatedCategoryFields', relations);
+
         return subcategory;
     }
 });
+
+/* ##--->: js/app/category/subcategory/preview/subcategory_preview_route.js */
 Conticious.SubcategoryPreviewRoute = Ember.Route.extend({
     model: function() {
         var subcategory = this.modelFor('subcategory');
@@ -360,6 +554,8 @@ Conticious.SubcategoryPreviewRoute = Ember.Route.extend({
     }
 });
 
+
+/* ##--->: js/app/category/subcategory/subcategory_index_controller.js */
 Conticious.SubcategoryIndexController = Ember.ObjectController.extend({
     actions: {
         doSaveSubcategory: function(subcategory) {
@@ -370,21 +566,29 @@ Conticious.SubcategoryIndexController = Ember.ObjectController.extend({
         }
     }
 });
+
+/* ##--->: js/app/category/subcategory/subcategory_route.js */
 Conticious.SubcategoryRoute = Ember.Route.extend({
     model: function(subcategory) {
         return this.store.find('subcategory', subcategory.subcategory_id);
     }
 });
 
+
+/* ##--->: js/app/category/subcategory/subcategroy_index_route.js */
 Conticious.SubcategoryIndexRoute = Ember.Route.extend({
     model: function() {
         var subcategory = this.modelFor('subcategory');
         return subcategory;
     }
 });
+
+/* ##--->: js/app/category/subcategory_controller.js */
 Conticious.SubcategoryController = Ember.ObjectController.extend({
 
 });
+
+/* ##--->: js/app/components/log_in/login_component.js */
 Conticious.LogInComponent = Ember.Component.extend({
     actions: {
         loginButtonAction: function() {
@@ -415,6 +619,8 @@ Conticious.LogInComponent = Ember.Component.extend({
         }
     }
 });
+
+/* ##--->: js/app/components/pop_over/pop_over_component.js */
 Conticious.PopOverComponent = Ember.Component.extend({
     classNames: ['glyphicon','glyphicon-question-sign','pull-right', 'popover-dismiss'],
     attributeBindings: ['dataToggle:data-toggle', 'title', 'dataContent:data-content'],
@@ -425,6 +631,8 @@ Conticious.PopOverComponent = Ember.Component.extend({
         $("#" + elementId).popover({ trigger: 'hover' });
     }
 });
+
+/* ##--->: js/app/components/select_multiple/select_multiple_component.js */
 Conticious.SelectMultipleComponent = Ember.Component.extend({
     actions: {
         addItem: function() {
@@ -447,14 +655,139 @@ Conticious.SelectMultipleComponent = Ember.Component.extend({
         },
 
         deleteItem: function(item) {
-            console.log('deleteItem: ' + item);
+            console.log('Select Multiple Component deleteItem: ' + item);
             if (item) {
                 this.get('addedItems').removeObject(item);
                 this.get('model').send('becomeDirty');
             }
+        },
+
+        droppedItem: function(draggedId, droppedItem, droppedTop) {
+            if (draggedId === droppedItem.get('id')) {
+                return;
+            }
+
+            var draggedIndex = null;
+            var draggedItem = null;
+            var droppedIndex = null;
+
+            for (var index = 0; index < this.get('addedItems.length'); index++) {
+                if (this.get('addedItems').objectAt(index).get('id') === draggedId) {
+                    draggedIndex = index;
+                    draggedItem = this.get('addedItems').objectAt(index);
+                }
+
+                if (this.get('addedItems').objectAt(index).get('id') === droppedItem.get('id')) {
+                    droppedIndex = index;
+                }
+            }
+
+            if (draggedIndex > -1 && droppedIndex > -1) {
+                if (!droppedTop) {
+                    droppedIndex++;
+                }
+
+                if (draggedIndex === (droppedIndex - 1)) {
+                    //nothing
+                } else {
+                    this.get('addedItems').removeAt(draggedIndex);
+                    this.get('addedItems').insertAt(droppedIndex, draggedItem);
+                    this.get('model').send('becomeDirty');
+                }
+            }
+
+
         }
     }
 });
+
+/* ##--->: js/app/components/select_multiple/select_multiple_item_component.js */
+Conticious.SelectMultipleItemComponent = Ember.Component.extend(Conticious.DraggableViewMixin, Conticious.DroppableViewMixin, {
+    classNames: ['list-group-item'],
+
+    actions: {
+        deleteItem: function(item) {
+            this.sendAction("deleteItem", item);
+        }
+    },
+
+    dragStart: function(event) {
+        this._super();
+
+        var dragData = {
+            id: this.get('item.id')
+        };
+
+        event.dataTransfer.setData(
+            'application/json',                     // first argument is data type
+            JSON.stringify( dragData ) // can only transfer strings
+        );
+    },
+
+    dragOver: function(event) {
+        var elementId = this.get('elementId');
+        var y = event.originalEvent.pageY - Ember.$("#" + elementId).offset().top;
+        var elemHeight = Ember.$("#" + elementId).height();
+
+        if (y <= (elemHeight / 2)) {
+            this.set('isDragOverTop', true);
+            this.set('isDragOverBottom', false);
+        } else if (y > (elemHeight / 2)) {
+            this.set('isDragOverTop', false);
+            this.set('isDragOverBottom', true);
+        }
+
+        event.preventDefault();
+
+        console.log("Dragging over: " + this.get('item.id') + " :: " + event);
+
+
+    },
+
+    drop: function(event) {
+        this._super();
+
+        var elementId = this.get('elementId');
+        var y = event.originalEvent.pageY - Ember.$("#" + elementId).offset().top;
+        var elemHeight = Ember.$("#" + elementId).height();
+        var droppedTop = true;
+
+        if  (y > (elemHeight / 2)) {
+            droppedTop = false;
+        }
+
+        console.log("y: " + y + " elemHeight: " + elemHeight);
+
+
+
+        var dragData = JSON.parse( event.dataTransfer.getData('application/json') );
+
+        console.log("item dropped: " + dragData.id);
+        console.log('item dropped on: ' + this.get('item.id'));
+
+        this.sendAction('droppedItem', dragData.id, this.get('item'), droppedTop);
+    },
+
+    isDragOverObserver: function() {
+        if (this.get('isDragging')) {
+            //No styling if this is the item being dragged!
+            return;
+        }
+        var elementId = this.get('elementId');
+        if (this.get('isDragOver') && this.get('isDragOverTop')) {
+            Ember.$("#" + elementId).addClass('draggingOverTop');
+            Ember.$("#" + elementId).removeClass('draggingOverBottom');
+        } else if (this.get('isDragOver') && this.get('isDragOverBottom')) {
+            Ember.$("#" + elementId).addClass('draggingOverBottom');
+            Ember.$("#" + elementId).removeClass('draggingOverTop');
+        } else {
+            Ember.$("#" + elementId).removeClass('draggingOverTop');
+            Ember.$("#" + elementId).removeClass('draggingOverBottom');
+        }
+    }.observes('isDragging', 'isDragOver', 'isDragOverTop', 'isDragOverBottom')
+});
+
+/* ##--->: js/app/header/header_controller.js */
 Conticious.HeaderController = Ember.Controller.extend({
     needs: ['user'],
 
@@ -466,11 +799,15 @@ Conticious.HeaderController = Ember.Controller.extend({
         }
     }
 });
+
+/* ##--->: js/app/models/category.js */
 Conticious.Category = DS.Model.extend({
     subcategories: DS.hasMany('subcategory'),
     defaultFields: DS.hasMany('categoryField'),
     isPublic: DS.attr('boolean')
 });
+
+/* ##--->: js/app/models/category_field.js */
 Conticious.CategoryField = DS.Model.extend({
     name: DS.attr('string'),
     type: DS.attr('string'),
@@ -497,6 +834,8 @@ Conticious.CategoryField = DS.Model.extend({
         return this.get('type') === 'toMany';
     }.property('type')
 });
+
+/* ##--->: js/app/models/domain.js */
 Conticious.Domain = DS.Model.extend({
     domainName: DS.attr('string'),
     webappName: DS.attr('string'),
@@ -506,14 +845,20 @@ Conticious.Domain = DS.Model.extend({
     uploadPath: DS.attr('string'),
     createCategory: DS.attr('string')
 });
+
+/* ##--->: js/app/models/setting.js */
 Conticious.Setting = DS.Model.extend({
     domains: DS.hasMany('domain')
 });
+
+/* ##--->: js/app/models/subcategory.js */
 Conticious.Subcategory = DS.Model.extend({
     name: DS.attr('string'),
     content: DS.attr('string'),
     fields: DS.hasMany('subcategoryField')
 });
+
+/* ##--->: js/app/models/subcategory_field.js */
 Conticious.SubcategoryField = DS.Model.extend({
     name: DS.attr('string'),
     type: DS.attr('string'),
@@ -546,22 +891,15 @@ Conticious.SubcategoryField = DS.Model.extend({
         return this.get('type') === 'toMany';
     }.property('type')
 });
+
+/* ##--->: js/app/models/user.js */
 Conticious.User = DS.Model.extend({
     username: DS.attr('string'),
     role: DS.attr('string')
 });
 
-Conticious.Router.map(function() {
-    this.resource("categories", {path: "/"}, function() {
-        this.resource('category', {path: "/category/:category_id"}, function() {
-            this.resource('subcategory', {path: "/subcategory/:subcategory_id"}, function() {
-                this.route('fields');
-                this.route('preview');
-            });
-        });
-    });
-    this.resource("setting");
-});
+
+/* ##--->: js/app/setting/setting_controller.js */
 Conticious.SettingController = Ember.ObjectController.extend({
     needs: ['user'],
 
@@ -641,18 +979,15 @@ Conticious.SettingController = Ember.ObjectController.extend({
         this.send("userChanged");
     }.observes("controllers.user.content.id")
 });
+
+/* ##--->: js/app/setting/setting_route.js */
 Conticious.SettingRoute = Ember.Route.extend({
     model: function() {
         return this.store.find('setting', 'ConticiousSettings');
     }
 });
-DS.RESTAdapter.reopen({
-    namespace: 'json/admin'
-});
 
-Conticious.Store = DS.Store.extend({
-    adapter:  "DS.RESTAdapter"
-});
+/* ##--->: js/app/user/user_controller.js */
 Conticious.UserController = Ember.Controller.extend({
     init: function() {
         console.log('UserController init');
@@ -667,7 +1002,7 @@ Conticious.UserController = Ember.Controller.extend({
     uuidObserver: function() {
         console.log('uuidAdminTokenObserver: ' + this.get('uuidAdminToken'));
         if (this.get('uuidAdminToken')) {
-            console.log('Fetching Admin User');
+            console.log('Fetching Admin DopplerUser');
 
             var controller = this;
             this.store.find('user', this.get('uuidAdminToken')).then(function(data) {
@@ -707,6 +1042,8 @@ Conticious.UserController = Ember.Controller.extend({
         return isAdmin;
     }.property('content.role')
 });
+
+/* ##--->: js/app/views/file_reader_view.js */
 Conticious.FileReaderView = Ember.View.extend({
     tagName: 'input',
     attributeBindings: ['type', 'id', 'name'],
@@ -758,12 +1095,16 @@ Conticious.FileReaderView = Ember.View.extend({
         });
     }
 });
+
+/* ##--->: js/app/views/markdown_text_area.js */
 Conticious.MarkdownTextArea = Ember.TextArea.extend({
     didInsertElement: function() {
         var elementId = this.get('elementId');
         $("#" + elementId).markdown({autofocus:false,savable:false});
     }
 });
+
+/* ##--->: js/app/views/menu_category_view.js */
 Conticious.MenuCategoryView = Ember.View.extend({
     templateName: 'menu-category',
     selectedSortColumn: null,
@@ -773,6 +1114,7 @@ Conticious.MenuCategoryView = Ember.View.extend({
     numSubcategoriesShown: 0,
     showNewSubcategoryArea: false,
     newSubcategoryName: null,
+    isExpanded: false,
 
     actions: {
         toggleSortAndFilter: function() {
@@ -845,6 +1187,33 @@ Conticious.MenuCategoryView = Ember.View.extend({
     isSelected: function() {
         return this.get('category.id') === this.get('controller.controllers.category.model.id');
     }.property('controller.controllers.category.model.id'),
+
+    /*isSelectedObserver: function() {
+        var view = this;
+        var isSelected = this.get('isSelected');
+
+        console.log("isSelectedObserver: " + isSelected + " id: " + view.get('category.id'));
+        if (isSelected) {
+            console.log(view.get('elementId') + " .categoryList");
+            view.set('isExpanded', true);
+            $("#" + view.get('elementId') + " .categoryList").css({hidden: true});
+            Ember.run.schedule("afterRender", function() {
+                $("#" + view.get('elementId') + " .categoryList").hide().slideDown(function() {
+                    console.log('setting isExpanded to true');
+
+                }, 600);
+            });
+
+        } else {
+            $("#" + view.get('elementId') + " .categoryList").slideUp(function() {
+                view.set('isExpanded', false);
+            }).hide();
+        }
+    }.observes('isSelected'),*/
+
+    subcategoryId: function() {
+        return this.get('elementId') + "_subcategoryArea";
+    }.property('elementId'),
 
     selectedSortColumnObserver: function() {
         console.log('New Sort Columnn: ' + this.get('selectedSortColumn'));
@@ -922,6 +1291,8 @@ Conticious.MenuCategoryView = Ember.View.extend({
 
     }.observes('sortedSubcategories.@each.id')
 });
+
+/* ##--->: js/app/views/menu_subcategory_view.js */
 Conticious.MenuSubcategoryView = Ember.View.extend({
     templateName: 'menu-subcategory',
 
@@ -931,11 +1302,7 @@ Conticious.MenuSubcategoryView = Ember.View.extend({
 
     isEditing: function() {
         return this.get('isSelected') && this.get('subcategory.isEditing');
-    }.property('isSelected', 'subcategory.isEditing'),
-
-    didInsertElement: function() {
-        $("#" + this.get('elementId')).hide().slideDown();
-    }
+    }.property('isSelected', 'subcategory.isEditing')
 
     /*,
 

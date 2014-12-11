@@ -157,6 +157,14 @@ a.subcategoryItem:hover.active {
     border-color: #8e9500;
 }
 
+.draggingOverBottom {
+    border-bottom: 3px solid #8e9500;
+}
+
+.draggingOverTop {
+    border-top: 3px solid #8e9500;
+}
+
 .tableHeader {
     text-align: center;
 }

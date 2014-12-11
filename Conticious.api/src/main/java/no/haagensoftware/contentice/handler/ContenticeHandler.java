@@ -49,6 +49,10 @@ public abstract class ContenticeHandler extends SimpleChannelInboundHandler<Full
             value = parameterMap.get(key);
         }
 
+        if (value != null) {
+            value = value.replaceAll("%20", " ");
+        }
+
         return value;
     }
 

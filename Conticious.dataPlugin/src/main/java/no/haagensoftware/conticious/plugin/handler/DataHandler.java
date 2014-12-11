@@ -60,9 +60,14 @@ public class DataHandler extends ContenticeHandler {
 
                 String categoryName = getPluginResolver().getSingularFor(category);
 
+                String appendToId = "";
+                if (subcategory.startsWith(category)) {
+                    appendToId = category + "_";
+                }
+
                 SubCategoryData subCategoryData = getStorage().getSubCategory(getDomain().getWebappName(), category, subcategory);
                 if (subCategoryData != null) {
-                    jsonReturn = DataAssembler.buildJsonFromSubCategoryData(categoryName, false, "", subCategoryData).toString();
+                    jsonReturn = DataAssembler.buildJsonFromSubCategoryData(categoryName, false  , appendToId, subCategoryData).toString();
                 }
             }
         }

@@ -74,7 +74,7 @@ Ember.assert = function(desc, test) {
   }
 
   if (Ember.testing && !test) {
-    // when testing, ensure test failures when assertions fail
+    // when testing, ensure tests failures when assertions fail
     throw new Ember.Error("Assertion Failed: " + desc);
   }
 };
@@ -513,7 +513,7 @@ Ember.merge = function(original, updates) {
 
   @method isNone
   @for Ember
-  @param {Object} obj Value to test
+  @param {Object} obj Value to tests
   @return {Boolean}
 */
 Ember.isNone = function(obj) {
@@ -540,7 +540,7 @@ Ember.none = Ember.deprecateFunc("Ember.none is deprecated. Please use Ember.isN
 
   @method isEmpty
   @for Ember
-  @param {Object} obj Value to test
+  @param {Object} obj Value to tests
   @return {Boolean}
 */
 Ember.isEmpty = function(obj) {
@@ -1260,7 +1260,7 @@ Ember.wrap = function(func, superFunc) {
 
   @method isArray
   @for Ember
-  @param {Object} obj The object to test
+  @param {Object} obj The object to tests
   @return {Boolean} true if the passed object is an array or Array-like
 */
 Ember.isArray = function(obj) {
@@ -3399,7 +3399,7 @@ Ember.Logger = {
 
    @method assert
    @for Ember.Logger
-   @param {Boolean} bool Value to test
+   @param {Boolean} bool Value to tests
   */
   assert: consoleMethod('assert') || assertPolyfill
 };
@@ -4888,10 +4888,10 @@ registerComputed('none', function(dependentKey) {
   Example
 
   ```javascript
-  var User = Ember.Object.extend({
+  var DopplerUser = Ember.Object.extend({
     isAnonymous: Ember.computed.not('loggedIn')
   });
-  var user = User.create({loggedIn: false});
+  var user = DopplerUser.create({loggedIn: false});
   user.get('isAnonymous'); // true
   user.set('loggedIn', true);
   user.get('isAnonymous'); // false
@@ -4943,10 +4943,10 @@ registerComputed('bool', function(dependentKey) {
   Example
 
   ```javascript
-  var User = Ember.Object.extend({
+  var DopplerUser = Ember.Object.extend({
     hasValidEmail: Ember.computed.match('email', /^.+@.+\..+$/)
   });
-  var user = User.create({loggedIn: false});
+  var user = DopplerUser.create({loggedIn: false});
   user.get('hasValidEmail'); // false
   user.set('email', '');
   user.get('hasValidEmail'); // false
@@ -5288,13 +5288,13 @@ Ember.computed.alias = function(dependentKey) {
   Example
 
   ```javascript
-  User = Ember.Object.extend({
+  DopplerUser = Ember.Object.extend({
     firstName: null,
     lastName: null,
     nickName: Ember.computed.oneWay('firstName')
   });
 
-  user = User.create({
+  user = DopplerUser.create({
     firstName: 'Teddy',
     lastName:  'Zeenny'
   });
@@ -5503,7 +5503,7 @@ define("backburner/queue",
           if (currentTarget === target && currentMethod === method) {
             queue[i+2] = args; // replace args
             queue[i+3] = stack; // replace stack
-            return {queue: this, target: target, method: method}; // TODO: test this code path
+            return {queue: this, target: target, method: method}; // TODO: tests this code path
           }
         }
 
@@ -6328,12 +6328,12 @@ Ember.run.schedule = function(queue, target, method) {
   backburner.schedule.apply(backburner, arguments);
 };
 
-// Used by global test teardown
+// Used by global tests teardown
 Ember.run.hasScheduledTimers = function() {
   return backburner.hasTimers();
 };
 
-// Used by global test teardown
+// Used by global tests teardown
 Ember.run.cancelTimers = function () {
   backburner.cancelTimers();
 };
@@ -6504,7 +6504,7 @@ Ember.run.scheduleOnce = function(queue, target, method) {
 
   The other major benefit to the above approach is that `Ember.run.next`
   introduces an element of non-determinism, which can make things much
-  harder to test, due to its reliance on `setTimeout`; it's much harder
+  harder to tests, due to its reliance on `setTimeout`; it's much harder
   to guarantee the order of scheduled operations when they are scheduled
   outside of the current run loop, i.e. with `Ember.run.next`.
 
@@ -10400,9 +10400,9 @@ define("container",
 
         ```javascript
         var container = new Container();
-        container.register('model:user', User);
+        container.register('model:user', DopplerUser);
 
-        container.lookup('model:user') instanceof User //=> true
+        container.lookup('model:user') instanceof DopplerUser //=> true
 
         container.unregister('model:user')
         container.lookup('model:user') === undefined //=> true
@@ -10680,7 +10680,7 @@ define("container",
         var container = new Container();
 
         container.register('source:main', Source);
-        container.register('model:user', User);
+        container.register('model:user', DopplerUser);
         container.register('model:post', Post);
 
         // injecting one fullName on another fullName
@@ -10774,7 +10774,7 @@ define("container",
 
         container.register('store:main', Store);
         container.register('store:secondary', OtherStore);
-        container.register('model:user', User);
+        container.register('model:user', DopplerUser);
         container.register('model:post', Post);
 
         // injecting one fullName on another type
@@ -11144,7 +11144,7 @@ function _copy(obj, deep, seen, copies) {
 
   Ember.assert('Cannot clone an Ember.Object that does not implement Ember.Copyable', !(obj instanceof Ember.Object) || (Ember.Copyable && Ember.Copyable.detect(obj)));
 
-  // IMPORTANT: this specific test will detect a native array only. Any other
+  // IMPORTANT: this specific tests will detect a native array only. Any other
   // object will need to implement Copyable.
   if (Ember.typeOf(obj) === 'array') {
     ret = obj.slice();
@@ -13719,8 +13719,8 @@ Ember.Enumerable = Ember.Mixin.create({
     this will match any property that evaluates to `true`.
 
     @method filterBy
-    @param {String} key the property to test
-    @param {String} [value] optional value to test against.
+    @param {String} key the property to tests
+    @param {String} [value] optional value to tests against.
     @return {Array} filtered array
   */
   filterBy: function(key, value) {
@@ -13733,8 +13733,8 @@ Ember.Enumerable = Ember.Mixin.create({
     this will match any property that evaluates to `true`.
 
     @method filterProperty
-    @param {String} key the property to test
-    @param {String} [value] optional value to test against.
+    @param {String} key the property to tests
+    @param {String} [value] optional value to tests against.
     @return {Array} filtered array
     @deprecated Use `filterBy` instead
   */
@@ -13746,8 +13746,8 @@ Ember.Enumerable = Ember.Mixin.create({
     this will match any property that evaluates to false.
 
     @method rejectBy
-    @param {String} key the property to test
-    @param {String} [value] optional value to test against.
+    @param {String} key the property to tests
+    @param {String} [value] optional value to tests against.
     @return {Array} rejected array
   */
   rejectBy: function(key, value) {
@@ -13764,8 +13764,8 @@ Ember.Enumerable = Ember.Mixin.create({
     this will match any property that evaluates to false.
 
     @method rejectProperty
-    @param {String} key the property to test
-    @param {String} [value] optional value to test against.
+    @param {String} key the property to tests
+    @param {String} [value] optional value to tests against.
     @return {Array} rejected array
     @deprecated Use `rejectBy` instead
   */
@@ -13823,8 +13823,8 @@ Ember.Enumerable = Ember.Mixin.create({
     This method works much like the more generic `find()` method.
 
     @method findBy
-    @param {String} key the property to test
-    @param {String} [value] optional value to test against.
+    @param {String} key the property to tests
+    @param {String} [value] optional value to tests against.
     @return {Object} found item or `undefined`
   */
   findBy: function(key, value) {
@@ -13839,8 +13839,8 @@ Ember.Enumerable = Ember.Mixin.create({
     This method works much like the more generic `find()` method.
 
     @method findProperty
-    @param {String} key the property to test
-    @param {String} [value] optional value to test against.
+    @param {String} key the property to tests
+    @param {String} [value] optional value to tests against.
     @return {Object} found item or `undefined`
     @deprecated Use `findBy` instead
   */
@@ -13886,8 +13886,8 @@ Ember.Enumerable = Ember.Mixin.create({
 
   /**
     @method everyBy
-    @param {String} key the property to test
-    @param {String} [value] optional value to test against.
+    @param {String} key the property to tests
+    @param {String} [value] optional value to tests against.
     @deprecated Use `isEvery` instead
     @return {Boolean}
   */
@@ -13895,8 +13895,8 @@ Ember.Enumerable = Ember.Mixin.create({
 
   /**
     @method everyProperty
-    @param {String} key the property to test
-    @param {String} [value] optional value to test against.
+    @param {String} key the property to tests
+    @param {String} [value] optional value to tests against.
     @deprecated Use `isEvery` instead
     @return {Boolean}
   */
@@ -13907,8 +13907,8 @@ Ember.Enumerable = Ember.Mixin.create({
     the enumerable. This method is often simpler/faster than using a callback.
 
     @method isEvery
-    @param {String} key the property to test
-    @param {String} [value] optional value to test against.
+    @param {String} key the property to tests
+    @param {String} [value] optional value to tests against.
     @return {Boolean}
   */
   isEvery: function(key, value) {
@@ -13997,8 +13997,8 @@ Ember.Enumerable = Ember.Mixin.create({
     the enumerable. This method is often simpler/faster than using a callback.
 
     @method isAny
-    @param {String} key the property to test
-    @param {String} [value] optional value to test against.
+    @param {String} key the property to tests
+    @param {String} [value] optional value to tests against.
     @return {Boolean} `true` if the passed function returns `true` for any item
   */
   isAny: function(key, value) {
@@ -14007,8 +14007,8 @@ Ember.Enumerable = Ember.Mixin.create({
 
   /**
     @method anyBy
-    @param {String} key the property to test
-    @param {String} [value] optional value to test against.
+    @param {String} key the property to tests
+    @param {String} [value] optional value to tests against.
     @return {Boolean} `true` if the passed function returns `true` for any item
     @deprecated Use `isAny` instead
   */
@@ -14016,8 +14016,8 @@ Ember.Enumerable = Ember.Mixin.create({
 
   /**
     @method someProperty
-    @param {String} key the property to test
-    @param {String} [value] optional value to test against.
+    @param {String} key the property to tests
+    @param {String} [value] optional value to tests against.
     @return {Boolean} `true` if the passed function returns `true` for any item
     @deprecated Use `isAny` instead
   */
@@ -19421,7 +19421,7 @@ var get = Ember.get, set = Ember.set, guidFor = Ember.guidFor, isNone = Ember.is
   An unordered collection of objects.
 
   A Set works a bit like an array except that its items are not ordered. You
-  can create a set to efficiently test for membership for an object. You can
+  can create a set to efficiently tests for membership for an object. You can
   also iterate through a set just like an array, even accessing objects by
   index, however there is no guarantee as to their order.
 
@@ -19474,7 +19474,7 @@ var get = Ember.get, set = Ember.set, guidFor = Ember.guidFor, isNone = Ember.is
 
   ## Testing for an Object
 
-  To test for an object's presence in a set you simply call
+  To tests for an object's presence in a set you simply call
   `Ember.Set#contains()`.
 
   ## Observing changes
@@ -20717,7 +20717,7 @@ var canSetInnerHTML = function(tagName) {
   // IE 8 and earlier don't allow us to do innerHTML on select
   if (tagName.toLowerCase() === 'select') {
     var el = document.createElement('select');
-    setInnerHTMLWithoutFix(el, '<option value="test">Test</option>');
+    setInnerHTMLWithoutFix(el, '<option value="tests">Test</option>');
     canSet = el.options.length === 1;
   }
 
@@ -22849,7 +22849,7 @@ Ember.View = Ember.CoreView.extend({
     // remove them under the assumption that they will be re-created when
     // we re-render.
 
-    // VIEW-TODO: Unit test this path.
+    // VIEW-TODO: Unit tests this path.
     var childViews = this._childViews;
     for (var i=lengthAfter-1; i>=lengthBefore; i--) {
       if (childViews[i]) { childViews[i].destroy(); }
@@ -27402,7 +27402,7 @@ Ember._HandlebarsBoundView = Ember._MetamorphView.extend({
     var result = this.normalizedValue();
     this._lastNormalizedValue = result;
 
-    // First, test the conditional to see if we should
+    // First, tests the conditional to see if we should
     // render the template or not.
     if (shouldDisplay(result)) {
       set(this, 'template', displayTemplate);
@@ -29343,7 +29343,7 @@ Ember.Handlebars.registerHelper('each', function eachHelper(path, options) {
   <script type="text/x-handlebars" data-template-name="logged_in_user">
     {{#with loggedInUser}}
       Last Login: {{lastLogin}}
-      User Info: {{template "user_info"}}
+      DopplerUser Info: {{template "user_info"}}
     {{/with}}
   </script>
   ```
@@ -36589,7 +36589,7 @@ Ember.onLoad('Ember.Handlebars', function(Handlebars) {
     If the controller does not implement the event, the event is sent
     to the current route, and it bubbles up the route hierarchy from there.
 
-    User interaction with that element will invoke the supplied action name on
+    DopplerUser interaction with that element will invoke the supplied action name on
     the appropriate target.
 
     Given the following application Handlebars template on the page
@@ -37180,10 +37180,10 @@ Ember.Location = {
 
    ```javascript
    // Given a location registered as follows:
-   container.register('location:history-test', HistoryTestLocation);
+   container.register('location:history-tests', HistoryTestLocation);
 
    // You could create a new instance via:
-   container.lookup('location:history-test');
+   container.lookup('location:history-tests');
    ```
 
     @method create
@@ -37210,10 +37210,10 @@ Ember.Location = {
 
    ```javascript
    Application.initializer({
-    name: "history-test-location",
+    name: "history-tests-location",
 
     initialize: function(container, application) {
-      application.register('location:history-test', HistoryTestLocation);
+      application.register('location:history-tests', HistoryTestLocation);
     }
    });
    ```
@@ -37318,7 +37318,7 @@ Ember.NoneLocation = Ember.Object.extend({
   */
   formatURL: function(url) {
     // The return value is not overly meaningful, but we do not want to throw
-    // errors when test code renders templates containing {{action href=true}}
+    // errors when tests code renders templates containing {{action href=true}}
     // helpers.
     return url;
   }
@@ -38585,17 +38585,17 @@ var Application = Ember.Application = Ember.Namespace.extend(Ember.DeferredMixin
       App = Ember.Application.create();
     });
 
-    module("acceptance test", {
+    module("acceptance tests", {
       setup: function() {
         App.reset();
       }
     });
 
-    test("first test", function() {
+    tests("first tests", function() {
       // App is freshly reset
     });
 
-    test("first test", function() {
+    tests("first tests", function() {
       // App is again freshly reset
     });
     ```
@@ -38614,7 +38614,7 @@ var Application = Ember.Application = Ember.Namespace.extend(Ember.DeferredMixin
       App = Ember.Application.create();
     });
 
-    module("acceptance test", {
+    module("acceptance tests", {
       setup: function() {
         Ember.run(function() {
           App.reset();
@@ -38623,7 +38623,7 @@ var Application = Ember.Application = Ember.Namespace.extend(Ember.DeferredMixin
       }
     });
 
-    test("first test", function() {
+    tests("first tests", function() {
       ok(true, 'something before app is initialized');
 
       Ember.run(function() {
@@ -39308,7 +39308,7 @@ Ember.DataAdapter = Ember.Object.extend({
 
     @private
     @method detect
-    @param {Class} klass The class to test
+    @param {Class} klass The class to tests
     @return boolean Whether the class is a model class or not
   */
   detect: function(klass) {
@@ -39545,9 +39545,9 @@ var slice = [].slice,
 /**
   This is a container for an assortment of testing related functionality:
 
-  * Choose your default test adapter (for your framework of choice).
-  * Register/Unregister additional test helpers.
-  * Setup callbacks to be fired when the test helpers are injected into
+  * Choose your default tests adapter (for your framework of choice).
+  * Register/Unregister additional tests helpers.
+  * Setup callbacks to be fired when the tests helpers are injected into
     your application.
 
   @class Test
@@ -39556,7 +39556,7 @@ var slice = [].slice,
 Ember.Test = {
 
   /**
-    `registerHelper` is used to register a test helper that will be injected
+    `registerHelper` is used to register a tests helper that will be injected
     when `App.injectTestHelpers` is called.
 
     The helper method will always be called with the current Application as
@@ -39593,7 +39593,7 @@ Ember.Test = {
   },
 
   /**
-    `registerAsyncHelper` is used to register an async test helper that will be injected
+    `registerAsyncHelper` is used to register an async tests helper that will be injected
     when `App.injectTestHelpers` is called.
 
     The helper method will always be called with the current Application as
@@ -39619,7 +39619,7 @@ Ember.Test = {
       click('.delete-' + postId);
     });
 
-    // ... in your test
+    // ... in your tests
     visit('/post/2');
     deletePost(2);
     visit('/post/3');
@@ -39903,17 +39903,17 @@ Ember.Application.reopen({
       },
 
   /**
-    This will be used as the container to inject the test helpers into. By
+    This will be used as the container to inject the tests helpers into. By
     default the helpers are injected into `window`.
 
     @property helperContainer
-   @type {Object} The object to be used for test helpers.
+   @type {Object} The object to be used for tests helpers.
    @default window
   */
   helperContainer: window,
 
   /**
-    This injects the test helpers into the `helperContainer` object. If an object is provided
+    This injects the tests helpers into the `helperContainer` object. If an object is provided
     it will be used as the helperContainer. If `helperContainer` is not set it will default
     to `window`. If a function of the same name has already been defined it will be cached
     (so that it can be reset if the helper is removed with `unregisterHelper` or
@@ -40121,7 +40121,7 @@ var Test = Ember.Test;
 
 /**
   The primary purpose of this class is to create hooks that can be implemented
-  by an adapter for various test frameworks.
+  by an adapter for various tests frameworks.
 
   @class Adapter
   @namespace Ember.Test
@@ -40333,7 +40333,7 @@ function andThen(app, callback) {
 
 function wait(app, value) {
   return Test.promise(function(resolve) {
-    // If this is the first async promise, kick off the async test
+    // If this is the first async promise, kick off the async tests
     if (++countAsync === 1) {
       Test.adapter.asyncStart();
     }
@@ -40357,7 +40357,7 @@ function wait(app, value) {
       // Stop polling
       clearInterval(watcher);
 
-      // If this is the last async promise, end the async test
+      // If this is the last async promise, end the async tests
       if (--countAsync === 0) {
         Test.adapter.asyncEnd();
       }

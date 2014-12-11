@@ -11,7 +11,7 @@ module.exports = function(grunt) {
         uglify: config('uglify'),
 		server: config('server'),
         watch: {
-            files: ['templates/**/*.hbs', 'js/app/**/*.js'],
+            files: ['templates/**/*.hbs', 'js/app/**/*.js', 'tests/unit/**/*.js'],
             tasks: ['emberTemplates', 'concat']
         }
   });

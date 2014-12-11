@@ -1,0 +1,15 @@
+{
+    "framework": "qunit",
+    "test_page": "tests/index.html",
+    "launch_in_dev": [
+        "PhantomJS",
+        "Chrome"
+    ],
+    "launch_in_ci": ["PhantomJS"],
+    "proxies": {
+        "/json": {
+            "port": 8085,
+            "host": "dev.kodegenet.no"
+        }
+    }
+}

@@ -193,6 +193,12 @@ public class Main {
             properties.setProperty("no.haagensoftware.contentice.storage.plugin", "FileSystemStoragePlugin");
             logger.warn("Storage Plugin is missing from configuration. Using default 'FileSystemStoragePlugin' plugin");
         }
+
+        Enumeration<Object> propEnum = properties.keys();
+        while (propEnum.hasMoreElements()) {
+            String property = (String) propEnum.nextElement();
+            System.setProperty(property, properties.getProperty(property));
+        }
     }
 
     private void configureLog4J() throws IOException {

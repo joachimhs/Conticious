@@ -33,6 +33,12 @@ public class URLData {
         this.parameters = parameters;
     }
 
+    public void addParameter(String key, String value) {
+        if (parameters != null) {
+            parameters.put(key, value);
+        }
+    }
+
     public String getUrlPattern() {
         return urlPattern;
     }

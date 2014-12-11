@@ -6,3 +6,5 @@ target
 *.iml
 .DS_Store
 Conticious.cms/src/main/resources/admin/node_modules/
+Conticious.adminPlugin/src/main/java/no/haagensoftware/contentice/plugin/handler/AdminRenameSubcategoryHandler.java
+Conticious.cms/src/main/resources/admin-0.1.zip

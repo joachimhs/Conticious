@@ -17,6 +17,7 @@ if (typeof String.prototype.endsWith != 'function') {
         return this.indexOf(suffix, this.length - suffix.length) !== -1;
     };
 }
+
 if (typeof String.prototype.startsWith != 'function') {
     // see below for better implementation!
     String.prototype.startsWith = function (str) {

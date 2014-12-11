@@ -25,6 +25,7 @@ public class SubCategoryData {
     }
 
     public SubCategoryData(String id) {
+        this();
         this.id = id;
     }
 

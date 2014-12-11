@@ -24,7 +24,7 @@ import java.net.URLDecoder;
 
 /**
  * Created with IntelliJ IDEA.
- * User: jhsmbp
+ * DopplerUser: jhsmbp
  * Date: 11/16/13
  * Time: 2:14 PM
  * To change this template use File | Settings | File Templates.
@@ -112,14 +112,14 @@ public class RouterHandler extends ContenticeHandler {
                 }
             }
 
-            logger.info("channelHandler: " + channelHandler);
+            //logger.info("channelHandler: " + channelHandler);
 
             if (channelHandler == null) {
                 if (defaultHandler == null) {
                     defaultHandler = NotFoundHandler.class;
                 }
 
-                logger.info("DEFAULT HANDLER");
+                //logger.info("DEFAULT HANDLER");
                 //Load default handler
 
                 ChannelHandler handler = defaultHandler.newInstance();

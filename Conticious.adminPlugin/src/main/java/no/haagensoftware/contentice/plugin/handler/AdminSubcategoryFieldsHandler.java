@@ -173,7 +173,12 @@ public class AdminSubcategoryFieldsHandler extends ContenticeHandler {
                                 subField.setName(cf.getName());
                                 subField.setRelation(cf.getRelation());
                                 if (subCategoryData.getKeyMap().get(cf.getName()) != null) {
-                                    subField.setValue(subCategoryData.getKeyMap().get(cf.getName()).getAsString());
+                                    if (cf.getType().equals("array") || cf.getType().equals("toMany")) {
+                                        subField.setValue(subCategoryData.getKeyMap().get(cf.getName()).getAsJsonArray().toString());
+                                    } else {
+                                        subField.setValue(subCategoryData.getKeyMap().get(cf.getName()).getAsString());
+                                    }
+
                                 }
 
                                 subcategoryFieldArray.add(new Gson().toJsonTree(subField));

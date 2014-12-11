@@ -41,8 +41,12 @@ public class AdminRoutesPlugin extends RouterPlugin {
         routeMap.put("/json/admin/categoryFields", AdminCategoryFieldsHandler.class);
         routeMap.put("/json/admin/categoryFields/{categoryField}", AdminCategoryFieldsHandler.class);
 
+        routeMap.put("/json/admin/renameSubcategory/{oldSubcategory}/{newSubcategory}", AdminRenameSubcategoryHandler.class);
+
         routeMap.put("/json/admin/subcategoryFields", AdminSubcategoryFieldsHandler.class);
         routeMap.put("/json/admin/subcategoryFields/{subcategoryField}", AdminSubcategoryFieldsHandler.class);
+
+        routeMap.put("/json/admin/addSubcategoryToRelation/{subcategoryToAdd}/{subcategoyFieldToAddTo}", AdminAddSubcategoryToFieldsHandler.class);
 
         routeMap.put("/json/admin/settings", SettingsHandler.class);
         routeMap.put("/json/admin/settings/{setting}", SettingsHandler.class);
@@ -92,6 +96,9 @@ public class AdminRoutesPlugin extends RouterPlugin {
 
     @Override
     public Map<String, String> getPlurals() {
-        return null;
+        Map<String, String> pluralMap = new LinkedHashMap<>();
+        pluralMap.put("productCategory", "productCategories");
+
+        return pluralMap;
     }
 }

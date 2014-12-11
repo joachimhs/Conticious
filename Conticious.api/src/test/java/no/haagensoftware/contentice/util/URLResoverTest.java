@@ -37,6 +37,7 @@ public class URLResoverTest {
         resolver.addUrlPattern("/json/data/{category}/{subcategory}", plugin2);
         resolver.addUrlPattern("classpath:/admin", plugin2);
     }
+
     @Test
     public void verifyUrlWithoutParameters() {
         URLData urlData = resolver.getValueForUrl("/categories");
@@ -122,5 +123,13 @@ public class URLResoverTest {
     public void verifyTooLongURLhReturnsNull() {
         URLData urlData = resolver.getValueForUrl("/categories/pages/subcategories/home/too/long");
         Assert.assertNull(urlData);
+    }
+
+    @Test
+    public void testQueryParams() {
+        //resolver.addUrlPattern("/json/data/{category}?id=123", plugin2);
+
+        URLData urlData = resolver.getValueForUrl("/json/data/category?id=333");
+        System.out.println(urlData);
     }
 }

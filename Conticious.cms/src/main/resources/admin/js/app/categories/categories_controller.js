@@ -83,9 +83,29 @@ Conticious.CategoriesController = Ember.ArrayController.extend({
         },
 
         renameSubcategory: function(subcategory) {
+            var self = this;
             console.log(this.get('newId'));
 
-            var newId = this.get('newId');
+            var newId = this.get('controllers.category.model.id') + "_" + this.get('newId');
+            var oldId = subcategory.get('id');
+
+            console.log("Renaming " + oldId + " to " + newId);
+
+            var url = "/json/admin/renameSubcategory/" + oldId + "/" + newId;
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: "",
+                success: function() {
+                    self.transitionToRoute("categories");
+                    self.reloadCategories();
+                },
+                dataType: "json"
+            });
+
+            /* This is the old way, which needs to handle fields, etc. This is now implemnted with a single
+             * call to the server, as renaming is a lot easier there!
 
             if (newId && this.get('controllers.category.model.id')) {
                 var name = newId;
@@ -94,7 +114,14 @@ Conticious.CategoriesController = Ember.ArrayController.extend({
                     id: newId,
                     name: name,
                     content: subcategory.get('content'),
-                    fields: subcategory.get('fields')
+                    fields: []
+
+                });
+
+                var fieldsToCopy = [];
+
+                subcategory.get('fields').forEach(function(field) {
+                    fieldsToCopy.pushObject(field);
                 });
 
                 subcategory.deleteRecord();
@@ -104,12 +131,24 @@ Conticious.CategoriesController = Ember.ArrayController.extend({
 
                 var controller = this;
                 newSubcategory.save().then(function(d) {
-                    controller.transitionToRoute("categories");
-                    controller.reloadCategories();
+                    console.log('saving fields');
+                    fieldsToCopy.forEach(function(fieldToCopy) {
+                        console.log('fields to save: ' + newSubcategory.get('fields.length'));
+                       newSubcategory.get('fields').forEach(function(oldField) {
+                           console.log("verifying: " + oldField.get('name') + " agains: " + ieldToCopy.get('name'));
+                           if (oldField.get('name') === fieldToCopy.get('name')) {
+                               console.log("updating: " + oldField.get('id'));
+                               oldField.set('value', fieldToCopy.get('value'));
+                               oldField.save();
+                           }
+                       });
+                    });
+
+
                 });
             } else {
                 console.log('newId is not valid: ' + newId);
-            }
+            }*/
 
         }
     },

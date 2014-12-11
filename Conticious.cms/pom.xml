@@ -54,6 +54,15 @@
         </dependency-->
 
 
+
+
+        <dependency>
+            <groupId>no.haagensoftware</groupId>
+            <artifactId>conticious-admin-plugin</artifactId>
+            <version>0.1</version>
+
+        </dependency>
+
         <dependency>
             <groupId>no.haagensoftware</groupId>
             <artifactId>conticious-filesystem-plugin</artifactId>
@@ -62,9 +71,45 @@
 
         <dependency>
             <groupId>no.haagensoftware</groupId>
-            <artifactId>conticious-admin-plugin</artifactId>
+            <artifactId>conticious-data-plugin</artifactId>
             <version>0.1</version>
+        </dependency>
 
+        <dependency>
+            <groupId>no.haagensoftware</groupId>
+            <artifactId>conticious-kodegenet-plugin</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>no.haagensoftware</groupId>
+            <artifactId>conticious-emberfest-plugin</artifactId>
+            <version>2.0</version>
+
+        </dependency>
+
+        <dependency>
+            <groupId>no.haagensoftware</groupId>
+            <artifactId>conticious-teknologihuset-plugin</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>no.haagensoftware</groupId>
+            <artifactId>conticious-spira-plugin</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>no.haagensoftware</groupId>
+            <artifactId>conticious-doppler-plugin</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>no.haagensoftware</groupId>
+            <artifactId>conticious-teknologihuset-plugin</artifactId>
+            <version>1.0</version>
         </dependency>
 
         <!--dependency>

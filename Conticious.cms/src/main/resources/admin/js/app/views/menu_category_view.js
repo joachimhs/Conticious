@@ -7,6 +7,7 @@ Conticious.MenuCategoryView = Ember.View.extend({
     numSubcategoriesShown: 0,
     showNewSubcategoryArea: false,
     newSubcategoryName: null,
+    isExpanded: false,
 
     actions: {
         toggleSortAndFilter: function() {
@@ -79,6 +80,33 @@ Conticious.MenuCategoryView = Ember.View.extend({
     isSelected: function() {
         return this.get('category.id') === this.get('controller.controllers.category.model.id');
     }.property('controller.controllers.category.model.id'),
+
+    /*isSelectedObserver: function() {
+        var view = this;
+        var isSelected = this.get('isSelected');
+
+        console.log("isSelectedObserver: " + isSelected + " id: " + view.get('category.id'));
+        if (isSelected) {
+            console.log(view.get('elementId') + " .categoryList");
+            view.set('isExpanded', true);
+            $("#" + view.get('elementId') + " .categoryList").css({hidden: true});
+            Ember.run.schedule("afterRender", function() {
+                $("#" + view.get('elementId') + " .categoryList").hide().slideDown(function() {
+                    console.log('setting isExpanded to true');
+
+                }, 600);
+            });
+
+        } else {
+            $("#" + view.get('elementId') + " .categoryList").slideUp(function() {
+                view.set('isExpanded', false);
+            }).hide();
+        }
+    }.observes('isSelected'),*/
+
+    subcategoryId: function() {
+        return this.get('elementId') + "_subcategoryArea";
+    }.property('elementId'),
 
     selectedSortColumnObserver: function() {
         console.log('New Sort Columnn: ' + this.get('selectedSortColumn'));

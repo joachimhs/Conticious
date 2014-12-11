@@ -12,7 +12,7 @@ Conticious.UserController = Ember.Controller.extend({
     uuidObserver: function() {
         console.log('uuidAdminTokenObserver: ' + this.get('uuidAdminToken'));
         if (this.get('uuidAdminToken')) {
-            console.log('Fetching Admin User');
+            console.log('Fetching Admin DopplerUser');
 
             var controller = this;
             this.store.find('user', this.get('uuidAdminToken')).then(function(data) {

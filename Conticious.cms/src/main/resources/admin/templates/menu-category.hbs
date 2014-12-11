@@ -61,7 +61,7 @@
 </div>
 
 {{#if view.isSelected}}
-    <div id="subcategoryArea" class="list-group categoryList">
+    <div class="list-group categoryList">
         {{#each subcategory in view.sortedSubcategories}}
             {{view Conticious.MenuSubcategoryView subcategory=subcategory}}
         {{/each}}

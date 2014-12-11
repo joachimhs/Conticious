@@ -58,7 +58,6 @@ public class AdminAuthenticationPlugin extends AuthenticationPlugin {
             String realpassword = subCategoryData.getKeyMap().get("password").getAsString();
             String realrole = subCategoryData.getKeyMap().get("role").getAsString();
 
-
             String md5Pass = null;
             try {
                 byte[] bytesOfMessage = password.getBytes();

@@ -1,11 +1,18 @@
 package no.haagensoftware.contentice.data.auth;
 
+import com.google.gson.annotations.Expose;
+
 /**
  * Created by jhsmbp on 20/04/14.
  */
 public class User {
+    @Expose
     private String username;
+
+    @Expose(serialize = false, deserialize = false)
     private String password;
+
+    @Expose
     private String role;
 
     public String getUsername() {

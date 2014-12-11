@@ -82,6 +82,8 @@ public class PluginResolver {
             foundPlugin = urlData.getPlugin();
         }
 
+
+
         return foundPlugin;
     }
 
@@ -114,7 +116,25 @@ public class PluginResolver {
             urlData.setQueryStringIds(queryIds);
         }
 
+        appendQueryStringParamsToPropertyMap(url, urlData);
+
         return urlData;
+    }
+
+    protected void appendQueryStringParamsToPropertyMap(String url, URLData urlData) {
+        //propertyMap.put(currUrlParts[i].substring(1, currUrlParts[i].length()-1), urlParts[i]);
+
+        if (url.contains("?")) {
+            String queryString = url.substring(url.indexOf("?") + 1, url.length());
+            for (String query : queryString.split("&")) {
+                if (query.contains("=")) {
+                    String[] parts = query.split("=");
+                    if (parts.length == 2) {
+                        urlData.addParameter(parts[0], parts[1]);
+                    }
+                }
+            }
+        }
     }
 
     protected List<String> buildIdsFromQueryStringString(String url) {

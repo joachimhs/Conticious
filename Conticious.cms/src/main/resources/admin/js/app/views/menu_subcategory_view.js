@@ -7,11 +7,7 @@ Conticious.MenuSubcategoryView = Ember.View.extend({
 
     isEditing: function() {
         return this.get('isSelected') && this.get('subcategory.isEditing');
-    }.property('isSelected', 'subcategory.isEditing'),
-
-    didInsertElement: function() {
-        $("#" + this.get('elementId')).hide().slideDown();
-    }
+    }.property('isSelected', 'subcategory.isEditing')
 
     /*,
 

@@ -35,6 +35,7 @@ public abstract class RouterPlugin implements ConticiousPlugin{
         if (urlData != null) {
             Class<? extends ChannelHandler> channelHandlerClass = getRoutes().get(urlData.getUrlPattern());
 
+
             if (channelHandlerClass != null) {
                 try {
                     channelHandler = channelHandlerClass.newInstance();
@@ -66,6 +67,22 @@ public abstract class RouterPlugin implements ConticiousPlugin{
         }
 
         return channelHandler;
+    }
+
+    protected void appendQueryStringParamsToPropertyMap(String url, URLData urlData) {
+        //propertyMap.put(currUrlParts[i].substring(1, currUrlParts[i].length()-1), urlParts[i]);
+
+        if (url.contains("?")) {
+            String queryString = url.substring(url.indexOf("?") + 1, url.length());
+            for (String query : queryString.split("&")) {
+                if (query.contains("=")) {
+                    String[] parts = query.split("=");
+                    if (parts.length == 2) {
+                        urlData.addParameter(parts[0], parts[1]);
+                    }
+                }
+            }
+        }
     }
 
     public URLData getUrlDataForUrl(String url) {
@@ -124,6 +141,8 @@ public abstract class RouterPlugin implements ConticiousPlugin{
         if (urlData != null) {
             urlData.setQueryStringIds(queryIds);
         }
+
+        appendQueryStringParamsToPropertyMap(url, urlData);
 
         return urlData;
     }

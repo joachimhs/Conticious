@@ -16,7 +16,7 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
 Ember.TEMPLATES["categories"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
-  var stack1, escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing;
+  var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing;
 
 function program1(depth0,data) {
   
@@ -115,9 +115,10 @@ function program13(depth0,data) {
   return buffer;
   }
 
+  data.buffer.push("∫");
   stack1 = helpers['if'].call(depth0, "controllers.user.isAdminLoggedIn", {hash:{},hashTypes:{},hashContexts:{},inverse:self.program(13, program13, data),fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  else { data.buffer.push(''); }
+  return buffer;
   
 });
 
@@ -361,21 +362,22 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
 Ember.TEMPLATES["components/select-multiple"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
-  var buffer = '', stack1, escapeExpression=this.escapeExpression, self=this;
+  var buffer = '', stack1, helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
   
-  var buffer = '', stack1;
-  data.buffer.push("\n        <div class=\"list-group-item\">\n            ");
-  stack1 = helpers._triageMustache.call(depth0, "item.id", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
-  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n            <button class=\"btn btn-danger btn-xs pull-right\" ");
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "deleteItem", "item", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0],types:["STRING","ID"],data:data})));
-  data.buffer.push(">Delete</button>\n        </div>\n    ");
+  var buffer = '', helper, options;
+  data.buffer.push("\n        ");
+  data.buffer.push(escapeExpression((helper = helpers['select-multipleItem'] || (depth0 && depth0['select-multipleItem']),options={hash:{
+    'item': ("item"),
+    'droppedItem': ("droppedItem"),
+    'deleteItem': ("deleteItem")
+  },hashTypes:{'item': "ID",'droppedItem': "STRING",'deleteItem': "STRING"},hashContexts:{'item': depth0,'droppedItem': depth0,'deleteItem': depth0},contexts:[],types:[],data:data},helper ? helper.call(depth0, options) : helperMissing.call(depth0, "select-multipleItem", options))));
+  data.buffer.push("\n    ");
   return buffer;
   }
 
-  data.buffer.push("\n<div>\n    ");
+  data.buffer.push("<div>\n    ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Ember.Select", {hash:{
     'contentBinding': ("items"),
     'valueBinding': ("selectedValue"),
@@ -389,6 +391,21 @@ function program1(depth0,data) {
   stack1 = helpers.each.call(depth0, "item", "in", "addedItems", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0,depth0,depth0],types:["ID","ID","ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n</div>\n");
+  return buffer;
+  
+});
+
+Ember.TEMPLATES["components/select-multipleItem"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
+  var buffer = '', stack1, escapeExpression=this.escapeExpression;
+
+
+  stack1 = helpers._triageMustache.call(depth0, "item.id", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n<button class=\"btn btn-danger btn-xs pull-right\" ");
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "deleteItem", "item", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0],types:["STRING","ID"],data:data})));
+  data.buffer.push(">Delete</button>");
   return buffer;
   
 });
@@ -542,7 +559,7 @@ function program9(depth0,data) {
 function program11(depth0,data) {
   
   var buffer = '', stack1;
-  data.buffer.push("\n    <div id=\"subcategoryArea\" class=\"list-group categoryList\">\n        ");
+  data.buffer.push("\n    <div class=\"list-group categoryList\">\n        ");
   stack1 = helpers.each.call(depth0, "subcategory", "in", "view.sortedSubcategories", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(12, program12, data),contexts:[depth0,depth0,depth0],types:["ID","ID","ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   data.buffer.push("\n    </div>\n");
@@ -842,84 +859,84 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = '', stack1;
-  data.buffer.push("\n    <tr>\n        <td>");
+  data.buffer.push("\n        <tr>\n            <td>");
   stack1 = helpers._triageMustache.call(depth0, "field.name", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("</td>\n        <td>\n            ");
+  data.buffer.push("</td>\n            <td>\n                ");
   stack1 = helpers['if'].call(depth0, "field.isTextfield", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(2, program2, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n\n            ");
+  data.buffer.push("\n\n                ");
   stack1 = helpers['if'].call(depth0, "field.isTextarea", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(4, program4, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n\n            ");
+  data.buffer.push("\n\n                ");
   stack1 = helpers['if'].call(depth0, "field.isBoolean", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(6, program6, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n\n            ");
+  data.buffer.push("\n\n                ");
   stack1 = helpers['if'].call(depth0, "field.isArray", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(8, program8, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n\n            ");
+  data.buffer.push("\n\n                ");
   stack1 = helpers['if'].call(depth0, "field.isToOne", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(10, program10, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n\n            ");
+  data.buffer.push("\n\n                ");
   stack1 = helpers['if'].call(depth0, "field.isToMany", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(12, program12, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n        </td>\n        <td>\n            ");
+  data.buffer.push("\n            </td>\n            <td>\n                ");
   stack1 = helpers['if'].call(depth0, "field.isDirty", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(14, program14, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n\n            ");
+  data.buffer.push("\n\n                ");
   stack1 = helpers['if'].call(depth0, "field.relations.isDirty", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(14, program14, data),contexts:[depth0],types:["ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n        </td>\n    </tr>\n");
+  data.buffer.push("\n            </td>\n        </tr>\n    ");
   return buffer;
   }
 function program2(depth0,data) {
   
   var buffer = '';
-  data.buffer.push("\n                ");
+  data.buffer.push("\n                    ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Ember.TextField", {hash:{
     'valueBinding': ("field.value")
   },hashTypes:{'valueBinding': "STRING"},hashContexts:{'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
-  data.buffer.push("\n            ");
+  data.buffer.push("\n                ");
   return buffer;
   }
 
 function program4(depth0,data) {
   
   var buffer = '';
-  data.buffer.push("\n                ");
+  data.buffer.push("\n                    ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Ember.TextArea", {hash:{
     'valueBinding': ("field.value")
   },hashTypes:{'valueBinding': "STRING"},hashContexts:{'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
-  data.buffer.push(" <br />\n            ");
+  data.buffer.push(" <br />\n                ");
   return buffer;
   }
 
 function program6(depth0,data) {
   
   var buffer = '';
-  data.buffer.push("\n                ");
+  data.buffer.push("\n                    ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Ember.Checkbox", {hash:{
     'checkedBinding': ("field.value")
   },hashTypes:{'checkedBinding': "STRING"},hashContexts:{'checkedBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
-  data.buffer.push(" <br />\n            ");
+  data.buffer.push(" <br />\n                ");
   return buffer;
   }
 
 function program8(depth0,data) {
   
   var buffer = '';
-  data.buffer.push("\n                ");
+  data.buffer.push("\n                    ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Ember.TextField", {hash:{
     'valueBinding': ("field.value")
   },hashTypes:{'valueBinding': "STRING"},hashContexts:{'valueBinding': depth0},contexts:[depth0],types:["ID"],data:data})));
-  data.buffer.push(" <br />\n            ");
+  data.buffer.push(" <br />\n                ");
   return buffer;
   }
 
 function program10(depth0,data) {
   
   var buffer = '';
-  data.buffer.push("\n                ");
+  data.buffer.push("\n                    ");
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Ember.Select", {hash:{
     'contentBinding': ("field.relation.subcategories"),
     'valueBinding': ("field.value"),
@@ -928,38 +945,81 @@ function program10(depth0,data) {
     'prompt': ("Select Subcategory"),
     'classNames': ("form-control")
   },hashTypes:{'contentBinding': "STRING",'valueBinding': "STRING",'optionValuePath': "STRING",'optionLabelPath': "STRING",'prompt': "STRING",'classNames': "STRING"},hashContexts:{'contentBinding': depth0,'valueBinding': depth0,'optionValuePath': depth0,'optionLabelPath': depth0,'prompt': depth0,'classNames': depth0},contexts:[depth0],types:["ID"],data:data})));
-  data.buffer.push("\n            ");
+  data.buffer.push("\n                ");
   return buffer;
   }
 
 function program12(depth0,data) {
   
   var buffer = '', helper, options;
-  data.buffer.push("\n                ");
+  data.buffer.push("\n                    ");
   data.buffer.push(escapeExpression((helper = helpers['select-multiple'] || (depth0 && depth0['select-multiple']),options={hash:{
     'items': ("field.relation.subcategories"),
     'addedItems': ("field.relations"),
     'model': ("field")
   },hashTypes:{'items': "ID",'addedItems': "ID",'model': "ID"},hashContexts:{'items': depth0,'addedItems': depth0,'model': depth0},contexts:[],types:[],data:data},helper ? helper.call(depth0, options) : helperMissing.call(depth0, "select-multiple", options))));
-  data.buffer.push("\n            ");
+  data.buffer.push("\n                ");
   return buffer;
   }
 
 function program14(depth0,data) {
   
   var buffer = '';
-  data.buffer.push("\n                <button class=\"btn btn-primary\" style=\"width: 75px;\" ");
+  data.buffer.push("\n                    <button class=\"btn btn-primary\" style=\"width: 75px;\" ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "saveSubcategoryField", "field", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0],types:["STRING","ID"],data:data})));
-  data.buffer.push(">Save</button>\n                <button class=\"btn btn-default\" style=\"width: 75px;\" ");
+  data.buffer.push(">Save</button>\n                    <button class=\"btn btn-default\" style=\"width: 75px;\" ");
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "revertSubcategoryField", "field", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0],types:["STRING","ID"],data:data})));
-  data.buffer.push(">Revert</button>\n            ");
+  data.buffer.push(">Revert</button>\n                ");
   return buffer;
   }
 
-  data.buffer.push("<table class=\"table subcategoryFields\">\n    <tr>\n        <th>Name</th>\n        <th>Value</th>\n        <th>Actions</th>\n    </tr>\n\n");
+function program16(depth0,data) {
+  
+  var buffer = '', stack1;
+  data.buffer.push("\n    <h1>Add this subcategory to a relationship</h1>\n\n    <table class=\"table subcategoryFields\">\n        <thead>\n        <tr>\n            <th>Related to Category</th>\n            <th>Through Field</th>\n            <th>Add to Subcategory</th>\n            <th>Actions</th>\n        </tr>\n        </thead>\n        <tbody>\n        ");
+  stack1 = helpers.each.call(depth0, "relation", "in", "relatedCategoryFields", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(17, program17, data),contexts:[depth0,depth0,depth0],types:["ID","ID","ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n        </tbody>\n    </table>\n");
+  return buffer;
+  }
+function program17(depth0,data) {
+  
+  var buffer = '', stack1;
+  data.buffer.push("\n            <tr>\n                <td>");
+  stack1 = helpers._triageMustache.call(depth0, "relation.relatedToCategory", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("</td>\n                <td>");
+  stack1 = helpers._triageMustache.call(depth0, "relation.throughField", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("</td>\n                <td>\n                    ");
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Ember.Select", {hash:{
+    'classNames': ("input-medium form-control"),
+    'valueBinding': ("relation.selectedRelationId"),
+    'contentBinding': ("relation.relatedSubcategories"),
+    'optionLabelPath': ("content.name"),
+    'optionValuePath': ("content.id")
+  },hashTypes:{'classNames': "STRING",'valueBinding': "STRING",'contentBinding': "STRING",'optionLabelPath': "STRING",'optionValuePath': "STRING"},hashContexts:{'classNames': depth0,'valueBinding': depth0,'contentBinding': depth0,'optionLabelPath': depth0,'optionValuePath': depth0},contexts:[depth0],types:["ID"],data:data})));
+  data.buffer.push("\n                </td>\n                <td>\n                    ");
+  stack1 = helpers['if'].call(depth0, "relation.selectedRelationId", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(18, program18, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n                </td>\n            </tr>\n        ");
+  return buffer;
+  }
+function program18(depth0,data) {
+  
+  var buffer = '';
+  data.buffer.push("\n                        <button class=\"btn btn-primary\" ");
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "addSubcategoryToRelation", "relation.selectedRelationId", "relation.throughField", {hash:{},hashTypes:{},hashContexts:{},contexts:[depth0,depth0,depth0],types:["STRING","ID","ID"],data:data})));
+  data.buffer.push(">Add to field</button>\n                    ");
+  return buffer;
+  }
+
+  data.buffer.push("<table class=\"table subcategoryFields\">\n    <thead>\n    <tr>\n        <th>Name</th>\n        <th>Value</th>\n        <th>Actions</th>\n    </tr>\n    </thead>\n    <tbody>\n    ");
   stack1 = helpers.each.call(depth0, "field", "in", "fields", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0,depth0,depth0],types:["ID","ID","ID"],data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n</table>");
+  data.buffer.push("\n    </tbody>\n</table>\n\n");
+  stack1 = helpers['if'].call(depth0, "relatedCategoryFields", {hash:{},hashTypes:{},hashContexts:{},inverse:self.noop,fn:self.program(16, program16, data),contexts:[depth0],types:["ID"],data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
   return buffer;
   
 });

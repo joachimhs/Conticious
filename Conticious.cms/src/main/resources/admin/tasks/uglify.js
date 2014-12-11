@@ -4,7 +4,7 @@ module.exports = {
     },
     dist: {
         files: {
-            'dist/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
+            'dist/<%= pkg.name %>.min.js': ['<%= concat.app.dest %>']
         }
     }
 };

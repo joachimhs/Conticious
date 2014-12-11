@@ -1020,7 +1020,7 @@ DS.Transform = Ember.Object.extend({
 
   ```javascript
   var attr = DS.attr;
-  App.User = DS.Model.extend({
+  App.DopplerUser = DS.Model.extend({
     isAdmin: attr('boolean'),
     name: attr('string'),
     email: attr('string')
@@ -1179,7 +1179,7 @@ var none = Ember.isNone;
 
   ```javascript
   var attr = DS.attr;
-  App.User = DS.Model.extend({
+  App.DopplerUser = DS.Model.extend({
     isAdmin: attr('boolean'),
     name: attr('string'),
     email: attr('string')
@@ -1566,7 +1566,7 @@ var get = Ember.get;
 */
 DS.FilteredRecordArray = DS.RecordArray.extend({
   /**
-    The filterFunction is a function used to test records from the store to
+    The filterFunction is a function used to tests records from the store to
     determine if they should be part of the record array.
 
     Example
@@ -1861,7 +1861,7 @@ DS.ManyArray = DS.RecordArray.extend({
       // We wait until the array has finished being
       // mutated before syncing the OneToManyChanges created
       // in arrayContentWillChange, so that the array
-      // membership test in the sync() logic operates
+      // membership tests in the sync() logic operates
       // on the final results.
       this._changesToSync.forEach(function(change) {
         change.sync();
@@ -5774,7 +5774,7 @@ function getValue(record, key) {
   ```javascript
   var attr = DS.attr;
 
-  App.User = DS.Model.extend({
+  App.DopplerUser = DS.Model.extend({
     username: attr('string'),
     email: attr('string'),
     verified: attr('boolean', {defaultValue: false})
@@ -6403,7 +6403,7 @@ function asyncBelongsTo(type, options, meta) {
   `DS.belongsTo`:
 
   ```javascript
-  App.User = DS.Model.extend({
+  App.DopplerUser = DS.Model.extend({
     profile: DS.belongsTo('profile')
   });
 
@@ -6867,7 +6867,7 @@ DS.Model.reopenClass({
 
     ```javascript
     var relationships = Ember.get(App.Blog, 'relationships');
-    relationships.get(App.User);
+    relationships.get(App.DopplerUser);
     //=> [ { name: 'users', kind: 'hasMany' },
     //     { name: 'owner', kind: 'belongsTo' } ]
     relationships.get(App.Post);
@@ -6964,7 +6964,7 @@ DS.Model.reopenClass({
 
     ```javascript
     var relatedTypes = Ember.get(App.Blog, 'relatedTypes');
-    //=> [ App.User, App.Post ]
+    //=> [ App.DopplerUser, App.Post ]
     ```
 
     @property relatedTypes
@@ -7020,9 +7020,9 @@ DS.Model.reopenClass({
     ```javascript
     var relationshipsByName = Ember.get(App.Blog, 'relationshipsByName');
     relationshipsByName.get('users');
-    //=> { key: 'users', kind: 'hasMany', type: App.User }
+    //=> { key: 'users', kind: 'hasMany', type: App.DopplerUser }
     relationshipsByName.get('owner');
-    //=> { key: 'owner', kind: 'belongsTo', type: App.User }
+    //=> { key: 'owner', kind: 'belongsTo', type: App.DopplerUser }
     ```
 
     @property relationshipsByName
