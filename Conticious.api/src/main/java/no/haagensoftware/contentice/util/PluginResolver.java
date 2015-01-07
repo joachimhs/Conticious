@@ -71,6 +71,10 @@ public class PluginResolver {
             url = url.substring(0, url.length()-1);
         }
 
+        if (url.endsWith(".json")) {
+            url = url.substring(0, url.length()-5);
+        }
+
         //Try Excact match first
         String value = getKeyForExactMatch(url);
         URLData urlData = getValueForUrlWithParameters(url);
@@ -90,6 +94,9 @@ public class PluginResolver {
     public URLData getValueForUrl(String url) {
         if (url.endsWith("/")) {
             url = url.substring(0, url.length()-1);
+        }
+        if (url.endsWith(".json")) {
+            url = url.substring(0, url.length()-5);
         }
         URLData urlData = null;
 
@@ -162,6 +169,10 @@ public class PluginResolver {
 
         if (url.contains("?")) {
             url = url.substring(0, url.indexOf("?"));
+        }
+
+        if (url.endsWith(".json")) {
+            url = url.substring(0, url.length()-5);
         }
 
         for (String currUrl : urlMap.keySet()) {

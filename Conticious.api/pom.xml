@@ -61,6 +61,11 @@
             <artifactId>commons-io</artifactId>
             <version>2.4</version>
         </dependency>
+        <dependency>
+            <groupId>no.haagensoftware.hyrrokkin</groupId>
+            <artifactId>hyrrokkin</artifactId>
+            <version>0.5-SNAPSHOT</version>
+        </dependency>
 	</dependencies>
 	
 	<repositories>

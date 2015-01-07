@@ -14,12 +14,8 @@ import no.haagensoftware.contentice.data.SubCategoryData;
 import no.haagensoftware.contentice.data.auth.Session;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
 import no.haagensoftware.contentice.spi.AuthenticationPlugin;
+import no.haagensoftware.contentice.util.ImageUploadProcessor;
 import org.apache.log4j.Logger;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
 
 /**
  * Created by jhsmbp on 06/07/14.
@@ -124,7 +120,8 @@ public class AdminUploadHandler extends ContenticeHandler {
 
                 // example of reading chunk by chunk (minimize memory usage due to
                 // Factory)
-                newFilename = readHttpDataChunkByChunk(getDomain().getWebappName());
+                String uploadPath = System.getProperty("no.haagensoftware.contentice.webappDir") + "/" + getDomain().getWebappName() + getDomain().getUploadPath();
+                newFilename = ImageUploadProcessor.storeUpload(decoder, uploadPath);
 
                 SubCategoryData subCategoryData = new SubCategoryData();
                 subCategoryData.setId(newFilename);
@@ -134,88 +131,5 @@ public class AdminUploadHandler extends ContenticeHandler {
         }
 
         return newFilename;
-    }
-
-    /**
-     * Example of reading request by chunk and getting values from chunk to chunk
-     */
-    private String readHttpDataChunkByChunk(String host) {
-        String newFilename = null;
-
-        try {
-            while (decoder.hasNext()) {
-
-                InterfaceHttpData data = decoder.next();
-                if (data != null) {
-                    try {
-                        // new value
-                        newFilename = writeHttpData(host, data);
-                    } finally {
-                        data.release();
-                    }
-                }
-            }
-        } catch (HttpPostRequestDecoder.EndOfDataDecoderException e1) {
-
-        }
-
-        return newFilename;
-    }
-
-    private String writeHttpData(String host, InterfaceHttpData data) {
-        String newFilename = null;
-
-        String uploadPath = getDomain().getUploadPath();
-
-        if (uploadPath != null && data.getHttpDataType() == InterfaceHttpData.HttpDataType.FileUpload) {
-            FileUpload fileUpload = (FileUpload) data;
-            String fileending = getFileEnding(fileUpload);
-
-            if (fileUpload.isCompleted() && fileending != null) {
-                try {
-                    String uuidFile = fileUpload.getFilename();
-
-                    String path = System.getProperty("no.haagensoftware.contentice.webappDir") + "/" + host +  uploadPath;
-
-                    if (!Files.exists(FileSystems.getDefault().getPath(path))) {
-                        Files.createDirectory(FileSystems.getDefault().getPath(path));
-                    }
-
-                    String filename = System.getProperty("no.haagensoftware.contentice.webappDir") + "/" + host +  uploadPath + "/" + uuidFile;
-
-                    fileUpload.renameTo(new File(filename));
-
-                    if (Files.exists(FileSystems.getDefault().getPath(filename))) {
-                        newFilename = uuidFile;
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return newFilename;
-    }
-
-    public String getFileEnding(FileUpload fileUpload) {
-        String fileEnding = null;
-
-        if (fileUpload.getContentType().equalsIgnoreCase("image/png")) {
-            fileEnding = ".png";
-        }
-
-        if (fileUpload.getContentType().equalsIgnoreCase("image/jpg")) {
-            fileEnding = ".jpg";
-        }
-
-        if (fileUpload.getContentType().equalsIgnoreCase("image/jpeg")) {
-            fileEnding = ".jpg";
-        }
-
-        if (fileUpload.getContentType().equalsIgnoreCase("application/zip")) {
-            fileEnding = ".zip";
-        }
-
-        return fileEnding;
     }
 }

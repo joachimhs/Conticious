@@ -96,6 +96,14 @@ public abstract class RouterPlugin implements ConticiousPlugin{
                 urlToFind = url.substring(0, url.indexOf("?"));
             }
 
+            if (urlToFind.endsWith(".json")) {
+                urlToFind = url.substring(0, url.length()-5);
+            }
+
+            if (url.endsWith(".json")) {
+                url = url.substring(0, url.length()-5);
+            }
+
             boolean urlMatch = false;
             Map<String, String> propertyMap = new HashMap<>();
 

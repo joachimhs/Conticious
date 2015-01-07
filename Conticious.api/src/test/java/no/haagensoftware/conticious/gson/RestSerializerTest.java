@@ -1,8 +1,8 @@
 package no.haagensoftware.conticious.gson;
 
-import com.google.gson.*;
 import no.haagensoftware.contentice.data.auth.Session;
 import no.haagensoftware.contentice.data.auth.User;
+import no.haagensoftware.hyrrokkin.serializer.RestSerializer;
 import org.junit.Test;
 
 import java.util.*;
