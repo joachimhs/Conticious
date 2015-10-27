@@ -11,8 +11,6 @@ Conticious.MenuCategoryView = Ember.View.extend({
 
     actions: {
         toggleSortAndFilter: function() {
-
-
             if (this.get('sortAndFilterShowing')) {
                 var view = this;
                 $("#sortAndFilterArea").slideUp(function() {
@@ -78,8 +76,8 @@ Conticious.MenuCategoryView = Ember.View.extend({
     },
 
     isSelected: function() {
-        return this.get('category.id') === this.get('controller.controllers.category.model.id');
-    }.property('controller.controllers.category.model.id'),
+        return this.get('category.id') === this.get('controller.controllers.category.model.id') && this.get('controller.controllers.category.model.isLoaded') === true;
+    }.property('controller.controllers.category.model.id', 'controller.controllers.category.model.isLoaded'),
 
     /*isSelectedObserver: function() {
         var view = this;
@@ -123,9 +121,10 @@ Conticious.MenuCategoryView = Ember.View.extend({
         this.sortOrFilter();
     }.observes('selectedFilterColumn'),
 
-    subcategoriesObserver: function() {
+    /*subcategoriesObserver: function() {
         this.set('sortedSubcategories', this.get('category.subcategories'));
-    }.observes('category.subcategories').on('init'),
+    }.observes('category.subcategories').on('init'),*/
+
 
     sortOrFilter: function() {
         console.log('Sorting subcategories');

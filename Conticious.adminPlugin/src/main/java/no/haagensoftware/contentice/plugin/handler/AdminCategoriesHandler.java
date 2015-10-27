@@ -20,6 +20,7 @@ import no.haagensoftware.contentice.plugin.admindata.AdminCategoryObject;
 import no.haagensoftware.contentice.plugin.assembler.AdminCategoryAssembler;
 import no.haagensoftware.contentice.plugin.assembler.AdminSubCategoryAssembler;
 import no.haagensoftware.contentice.spi.AuthenticationPlugin;
+import no.haagensoftware.hyrrokkin.serializer.RestSerializer;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -72,7 +73,16 @@ public class AdminCategoriesHandler extends ContenticeHandler {
             }
         }
 
-        JsonObject topLevelObject = buildResponse(categories);
+        for (CategoryData category : categories) {
+            for (SubCategoryData subcategoryData : getStorage().getSubCategories(getDomain().getWebappName(), category.getId())) {
+                category.addSubcategory(subcategoryData);
+            }
+        }
+
+        RestSerializer serializer = new RestSerializer();
+        serializer.addPluralization("category", "categories");
+        serializer.addPluralization("subcategory", "subcategories");
+        String topLevelObject =  serializer.serialize(categories, null).toString();//buildResponse(categories);
 
         writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json");
     }

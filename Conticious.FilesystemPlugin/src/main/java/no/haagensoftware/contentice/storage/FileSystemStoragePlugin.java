@@ -335,6 +335,10 @@ public class FileSystemStoragePlugin extends StoragePlugin {
     public void setSubCategory(String host, String category, String subCategory, SubCategoryData subCategoryData) {
         String docDir = documentsDirectory + File.separatorChar + host;
 
+        if (subCategory.startsWith(category)) {
+            subCategory = subCategory.substring(category.length()+1);
+        }
+
         Path markdownPath = FileSystems.getDefault().getPath(docDir + File.separatorChar + category + File.separatorChar + subCategory + ".md");
         Path jsonPath = FileSystems.getDefault().getPath(docDir + File.separatorChar + category + File.separatorChar + subCategory + ".json");
 

@@ -25,13 +25,13 @@ public class RestSerializerTest {
         strList.add("str1");
         strList.add("str2");
         strList.add("str3");
-        session.setArrProp(strList);
+        //session.setArrProp(strList);
 
         List<Integer> intList = new ArrayList<>();
         intList.add(4);
         intList.add(8);
         intList.add(3);
-        session.setIntProp(intList);
+        //session.setIntProp(intList);
 
         List<User> userList = new ArrayList<>();
 
@@ -54,7 +54,7 @@ public class RestSerializerTest {
 
         userList.add(user3);
         userList.add(user2);
-        session.setUsers(userList);
+        //session.setUsers(userList);
 
         RestSerializer restSerializer = new RestSerializer();
         System.out.println("json: \n" + restSerializer.serialize(session));

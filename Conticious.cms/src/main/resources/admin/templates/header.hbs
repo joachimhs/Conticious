@@ -3,11 +3,13 @@
         {{#link-to "categories"}}
             <img src="/admin/images/logo.png" class="headerLogo" />
         {{/link-to}}
-        {{#if controllers.user.isAdminLoggedIn}}
+        {{#if controllers.user.isSuperLoggedIn}}
             {{#link-to "setting"}}
                 <button class="btn btn-default pull-right">Settings</button>
             {{/link-to}}
+        {{/if}}
 
+        {{#if controllers.user.isAdminLoggedIn}}
             <button class="btn btn-default pull-right" {{action "logOut"}}>Log Out</button>
         {{/if}}
     </div>

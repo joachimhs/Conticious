@@ -7,6 +7,19 @@ Conticious.CategoriesController = Ember.ArrayController.extend({
     newId: null,
 
     actions: {
+        selectCategory: function(category) {
+            console.log('SELECTING:' + category);
+
+            var self = this;
+            category.reload().then(function(data) {
+                console.log('TRANSITION');
+                self.transitionToRoute("category", category);
+            }, function() {
+                console.log("ERROR");
+            });
+            //{{#link-to "category" category
+        },
+
         showNewCategory: function() {
             this.set('showNewCategoryField', true);
         },

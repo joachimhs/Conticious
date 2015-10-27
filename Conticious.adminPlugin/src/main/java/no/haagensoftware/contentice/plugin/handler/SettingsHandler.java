@@ -36,7 +36,9 @@ public class SettingsHandler extends ContenticeHandler {
             Session session = authenticationPlugin.getSession(cookieUuidToken);
 
             if (session != null && "super".equals(session.getUser().getRole())) {
-                handleRequest(channelHandlerContext, fullHttpRequest);
+                handleSuperRequest(channelHandlerContext, fullHttpRequest);
+            } else if (session != null && "admin".equals(session.getUser().getRole())) {
+                handleAdminRequest(channelHandlerContext, fullHttpRequest);
             } else {
                 JsonObject topLevelObject = buildDomainObject(new ArrayList<Domain>());
 
@@ -44,10 +46,24 @@ public class SettingsHandler extends ContenticeHandler {
             }
         }
 
-        handleRequest(channelHandlerContext, fullHttpRequest);
+        sendError(channelHandlerContext, HttpResponseStatus.UNAUTHORIZED);
     }
 
-    private void handleRequest(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) {
+    private void handleAdminRequest(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) {
+        String jsonResponse = "";
+
+        if (isGet(fullHttpRequest)) {
+            List<Domain> domains = Settings.getInstance().getDomains();
+
+            JsonObject topLevelObject = buildDomainObject(domains);
+
+            writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json");
+        } else {
+            sendError(channelHandlerContext, HttpResponseStatus.METHOD_NOT_ALLOWED);
+        }
+    }
+
+    private void handleSuperRequest(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) {
         String jsonResponse = "";
 
         if (isGet(fullHttpRequest)) {

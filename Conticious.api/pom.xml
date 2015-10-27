@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>no.haagensoftware</groupId>
 		<artifactId>conticious-parent</artifactId>
-		<version>0.1</version>
+		<version>0.2</version>
 	</parent>
 	<artifactId>conticious-api</artifactId>
 	<name>Conticious API</name>
@@ -27,8 +27,6 @@
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
-
-			
 		</plugins>
 	</build>
 
@@ -64,9 +62,15 @@
         <dependency>
             <groupId>no.haagensoftware.hyrrokkin</groupId>
             <artifactId>hyrrokkin</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>0.7-SNAPSHOT</version>
         </dependency>
-	</dependencies>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.5.2</version>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
 	
 	<repositories>
 		<repository>

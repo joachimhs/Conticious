@@ -2,6 +2,9 @@ package no.haagensoftware.contentice.data;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.annotations.Expose;
+import no.haagensoftware.hyrrokkin.annotations.SerializedClassName;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,10 +17,11 @@ import java.util.*;
  * Time: 12:13
  * To change this template use File | Settings | File Templates.
  */
+@SerializedClassName("subcategory")
 public class SubCategoryData {
-    private String id;
-    private String name;
-    private String content;
+    @Expose private String id;
+    @Expose private String name;
+    @Expose private String content;
     private Map<String, JsonElement> keyMap;
 
     public SubCategoryData() {
@@ -77,21 +81,54 @@ public class SubCategoryData {
         return retList;
     }
 
+    public void setListForKey(String key, List<String> values) {
+        JsonArray jsonArray = new JsonArray();
+
+        for (String value : values) {
+            jsonArray.add(new JsonPrimitive(value));
+        }
+
+        getKeyMap().put(key, jsonArray);
+    }
+
     public List<String> getListForKey(String key, String delimeter) {
         List<String> retList = new ArrayList<>();
 
-        String value = getValueForKey(key);
-
-        if (value.contains(delimeter)) {
-            String[] values = value.split(delimeter);
-            for (String val : values) {
-                retList.add(val);
+        if (keyIsJsonArray(key)) {
+            JsonArray array = getJsonArrayForKey(key);
+            for (JsonElement elem : array) {
+                if (elem.isJsonPrimitive()) {
+                    retList.add(elem.getAsString());
+                }
             }
         } else {
-            retList.add(value);
+            String value = getValueForKey(key);
+
+            if (value != null && value.contains(delimeter)) {
+                String[] values = value.split(delimeter);
+                for (String val : values) {
+                    retList.add(val);
+                }
+            } else {
+                retList.add(value);
+            }
         }
 
         return retList;
+    }
+
+    private boolean keyIsJsonArray(String key) {
+        JsonElement element = getKeyMap().get(key);
+        return element != null && element.isJsonArray();
+    }
+
+    private JsonArray getJsonArrayForKey(String key) {
+        JsonElement element = getKeyMap().get(key);
+        if (element != null && element.isJsonArray()) {
+            return element.getAsJsonArray();
+        }
+
+        return null;
     }
 
     public String getValueForKey(String key) {
@@ -106,6 +143,51 @@ public class SubCategoryData {
         return value;
     }
 
+    public void setValueForKey(String key, String value) {
+        if (value != null) {
+            getKeyMap().put(key, new JsonPrimitive(value));
+        }
+    }
+
+    public void setValueForKey(String key, Integer value) {
+        if (value != null) {
+            getKeyMap().put(key, new JsonPrimitive(value));
+        }
+    }
+
+    public void setValueForKey(String key, Long value) {
+        if (value != null) {
+            getKeyMap().put(key, new JsonPrimitive(value));
+        }
+    }
+
+    public void setValueForKey(String key, Double value) {
+        if (value != null) {
+            getKeyMap().put(key, new JsonPrimitive(value));
+        }
+    }
+
+    public void setValueForKey(String key, Boolean value) {
+        if (value != null) {
+            getKeyMap().put(key, new JsonPrimitive(value.booleanValue()));
+        }
+    }
+
+    public Integer getIntegerValueForKey(String key) {
+        String valueString = getValueForKey(key);
+        Integer value = null;
+
+        try {
+            value = Integer.parseInt(valueString);
+        } catch (NumberFormatException nfe) {
+            //Nothing to do, really
+        } catch (NullPointerException npe) {
+
+        }
+
+        return value;
+    }
+
     public Long getLongValueForKey(String key) {
         String valueString = getValueForKey(key);
         Long value = null;
@@ -114,6 +196,8 @@ public class SubCategoryData {
             value = Long.parseLong(valueString);
         } catch (NumberFormatException nfe) {
             //Nothing to do, really
+        } catch (NullPointerException npe) {
+
         }
 
         return value;
@@ -127,6 +211,8 @@ public class SubCategoryData {
             value = Double.parseDouble(valueString);
         } catch (NumberFormatException nfe) {
             //Nothing to do, really
+        } catch (NullPointerException npe) {
+
         }
 
         return value;
@@ -140,6 +226,8 @@ public class SubCategoryData {
             value = Boolean.parseBoolean(valueString);
         } catch (NumberFormatException nfe) {
             //Nothing to do, really
+        } catch (NullPointerException npe) {
+
         }
 
         if (value == null) {
@@ -164,6 +252,8 @@ public class SubCategoryData {
             }
         } catch (ParseException pe) {
             pe.printStackTrace();
+        } catch (NullPointerException npe) {
+
         }
 
         return date;

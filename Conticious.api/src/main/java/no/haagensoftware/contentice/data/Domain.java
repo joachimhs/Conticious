@@ -16,6 +16,8 @@ public class Domain {
     private Boolean active;
     private Boolean minified;
 
+    private String postProcessor;
+
     public String getId() {
         return id;
     }
@@ -78,5 +80,13 @@ public class Domain {
 
     public void setMinified(Boolean minified) {
         this.minified = minified;
+    }
+
+    public String getPostProcessor() {
+        return postProcessor;
+    }
+
+    public void setPostProcessor(String postProcessor) {
+        this.postProcessor = postProcessor;
     }
 }

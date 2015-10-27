@@ -100,6 +100,19 @@ Conticious.CategoriesController = Ember.ArrayController.extend({
     newId: null,
 
     actions: {
+        selectCategory: function(category) {
+            console.log('SELECTING:' + category);
+
+            var self = this;
+            category.reload().then(function(data) {
+                console.log('TRANSITION');
+                self.transitionToRoute("category", category);
+            }, function() {
+                console.log("ERROR");
+            });
+            //{{#link-to "category" category
+        },
+
         showNewCategory: function() {
             this.set('showNewCategoryField', true);
         },
@@ -546,6 +559,18 @@ Conticious.SubcategoryFieldsRoute = Ember.Route.extend({
     }
 });
 
+/* ##--->: js/app/category/subcategory/preview/subcategory_preview_controller.js */
+Conticious.SubcategoryPreviewController = Ember.ObjectController.extend({
+    actions: {
+        doSaveSubcategory: function(subcategory) {
+            console.log('doSaveSubcategory: ' + subcategory.get('id'));
+            if (subcategory.get('isDirty')) {
+                subcategory.save();
+            }
+        }
+    }
+});
+
 /* ##--->: js/app/category/subcategory/preview/subcategory_preview_route.js */
 Conticious.SubcategoryPreviewRoute = Ember.Route.extend({
     model: function() {
@@ -575,6 +600,14 @@ Conticious.SubcategoryRoute = Ember.Route.extend({
 });
 
 
+/* ##--->: js/app/category/subcategory/subcategory_view.js */
+Conticious.SubcategoryView = Ember.View.extend({
+    modelObserver: function() {
+        console.log('SubcategoryView ModelObserver');
+        //this.rerender();
+    }.observes('controller.model.id').on('init')
+});
+
 /* ##--->: js/app/category/subcategory/subcategroy_index_route.js */
 Conticious.SubcategoryIndexRoute = Ember.Route.extend({
     model: function() {
@@ -586,6 +619,75 @@ Conticious.SubcategoryIndexRoute = Ember.Route.extend({
 /* ##--->: js/app/category/subcategory_controller.js */
 Conticious.SubcategoryController = Ember.ObjectController.extend({
 
+});
+
+/* ##--->: js/app/components/input_wysiwyg/wysiwyg.js */
+Conticious.InputWysiwygComponent = Ember.Component.extend({
+    classNames: ['wysiwyg-editor'],
+    btnSize: 'btn-sm',
+    height: '600',
+
+    lang: "en",
+
+    willDestroyElement: function() {
+        this.$('textarea').destroy();
+    },
+
+    didInsertElement: function() {
+        var btnSize = this.get('btnSize');
+        var height = this.get('height');
+
+        this.$('textarea').summernote({
+            lang: this.get('lang'),
+            height: height,
+            toolbar: [
+                ['style', ['style', 'bold', 'italic', 'underline', 'clear']],
+                ['fontsize', ['fontsize']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['height', ['height']],
+                ['insert', ['link']],
+                ['table', ['table']],
+                ['undoredo', ['undo', 'redo']],
+                ['misc', ["fullscreen"]]
+            ]
+        });
+
+        var content = this.get('content');
+        this.$('textarea').code(content);
+        var placeholder = this.get("placeholder");
+        if(placeholder){
+            Ember.$('[contentEditable=true]').attr("data-placeholder", placeholder);
+        }
+
+        Ember.$('.btn').addClass(btnSize);
+    },
+
+    keyUp: function() {
+        this.doUpdate();
+    },
+
+    click: function() {
+        this.doUpdate();
+    },
+
+    doUpdate: function() {
+        var content = this.$('.note-editable').html();
+        this.set('content', content);
+    },
+
+    contentObserver: function() {
+        console.log('content observer!');
+
+        var hasFocus = Ember.$('.wysiwyg-editor .note-editable').eq(0).is(':focus');
+
+        console.log('hasFocus: ' + hasFocus);
+
+        if (!hasFocus) {
+            var content = this.get('content');
+            Ember.$('.wysiwyg-editor textarea').code(content);
+        }
+    }.observes('content').on('init')
 });
 
 /* ##--->: js/app/components/log_in/login_component.js */
@@ -634,6 +736,10 @@ Conticious.PopOverComponent = Ember.Component.extend({
 
 /* ##--->: js/app/components/select_multiple/select_multiple_component.js */
 Conticious.SelectMultipleComponent = Ember.Component.extend({
+
+    sortProperties: ['id'],
+    sortedItems: Ember.computed.sort('items', 'sortProperties'),
+
     actions: {
         addItem: function() {
             var selectedValue = this.get('selectedValue');
@@ -803,8 +909,11 @@ Conticious.HeaderController = Ember.Controller.extend({
 /* ##--->: js/app/models/category.js */
 Conticious.Category = DS.Model.extend({
     subcategories: DS.hasMany('subcategory'),
-    defaultFields: DS.hasMany('categoryField'),
-    isPublic: DS.attr('boolean')
+    defaultFields: DS.hasMany('categoryField', {async: true}),
+    isPublic: DS.attr('boolean'),
+
+    sortProperties: ['id'],
+    sortedSubcategories: Ember.computed.sort('subcategories', 'sortProperties')
 });
 
 /* ##--->: js/app/models/category_field.js */
@@ -843,7 +952,13 @@ Conticious.Domain = DS.Model.extend({
     minified: DS.attr('boolean'),
     uploadUrl: DS.attr('string'),
     uploadPath: DS.attr('string'),
-    createCategory: DS.attr('string')
+    createCategory: DS.attr('string'),
+    postProcessor: DS.belongsTo('postProcessor')
+});
+
+/* ##--->: js/app/models/postProcessor.js */
+Conticious.PostProcessor = DS.Model.extend({
+    name: DS.attr('string')
 });
 
 /* ##--->: js/app/models/setting.js */
@@ -855,7 +970,7 @@ Conticious.Setting = DS.Model.extend({
 Conticious.Subcategory = DS.Model.extend({
     name: DS.attr('string'),
     content: DS.attr('string'),
-    fields: DS.hasMany('subcategoryField')
+    fields: DS.hasMany('subcategoryField', {async: true})
 });
 
 /* ##--->: js/app/models/subcategory_field.js */
@@ -916,7 +1031,7 @@ Conticious.SettingController = Ember.ObjectController.extend({
 
         deleteDomain: function(domain) {
             domain.deleteRecord();
-            this.get('model.domains').removeObject(domain);
+            this.get('settings.domains').removeObject(domain);
         },
 
         saveChanges: function() {
@@ -925,7 +1040,7 @@ Conticious.SettingController = Ember.ObjectController.extend({
 
         userChanged: function() {
             console.log('user changed. Refreshing settings!');
-            this.get('model').reload();
+            this.get('settings').reload();
         },
 
         generateStatic: function(domain) {
@@ -953,7 +1068,7 @@ Conticious.SettingController = Ember.ObjectController.extend({
     doSaveSettings: function() {
         var domains = [];
 
-        this.get('model.domains').forEach(function(domain) {
+        this.get('settings.domains').forEach(function(domain) {
             domains.pushObject(domain);
         });
 
@@ -969,8 +1084,8 @@ Conticious.SettingController = Ember.ObjectController.extend({
             type: 'POST',
             success: function () {
                 console.log('SUCCESS');
-                console.log(controller.get('model'));
-                controller.get('model').reload();
+                console.log(controller.get('settings'));
+                controller.get('settings').reload();
             }
         });
     },
@@ -983,7 +1098,10 @@ Conticious.SettingController = Ember.ObjectController.extend({
 /* ##--->: js/app/setting/setting_route.js */
 Conticious.SettingRoute = Ember.Route.extend({
     model: function() {
-        return this.store.find('setting', 'ConticiousSettings');
+        return Ember.RSVP.hash({
+            "settings": this.store.find('setting', 'ConticiousSettings'),
+            "postProcessors": this.store.find('postProcessor')
+        });
     }
 });
 
@@ -1036,6 +1154,17 @@ Conticious.UserController = Ember.Controller.extend({
         console.log('roleObserver: ' + this.get('content.role'));
 
         if (this.get('content.role') === 'admin' || this.get('content.role') === 'super') {
+            isAdmin = true;
+        }
+
+        return isAdmin;
+    }.property('content.role'),
+
+    isSuperLoggedIn: function() {
+        var isAdmin = false;
+        console.log('roleObserver: ' + this.get('content.role'));
+
+        if (this.get('content.role') === 'super') {
             isAdmin = true;
         }
 
@@ -1100,7 +1229,7 @@ Conticious.FileReaderView = Ember.View.extend({
 Conticious.MarkdownTextArea = Ember.TextArea.extend({
     didInsertElement: function() {
         var elementId = this.get('elementId');
-        $("#" + elementId).markdown({autofocus:false,savable:false});
+        //$("#" + elementId).markdown({autofocus:false,savable:false});
     }
 });
 
@@ -1118,8 +1247,6 @@ Conticious.MenuCategoryView = Ember.View.extend({
 
     actions: {
         toggleSortAndFilter: function() {
-
-
             if (this.get('sortAndFilterShowing')) {
                 var view = this;
                 $("#sortAndFilterArea").slideUp(function() {
@@ -1185,8 +1312,8 @@ Conticious.MenuCategoryView = Ember.View.extend({
     },
 
     isSelected: function() {
-        return this.get('category.id') === this.get('controller.controllers.category.model.id');
-    }.property('controller.controllers.category.model.id'),
+        return this.get('category.id') === this.get('controller.controllers.category.model.id') && this.get('controller.controllers.category.model.isLoaded') === true;
+    }.property('controller.controllers.category.model.id', 'controller.controllers.category.model.isLoaded'),
 
     /*isSelectedObserver: function() {
         var view = this;
@@ -1230,9 +1357,10 @@ Conticious.MenuCategoryView = Ember.View.extend({
         this.sortOrFilter();
     }.observes('selectedFilterColumn'),
 
-    subcategoriesObserver: function() {
+    /*subcategoriesObserver: function() {
         this.set('sortedSubcategories', this.get('category.subcategories'));
-    }.observes('category.subcategories').on('init'),
+    }.observes('category.subcategories').on('init'),*/
+
 
     sortOrFilter: function() {
         console.log('Sorting subcategories');

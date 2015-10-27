@@ -14,7 +14,7 @@ Conticious.SettingController = Ember.ObjectController.extend({
 
         deleteDomain: function(domain) {
             domain.deleteRecord();
-            this.get('model.domains').removeObject(domain);
+            this.get('settings.domains').removeObject(domain);
         },
 
         saveChanges: function() {
@@ -23,7 +23,7 @@ Conticious.SettingController = Ember.ObjectController.extend({
 
         userChanged: function() {
             console.log('user changed. Refreshing settings!');
-            this.get('model').reload();
+            this.get('settings').reload();
         },
 
         generateStatic: function(domain) {
@@ -51,7 +51,7 @@ Conticious.SettingController = Ember.ObjectController.extend({
     doSaveSettings: function() {
         var domains = [];
 
-        this.get('model.domains').forEach(function(domain) {
+        this.get('settings.domains').forEach(function(domain) {
             domains.pushObject(domain);
         });
 
@@ -67,8 +67,8 @@ Conticious.SettingController = Ember.ObjectController.extend({
             type: 'POST',
             success: function () {
                 console.log('SUCCESS');
-                console.log(controller.get('model'));
-                controller.get('model').reload();
+                console.log(controller.get('settings'));
+                controller.get('settings').reload();
             }
         });
     },

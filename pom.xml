@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>no.haagensoftware</groupId>
 	<artifactId>conticious-parent</artifactId>
-	<version>0.1</version>
+	<version>0.2</version>
 	<name>Conticious Parent</name>
 	<packaging>pom</packaging>
 
 	<properties>
-		<netty.version>4.0.14.Final</netty.version>
+		<netty.version>4.0.26.Final</netty.version>
 		<junit.version>4.7</junit.version>
 		<log4j.version>1.2.13</log4j.version>
 	</properties>
@@ -20,6 +20,7 @@
         <module>Conticious.FilesystemPlugin</module>
         <module>Conticious.AdminPlugin</module>
         <module>Conticious.dataPlugin</module>
+        <module>Conticious.StormpathPlugin</module>
     </modules>
 
 	<build>

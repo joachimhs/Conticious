@@ -2,6 +2,8 @@ package no.haagensoftware.contentice.data;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.annotations.Expose;
+import no.haagensoftware.hyrrokkin.annotations.SerializedClassName;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,11 +16,12 @@ import java.util.Map;
  * Time: 12:11
  * To change this template use File | Settings | File Templates.
  */
+@SerializedClassName("category")
 public class CategoryData {
-    private String id;
-    private List<SubCategoryData> subcategories = new ArrayList<>();
-    private List<CategoryField> defaultFields = new ArrayList<>();
-    private boolean isPublic = false;
+    @Expose private String id;
+    @Expose private List<SubCategoryData> subcategories = new ArrayList<>();
+    @Expose private List<CategoryField> defaultFields = new ArrayList<>();
+    @Expose private boolean isPublic = false;
 
     public CategoryData() {
 

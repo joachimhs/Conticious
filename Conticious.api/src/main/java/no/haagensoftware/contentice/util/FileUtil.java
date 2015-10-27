@@ -2,7 +2,10 @@ package no.haagensoftware.contentice.util;
 
 import org.apache.log4j.Logger;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URL;
 
 /**
@@ -52,5 +55,20 @@ public class FileUtil {
         logger.info("Got Resource: " + resource.getAbsolutePath());
 
         return resource;
+    }
+
+    public static String getFilecontents(File inputFile) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        BufferedReader inStream = new BufferedReader(new FileReader(inputFile));
+        String nextLine = inStream.readLine();
+
+        while (nextLine != null) {
+            sb.append(nextLine).append("\n");
+            nextLine = inStream.readLine();
+        }
+
+        inStream.close();
+
+        return sb.toString();
     }
 }

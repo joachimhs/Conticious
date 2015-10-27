@@ -8,6 +8,7 @@ import io.netty.handler.stream.ChunkedFile;
 import io.netty.util.CharsetUtil;
 import no.haagensoftware.contentice.data.Domain;
 import no.haagensoftware.contentice.spi.AuthenticationPlugin;
+import no.haagensoftware.contentice.spi.PostProcessorPlugin;
 import no.haagensoftware.contentice.spi.StoragePlugin;
 import no.haagensoftware.contentice.util.PluginResolver;
 import org.apache.log4j.Logger;
@@ -31,82 +32,23 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
  * Time: 12:24
  * To change this template use File | Settings | File Templates.
  */
-public abstract class ContenticeHandler extends SimpleChannelInboundHandler<FullHttpRequest> implements ContenticeParameterMap {
-
-    private Map<String, String> parameterMap;
-    private List<String> queryStringIds;
-    private String browserHost;
-    private Domain domain;
-    private AuthenticationPlugin authenticationPlugin;
-    private PluginResolver pluginResolver;
-    private StoragePlugin storage;
-
-    @Override
-    public String getParameter(String key) {
-        String value = null;
-
-        if (parameterMap != null) {
-            value = parameterMap.get(key);
-        }
-
-        if (value != null) {
-            value = value.replaceAll("%20", " ");
-        }
-
-        return value;
-    }
-
-    @Override
-    public void setParameterMap(Map<String, String> parameterMap) {
-        this.parameterMap = parameterMap;
-    }
-
-    @Override
-    public List<String> getQueryStringIds() {
-        return queryStringIds;
-    }
-
-    @Override
-    public void setQueryStringIds(List<String> queryStringids) {
-        this.queryStringIds = queryStringids;
-    }
-
-    @Override
-    public PluginResolver getPluginResolver() {
-        return pluginResolver;
-    }
-
-    @Override
-    public void setPluginResolver(PluginResolver pluginResolver) {
-        this.pluginResolver = pluginResolver;
-    }
-
-    public AuthenticationPlugin getAuthenticationPlugin() {
-        return authenticationPlugin;
-    }
-
-    public void setAuthenticationPlugin(AuthenticationPlugin authenticationPlugin) {
-        this.authenticationPlugin = authenticationPlugin;
-    }
-
-    public Domain getDomain() {
-        return domain;
-    }
-
-    public void setDomain(Domain domain) {
-        this.domain = domain;
-    }
-
-    public void setStorage(StoragePlugin storage) {
-        this.storage = storage;
-    }
-
-    public StoragePlugin getStorage() {
-        return storage;
-    }
-
+public abstract class ContenticeHandler extends CommonConticiousInboundHandler {
     public String getUri(FullHttpRequest fullHttpRequest) {
         return fullHttpRequest.getUri();
+    }
+
+    protected String getQueryString(String url) {
+        String queryString = null;
+
+        if (url.contains("?")) {
+            queryString = url.substring(url.indexOf("?") + 1, url.length());
+
+            queryString = queryString.replaceAll("%5B", "");
+            queryString = queryString.replaceAll("%5D", "");
+            queryString = queryString.replaceAll("%40", "@");
+        }
+
+        return queryString;
     }
 
     public String getContentType(FullHttpRequest fullHttpRequest) {
@@ -152,26 +94,6 @@ public abstract class ContenticeHandler extends SimpleChannelInboundHandler<Full
         }
 
         return cookieValue;
-    }
-
-    public boolean isPut(FullHttpRequest fullHttpRequest) {
-        HttpMethod method = fullHttpRequest.getMethod();
-        return method == HttpMethod.PUT;
-    }
-
-    public boolean isPost(FullHttpRequest fullHttpRequest) {
-        HttpMethod method = fullHttpRequest.getMethod();
-        return method == HttpMethod.POST;
-    }
-
-    public boolean isGet(FullHttpRequest fullHttpRequest) {
-        HttpMethod method = fullHttpRequest.getMethod();
-        return method == HttpMethod.GET;
-    }
-
-    public boolean isDelete(FullHttpRequest fullHttpRequest) {
-        HttpMethod method = fullHttpRequest.getMethod();
-        return method == HttpMethod.DELETE;
     }
 
     public String getHttpMessageContent(FullHttpRequest fullHttpRequest) {

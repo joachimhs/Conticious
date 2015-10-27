@@ -5,5 +5,6 @@ Conticious.Domain = DS.Model.extend({
     minified: DS.attr('boolean'),
     uploadUrl: DS.attr('string'),
     uploadPath: DS.attr('string'),
-    createCategory: DS.attr('string')
+    createCategory: DS.attr('string'),
+    postProcessor: DS.belongsTo('postProcessor')
 });

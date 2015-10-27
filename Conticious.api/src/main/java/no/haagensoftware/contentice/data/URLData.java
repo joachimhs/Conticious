@@ -19,6 +19,7 @@ public class URLData {
     private ConticiousPlugin plugin;
     private Map<String, String> parameters;
     private List<String> queryStringIds;
+    private String queryString;
 
     public URLData(String urlPattern, String realUrl, Map<String, String> parameters) {
         this.urlPattern = urlPattern;
@@ -61,5 +62,13 @@ public class URLData {
 
     public void setQueryStringIds(List<String> queryStringIds) {
         this.queryStringIds = queryStringIds;
+    }
+
+    public String getQueryString() {
+        return queryString;
+    }
+
+    public void setQueryString(String queryString) {
+        this.queryString = queryString;
     }
 }

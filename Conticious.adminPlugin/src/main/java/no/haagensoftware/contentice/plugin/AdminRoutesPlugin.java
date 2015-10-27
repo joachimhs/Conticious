@@ -3,10 +3,8 @@ package no.haagensoftware.contentice.plugin;
 import io.netty.channel.ChannelHandler;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
 import no.haagensoftware.contentice.plugin.handler.*;
-import no.haagensoftware.contentice.spi.AuthenticationPlugin;
 import no.haagensoftware.contentice.spi.ConticiousPlugin;
 import no.haagensoftware.contentice.spi.RouterPlugin;
-import no.haagensoftware.contentice.spi.StoragePlugin;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -58,6 +56,8 @@ public class AdminRoutesPlugin extends RouterPlugin {
 
         routeMap.put("/json/admin/spg/{domain}", SpgHandler.class);
 
+        routeMap.put("/json/admin/postProcessors", AdminPostProcessorHandler.class);
+
         routeMap.put("/json/admin/fileUpload", AdminUploadHandler.class);
 
         routeMap.put("startsWith:/admin", AdminPagesHandler.class);
@@ -98,6 +98,9 @@ public class AdminRoutesPlugin extends RouterPlugin {
     public Map<String, String> getPlurals() {
         Map<String, String> pluralMap = new LinkedHashMap<>();
         pluralMap.put("productCategory", "productCategories");
+        pluralMap.put("prototypeCategory", "prototypeCategories");
+        pluralMap.put("campaignSettingsCategory", "campaignSettingsCategories");
+        pluralMap.put("figur", "figurer");
 
         return pluralMap;
     }

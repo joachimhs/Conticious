@@ -9,7 +9,9 @@ import no.haagensoftware.contentice.data.Domain;
 import no.haagensoftware.contentice.data.Settings;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
 import no.haagensoftware.contentice.handler.FileServerHandler;
+import no.haagensoftware.contentice.plugin.PostProcessorPluginService;
 import no.haagensoftware.contentice.spi.ConticiousPlugin;
+import no.haagensoftware.contentice.spi.PostProcessorPlugin;
 import no.haagensoftware.contentice.spi.RouterPlugin;
 import no.haagensoftware.contentice.spi.StoragePlugin;
 import no.haagensoftware.contentice.util.PluginResolver;
@@ -18,6 +20,8 @@ import no.haagensoftware.conticious.scriptcache.ScriptHash;
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
@@ -34,11 +38,19 @@ public class RouterHandler extends ContenticeHandler {
     private StoragePlugin storage;
 
     private PluginResolver pluginResolver;
+    private List<PostProcessorPlugin> postProcessorPlugins;
+
     private Class<? extends ChannelHandler> defaultHandler;
 
     public RouterHandler(PluginResolver pluginResolver,Class<? extends ChannelHandler> defaultHandler, StoragePlugin storage) {
         this.pluginResolver = pluginResolver;
         this.defaultHandler = defaultHandler;
+        this.postProcessorPlugins = new ArrayList<>();
+        for (ConticiousPlugin cp : PostProcessorPluginService.getInstance().getLoadedPlugins()) {
+            if (cp instanceof PostProcessorPlugin) {
+                this.postProcessorPlugins.add((PostProcessorPlugin)cp);
+            }
+        }
         this.storage = storage;
     }
 
@@ -95,8 +107,6 @@ public class RouterHandler extends ContenticeHandler {
             //Set up and send the response.
             writeContentsToBuffer(channelHandlerContext, returnContent, "application/javascript");
         } else {
-
-
             Domain domain = Settings.getInstance().getConticiousOptions().getWebappForHost(getHost(fullHttpRequest));
             if (domain != null) {
                 logger.info("domain: " + domain.getDomainName());
@@ -110,6 +120,12 @@ public class RouterHandler extends ContenticeHandler {
                     RouterPlugin routerPlugin = (RouterPlugin) plugin;
                     channelHandler = ((RouterPlugin) plugin).getHandlerForUrl(url);
                 }
+            }
+
+            PostProcessorPlugin postProcessorPlugin = getPostProcessorPlugin(domain.getPostProcessor());
+            if (postProcessorPlugin != null) {
+                postProcessorPlugin.setStorage(storage);
+                postProcessorPlugin.setDomain(domain);
             }
 
             //logger.info("channelHandler: " + channelHandler);
@@ -127,7 +143,10 @@ public class RouterHandler extends ContenticeHandler {
                 if (handler instanceof FileServerHandler) {
                     //addFileHandlers(channelHandlerContext, fullHttpRequest);
                     ((FileServerHandler) handler).setDomain(domain);
+                    ((FileServerHandler) handler).setPostProcessorPlugin(postProcessorPlugin);
+                    ((FileServerHandler) handler).setPostProcessorPlugins(postProcessorPlugins);
                 }
+
                 addOrReplaceHandler(channelHandlerContext, handler, "route-generated", fullHttpRequest);
             } else {
 
@@ -136,12 +155,17 @@ public class RouterHandler extends ContenticeHandler {
                     //((FileServerHandler)handler).setFromClasspath(false);
                     //addFileHandlers(channelHandlerContext, fullHttpRequest);
                     ((FileServerHandler) channelHandler).setDomain(domain);
+                    ((ContenticeHandler) channelHandler).setPostProcessorPlugin(postProcessorPlugin);
+                    ((ContenticeHandler) channelHandler).setPostProcessorPlugins(postProcessorPlugins);
                 } else if (channelHandler instanceof ContenticeHandler) {
                     //addDataHandlers(channelHandlerContext, fullHttpRequest);
 
                     //Initializer Handler correctly if the handler is a subclass of the ContenticeHandler
                     ((ContenticeHandler) channelHandler).setDomain(domain);
                     ((ContenticeHandler) channelHandler).setPluginResolver(pluginResolver);
+                    ((ContenticeHandler) channelHandler).setPostProcessorPlugin(postProcessorPlugin);
+                    ((ContenticeHandler) channelHandler).setPostProcessorPlugins(postProcessorPlugins);
+
                 }
                 addOrReplaceHandler(channelHandlerContext, channelHandler, "route-generated", fullHttpRequest);
             }
@@ -150,6 +174,18 @@ public class RouterHandler extends ContenticeHandler {
             logger.info("//channelRead: HttpRequest. File handlers before: " + FileServerHandler.getOpenFileDescriptorCount());
             channelHandlerContext.fireChannelRead(fullHttpRequest);
         }
+    }
+
+    private PostProcessorPlugin getPostProcessorPlugin(String name) {
+        PostProcessorPlugin foundPlugin = null;
+
+        for (PostProcessorPlugin postProcessorPlugin : postProcessorPlugins) {
+            if (postProcessorPlugin.getPluginName().equals(name)) {
+                foundPlugin = postProcessorPlugin;
+            }
+        }
+
+        return foundPlugin;
     }
 
     private void addFileHandlers(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) {

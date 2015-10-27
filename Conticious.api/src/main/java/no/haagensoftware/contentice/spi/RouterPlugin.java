@@ -31,10 +31,8 @@ public abstract class RouterPlugin implements ConticiousPlugin{
         URLData urlData = getUrlDataForUrl(url);
         ChannelHandler channelHandler = null;
 
-
         if (urlData != null) {
             Class<? extends ChannelHandler> channelHandlerClass = getRoutes().get(urlData.getUrlPattern());
-
 
             if (channelHandlerClass != null) {
                 try {
@@ -145,6 +143,7 @@ public abstract class RouterPlugin implements ConticiousPlugin{
             }
         }
 
+        urlData.setQueryString(getQueryString(url));
         List queryIds = buildIdsFromQueryStringString(url);
         if (urlData != null) {
             urlData.setQueryStringIds(queryIds);
@@ -155,18 +154,27 @@ public abstract class RouterPlugin implements ConticiousPlugin{
         return urlData;
     }
 
-    protected List<String> buildIdsFromQueryStringString(String url) {
-        //?ids[]=
-        List<String> ids = new ArrayList<>();
+    protected String getQueryString(String url) {
+        String queryString = null;
 
         if (url.contains("?")) {
-            String queryString = url.substring(url.indexOf("?") + 1, url.length());
+            queryString = url.substring(url.indexOf("?") + 1, url.length());
 
             queryString = queryString.replaceAll("%5B", "");
             queryString = queryString.replaceAll("%5D", "");
             queryString = queryString.replaceAll("%40", "@");
+        }
 
-            for (String query : queryString.split("&")) {
+        return queryString;
+    }
+
+    protected List<String> buildIdsFromQueryStringString(String url) {
+        //?ids[]=
+        List<String> ids = new ArrayList<>();
+        String queryString = getQueryString(url);
+
+        if (queryString != null) {
+            for (String query : getQueryString(url).split("&")) {
                 if (query.startsWith("ids=")) {
                     ids.add(query.substring(4, query.length()));
                 }

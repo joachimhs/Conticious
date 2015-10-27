@@ -1,5 +1,7 @@
 package no.haagensoftware.contentice.data;
 
+import com.google.gson.annotations.Expose;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jhsmbp
@@ -8,11 +10,11 @@ package no.haagensoftware.contentice.data;
  * To change this template use File | Settings | File Templates.
  */
 public class CategoryField {
-    private String id;
-    private String name;
-    private String type;
-    private boolean required;
-    private String relation;
+    @Expose private String id;
+    @Expose private String name;
+    @Expose private String type;
+    @Expose private boolean required;
+    @Expose private String relation;
 
     public CategoryField() {
     }

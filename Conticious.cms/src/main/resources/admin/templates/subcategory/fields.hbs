@@ -28,7 +28,7 @@
                 {{/if}}
 
                 {{#if field.isToOne}}
-                    {{view Ember.Select contentBinding="field.relation.subcategories" valueBinding="field.value" optionValuePath="content.id" optionLabelPath="content.id" prompt="Select Subcategory" classNames="form-control"}}
+                    {{view Ember.Select contentBinding="field.relation.sortedSubcategories" valueBinding="field.value" optionValuePath="content.id" optionLabelPath="content.id" prompt="Select Subcategory" classNames="form-control"}}
                 {{/if}}
 
                 {{#if field.isToMany}}

@@ -191,9 +191,9 @@ public class FileServerHandler extends ContenticeHandler {
 
                 String staticPath = staticFile.getAbsolutePath();
 
-                if (staticFile.isDirectory() || !staticFile.exists()) {
+                /*if (staticFile.isDirectory() || !staticFile.exists()) {
                     staticPath = staticFile.getAbsolutePath() + ".html";
-                }
+                }*/
 
                 staticFile = new File(staticPath);
 
@@ -201,7 +201,12 @@ public class FileServerHandler extends ContenticeHandler {
                 logger.info("original path: " + originalPath);
                 logger.info("static path: " + staticPath);
 
-                writeFileToBuffer(channelHandlerContext, path, ContentTypeUtil.getContentType(path));
+                if (getPostProcessorPlugin() != null && ContentTypeUtil.getContentType(path).contains("text/html"))  {
+                    String postProcessedContent = getPostProcessorPlugin().postProcess(getFileContent(path), path, getQueryString(getUri(fullHttpRequest)), ContentTypeUtil.getContentType(path));
+                    writeContentsToBuffer(channelHandlerContext, postProcessedContent, ContentTypeUtil.getContentType(path));
+                } else {
+                    writeFileToBuffer(channelHandlerContext, path, ContentTypeUtil.getContentType(path));
+                }
 
 /*                if (path.endsWith(".html")) {
                     ScriptCache cache = ScriptHash.getScriptCache(path);

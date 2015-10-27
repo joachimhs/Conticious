@@ -32,6 +32,14 @@ public class PluginResolver {
         singulars.put(plural, singular);
     }
 
+    public Map<String, String> getPlurals() {
+        return plurals;
+    }
+
+    public Map<String, String> getSingulars() {
+        return singulars;
+    }
+
     public String getPluralFor(String singular) {
         String plural = plurals.get(singular);
 

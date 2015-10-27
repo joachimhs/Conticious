@@ -1,5 +1,6 @@
 package no.haagensoftware.contentice.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ListToString {
@@ -21,4 +22,19 @@ public class ListToString {
 		
 		return sb.toString();
 	}
+
+    public static List<String> convertToList(String content, String delimeter) {
+        List<String> retList = new ArrayList<>();
+
+        if (content.contains(delimeter)) {
+            String[] values = content.split(delimeter);
+            for (String val : values) {
+                retList.add(val);
+            }
+        } else {
+            retList.add(content);
+        }
+
+        return retList;
+    }
 }

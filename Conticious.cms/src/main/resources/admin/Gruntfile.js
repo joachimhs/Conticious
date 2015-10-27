@@ -1,27 +1,27 @@
-function config(name) {	
-  return require('./tasks/' + name + '.js');
+function config(name) {
+    return require('./tasks/' + name + '.js');
 }
 
-module.exports = function(grunt) {
-  grunt.initConfig({
-    pkg: grunt.file.readJSON('package.json'),
+module.exports = function (grunt) {
+    grunt.initConfig({
+        pkg: grunt.file.readJSON('package.json'),
         concat: config('concat'),
         jshint: config('jshint'),
-        emberTemplates: config('emberTemplates'),
+        emberhandlebars: config('emberhandlebars'),
         uglify: config('uglify'),
-		server: config('server'),
+        server: config('server'),
         watch: {
             files: ['templates/**/*.hbs', 'js/app/**/*.js', 'tests/unit/**/*.js'],
             tasks: ['emberTemplates', 'concat']
         }
-  });
+    });
 
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-ember-templates');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-ember-template-compiler');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-watch');
 
-  grunt.registerTask('dist', ['jshint', 'emberTemplates', 'concat', 'uglify']);
-  grunt.registerTask('default', ['watch']);
+    grunt.registerTask('dist', ['jshint', 'emberhandlebars', 'concat', 'uglify']);
+    grunt.registerTask('default', ['watch']);
 };

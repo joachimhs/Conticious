@@ -44,7 +44,7 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
 
         pipeline.addLast("codec", new HttpServerCodec());
 
-        pipeline.addLast("aggregator", new HttpObjectAggregator(400 * 1024 * 1024));
+        pipeline.addLast("aggregator", new HttpObjectAggregator(600 * 1024 * 1024));
         pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
 
         for (RouterPlugin routerPlugin : RouterPluginService.getInstance().getRouterPlugins()) {
@@ -60,6 +60,9 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
 
         //Router Handler
         pipeline.addLast("router_handler", new RouterHandler(pluginResolver, FileServerHandler.class, StoragePluginService.getInstance().getStoragePluginWithName(System.getProperty("no.haagensoftware.contentice.storage.plugin"))));
+
+        //this needs to be there in case the domain has a post processor configured
+        pipeline.addLast("route-postprocess", new PostProcesorHandler(null));
 
 
         //pipeline.addLast("handler", new HttpStaticFileServerHandler(true));

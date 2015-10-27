@@ -50,5 +50,16 @@ Conticious.UserController = Ember.Controller.extend({
         }
 
         return isAdmin;
+    }.property('content.role'),
+
+    isSuperLoggedIn: function() {
+        var isAdmin = false;
+        console.log('roleObserver: ' + this.get('content.role'));
+
+        if (this.get('content.role') === 'super') {
+            isAdmin = true;
+        }
+
+        return isAdmin;
     }.property('content.role')
 });

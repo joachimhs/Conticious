@@ -1,5 +1,6 @@
 package no.haagensoftware.contentice.handler;
 
+import no.haagensoftware.contentice.spi.PostProcessorPlugin;
 import no.haagensoftware.contentice.util.PluginResolver;
 
 import java.util.Map;
@@ -25,4 +26,12 @@ public interface ContenticeParameterMap {
     public void setPluginResolver(PluginResolver pluginResolver);
 
     public PluginResolver getPluginResolver();
+
+    public List<PostProcessorPlugin> getPostProcessorPlugins();
+
+    public void setPostProcessorPlugins(List<PostProcessorPlugin> postProcessorPlugins);
+
+    public PostProcessorPlugin getPostProcessorPlugin();
+
+    public void setPostProcessorPlugin(PostProcessorPlugin postProcessorPlugin);
 }

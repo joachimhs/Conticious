@@ -20,9 +20,13 @@ import no.haagensoftware.contentice.plugin.admindata.AdminCategoryObjectWithIds;
 import no.haagensoftware.contentice.plugin.assembler.AdminCategoryAssembler;
 import no.haagensoftware.contentice.plugin.assembler.AdminSubCategoryAssembler;
 import no.haagensoftware.contentice.spi.AuthenticationPlugin;
+import no.haagensoftware.hyrrokkin.serializer.RestSerializer;
 import org.apache.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,6 +37,7 @@ import java.util.Map;
  */
 public class AdminCategoryHandler extends ContenticeHandler  {
     private static final Logger logger = Logger.getLogger(AdminCategoriesHandler.class.getName());
+    private static List<String> sideloadKeys = Arrays.asList("categoryField");
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
@@ -93,8 +98,16 @@ public class AdminCategoryHandler extends ContenticeHandler  {
             if (categoryData == null) {
                 write404ToBuffer(channelHandlerContext);
             } else {
-                JsonObject topLevelObject = convertCategoryToJson(getDomain().getWebappName(), categoryData);
-                writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json");
+                //JsonObject topLevelObject = convertCategoryToJson(getDomain().getWebappName(), categoryData);
+                for (SubCategoryData subcategoryData : getStorage().getSubCategories(getDomain().getWebappName(), categoryData.getId())) {
+                    categoryData.addSubcategory(subcategoryData);
+                }
+
+
+                RestSerializer serializer = new RestSerializer();
+                serializer.addPluralization("category", "categories");
+                serializer.addPluralization("subcategory", "subcategories");
+                writeContentsToBuffer(channelHandlerContext, serializer.serialize(categoryData, sideloadKeys).toString(), "application/json");
             }
         }
     }

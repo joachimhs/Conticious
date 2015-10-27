@@ -1,4 +1,8 @@
 Conticious.SelectMultipleComponent = Ember.Component.extend({
+
+    sortProperties: ['id'],
+    sortedItems: Ember.computed.sort('items', 'sortProperties'),
+
     actions: {
         addItem: function() {
             var selectedValue = this.get('selectedValue');

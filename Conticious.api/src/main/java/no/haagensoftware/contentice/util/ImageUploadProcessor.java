@@ -91,6 +91,14 @@ public class ImageUploadProcessor {
             fileEnding = ".zip";
         }
 
+        if (fileUpload.getContentType().equalsIgnoreCase("image/gif")) {
+            fileEnding = ".gif";
+        }
+
+        if (fileEnding == null && fileUpload.getFilename().contains(".")) {
+            fileEnding = fileUpload.getFilename().substring(fileUpload.getFilename().lastIndexOf("."));
+        }
+
         return fileEnding;
     }
 }
