@@ -15,11 +15,24 @@ export default Ember.Controller.extend({
 
   actions: {
     selectCategory: function(category) {
-      console.log('SELECTING:' + category.id);
+
 
       var self = this;
 
-      self.transitionToRoute("categories.category", category.id);
+      console.log('category.id: ' + category.id);
+      console.log('categorryController ' + this.get('categoryController'));
+      console.log('categorryController category ' + this.get('categoryController.model.category'));
+      console.log('categorryController category.id ' + this.get('categoryController.model.category.id'));
+      if (category.id === this.get('categoryController.model.category.id')) {
+        console.log('DE-SELECTING:' + category.id);
+        this.set('categoryController.model.category', null);
+        self.transitionToRoute("categories");
+      } else {
+        console.log('SELECTING:' + category.id);
+        self.transitionToRoute("categories.category", category.id);
+      }
+
+
 
       /*category.reload().then(function(data) {
         console.log('TRANSITION');
