@@ -1,0 +1,14 @@
+<div class="row">
+    <div class="col-md-10">
+        {{my-select content=items selectedValue=selectedValue optionValuePath="content" optionLabelPath="content.id" prompt="Add Item"}}
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-primary btn-xs pull-right" {{action "addItem"}}>Add</button>
+    </div>
+</div>
+
+<div class="list-group">
+    {{#each addedItems as |item|}}
+        {{select-multiple-item item=item droppedItem="droppedItem" deleteItem="deleteItem"}}
+    {{/each}}
+</div>

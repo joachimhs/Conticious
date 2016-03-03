@@ -40,55 +40,6 @@
         </dependency>
 
         <dependency>
-            <groupId>no.haagensoftware</groupId>
-            <artifactId>conticious-admin-plugin</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>no.haagensoftware</groupId>
-            <artifactId>conticious-filesystem-plugin</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>no.haagensoftware</groupId>
-            <artifactId>conticious-data-plugin</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>no.haagensoftware</groupId>
-            <artifactId>conticious-kodegenet-plugin</artifactId>
-            <version>1.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>no.haagensoftware</groupId>
-            <artifactId>conticious-emberfest-plugin</artifactId>
-            <version>2.0</version>
-
-        </dependency>
-
-        <dependency>
-            <groupId>no.haagensoftware</groupId>
-            <artifactId>conticious-teknologihuset-plugin</artifactId>
-            <version>1.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>no.haagensoftware</groupId>
-            <artifactId>conticious-spira-plugin</artifactId>
-            <version>1.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>no.haagensoftware</groupId>
-            <artifactId>conticious-teknologihuset-plugin</artifactId>
-            <version>1.0</version>
-        </dependency>
-
-        <dependency>
             <groupId>htmlunit</groupId>
             <artifactId>htmlunit</artifactId>
             <version>1.14</version>
@@ -216,6 +167,71 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>local</id>
+            <activation>
+                <property>
+                    <name>env</name>
+                    <value>local</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>no.haagensoftware</groupId>
+                    <artifactId>conticious-admin-plugin</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>no.haagensoftware</groupId>
+                    <artifactId>conticious-filesystem-plugin</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>no.haagensoftware</groupId>
+                    <artifactId>conticious-data-plugin</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>no.haagensoftware</groupId>
+                    <artifactId>conticious-kodegenet-plugin</artifactId>
+                    <version>1.0</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>no.haagensoftware</groupId>
+                    <artifactId>conticious-emberfest-plugin</artifactId>
+                    <version>2.0</version>
+
+                </dependency>
+
+                <dependency>
+                    <groupId>no.haagensoftware</groupId>
+                    <artifactId>conticious-teknologihuset-plugin</artifactId>
+                    <version>1.0</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>no.haagensoftware</groupId>
+                    <artifactId>conticious-spira-plugin</artifactId>
+                    <version>1.0</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>no.haagensoftware</groupId>
+                    <artifactId>conticious-teknologihuset-plugin</artifactId>
+                    <version>1.0</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>no.haagensoftware</groupId>
+                    <artifactId>conticious-stormpath</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 

@@ -7,3 +7,7 @@ target
 .DS_Store
 Conticious.cms/src/main/resources/admin/node_modules/
 Conticious.cms/src/main/resources/admin-0.1.zip
+bower_components
+node_modules
+dist
+tmp

@@ -16,7 +16,7 @@ public class SubcategoryField {
     private boolean required;
     private String value;
     private String relation;
-    private List<String> relations;
+    private List<String> addedRelations;
 
     public SubcategoryField() {
     }
@@ -70,11 +70,11 @@ public class SubcategoryField {
         this.relation = relation;
     }
 
-    public List<String> getRelations() {
-        return relations;
+    public List<String> getAddedRelations() {
+        return addedRelations;
     }
 
-    public void setRelations(List<String> relations) {
-        this.relations = relations;
+    public void setAddedRelations(List<String> addedRelations) {
+        this.addedRelations = addedRelations;
     }
 }

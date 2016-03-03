@@ -8,7 +8,9 @@ import no.haagensoftware.contentice.spi.AuthenticationPlugin;
 import no.haagensoftware.contentice.spi.PostProcessorPlugin;
 import no.haagensoftware.contentice.spi.StoragePlugin;
 import no.haagensoftware.contentice.util.PluginResolver;
+import no.haagensoftware.contentice.util.UrlUtil;
 
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +37,7 @@ public abstract class CommonConticiousInboundHandler extends SimpleChannelInboun
         }
 
         if (value != null) {
-            value = value.replaceAll("%20", " ");
+            value = UrlUtil.decodeUrl(value);
         }
 
         return value;

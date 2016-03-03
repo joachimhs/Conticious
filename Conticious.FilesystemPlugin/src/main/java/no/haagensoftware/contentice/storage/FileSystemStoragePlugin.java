@@ -215,6 +215,22 @@ public class FileSystemStoragePlugin extends StoragePlugin {
     }
 
     @Override
+    public Integer getNumberOfSubcategories(String host, String category) {
+        Integer number = 0;
+
+        String docDir = documentsDirectory + File.separatorChar + host;
+        try (DirectoryStream<Path> ds = Files.newDirectoryStream(FileSystems.getDefault().getPath(docDir + File.separatorChar + category), "*.md")) {
+            for (Path p : ds) {
+                number++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return number;
+    }
+
+    @Override
     public List<SubCategoryData> getSubCategories(String host, String category) {
         String docDir = documentsDirectory + File.separatorChar + host;
         List<SubCategoryData> subCategories = new ArrayList<>();

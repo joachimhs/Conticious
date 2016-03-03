@@ -1,6 +1,6 @@
 <div class="list-group">
 
-    <div class="list-group-item categoryItem" {{action "selectCategory" category}}>
+    {{#link-to "category" category classNames="list-group-item categoryItem"}}
         {{#if view.isSelected}}
             &#x25BC;
         {{else}}
@@ -11,14 +11,10 @@
 
         <span class="pull-right">
             <span class="badge menuBadge">
-                {{#if view.isSelected}}
-                    {{#if category.isLoaded}}
-                        {{view.sortedSubcategories.length}} / {{category.subcategories.length}}
-                    {{/if}}
-                {{/if}}
+                {{view.sortedSubcategories.length}} / {{category.subcategories.length}}
             </span>
         </span>
-    </div>
+    {{/link-to}}
 
     {{#if view.isSelected}}
         <div class="list-group-item text-right menuFilterItem">

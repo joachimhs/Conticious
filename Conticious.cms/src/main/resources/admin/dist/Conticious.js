@@ -100,19 +100,6 @@ Conticious.CategoriesController = Ember.ArrayController.extend({
     newId: null,
 
     actions: {
-        selectCategory: function(category) {
-            console.log('SELECTING:' + category);
-
-            var self = this;
-            category.reload().then(function(data) {
-                console.log('TRANSITION');
-                self.transitionToRoute("category", category);
-            }, function() {
-                console.log("ERROR");
-            });
-            //{{#link-to "category" category
-        },
-
         showNewCategory: function() {
             this.set('showNewCategoryField', true);
         },
@@ -641,15 +628,14 @@ Conticious.InputWysiwygComponent = Ember.Component.extend({
             lang: this.get('lang'),
             height: height,
             toolbar: [
-                ['style', ['style', 'bold', 'italic', 'underline', 'clear']],
+                ['style', ['bold', 'italic', 'underline', 'clear']],
                 ['fontsize', ['fontsize']],
                 ['color', ['color']],
                 ['para', ['ul', 'ol', 'paragraph']],
                 ['height', ['height']],
                 ['insert', ['link']],
                 ['table', ['table']],
-                ['undoredo', ['undo', 'redo']],
-                ['misc', ["fullscreen"]]
+                ['undoredo', ['undo', 'redo']]
             ]
         });
 
@@ -909,7 +895,7 @@ Conticious.HeaderController = Ember.Controller.extend({
 /* ##--->: js/app/models/category.js */
 Conticious.Category = DS.Model.extend({
     subcategories: DS.hasMany('subcategory'),
-    defaultFields: DS.hasMany('categoryField', {async: true}),
+    defaultFields: DS.hasMany('categoryField'),
     isPublic: DS.attr('boolean'),
 
     sortProperties: ['id'],
@@ -952,13 +938,7 @@ Conticious.Domain = DS.Model.extend({
     minified: DS.attr('boolean'),
     uploadUrl: DS.attr('string'),
     uploadPath: DS.attr('string'),
-    createCategory: DS.attr('string'),
-    postProcessor: DS.belongsTo('postProcessor')
-});
-
-/* ##--->: js/app/models/postProcessor.js */
-Conticious.PostProcessor = DS.Model.extend({
-    name: DS.attr('string')
+    createCategory: DS.attr('string')
 });
 
 /* ##--->: js/app/models/setting.js */
@@ -970,7 +950,7 @@ Conticious.Setting = DS.Model.extend({
 Conticious.Subcategory = DS.Model.extend({
     name: DS.attr('string'),
     content: DS.attr('string'),
-    fields: DS.hasMany('subcategoryField', {async: true})
+    fields: DS.hasMany('subcategoryField')
 });
 
 /* ##--->: js/app/models/subcategory_field.js */
@@ -1031,7 +1011,7 @@ Conticious.SettingController = Ember.ObjectController.extend({
 
         deleteDomain: function(domain) {
             domain.deleteRecord();
-            this.get('settings.domains').removeObject(domain);
+            this.get('model.domains').removeObject(domain);
         },
 
         saveChanges: function() {
@@ -1040,7 +1020,7 @@ Conticious.SettingController = Ember.ObjectController.extend({
 
         userChanged: function() {
             console.log('user changed. Refreshing settings!');
-            this.get('settings').reload();
+            this.get('model').reload();
         },
 
         generateStatic: function(domain) {
@@ -1068,7 +1048,7 @@ Conticious.SettingController = Ember.ObjectController.extend({
     doSaveSettings: function() {
         var domains = [];
 
-        this.get('settings.domains').forEach(function(domain) {
+        this.get('model.domains').forEach(function(domain) {
             domains.pushObject(domain);
         });
 
@@ -1084,8 +1064,8 @@ Conticious.SettingController = Ember.ObjectController.extend({
             type: 'POST',
             success: function () {
                 console.log('SUCCESS');
-                console.log(controller.get('settings'));
-                controller.get('settings').reload();
+                console.log(controller.get('model'));
+                controller.get('model').reload();
             }
         });
     },
@@ -1098,10 +1078,7 @@ Conticious.SettingController = Ember.ObjectController.extend({
 /* ##--->: js/app/setting/setting_route.js */
 Conticious.SettingRoute = Ember.Route.extend({
     model: function() {
-        return Ember.RSVP.hash({
-            "settings": this.store.find('setting', 'ConticiousSettings'),
-            "postProcessors": this.store.find('postProcessor')
-        });
+        return this.store.find('setting', 'ConticiousSettings');
     }
 });
 
@@ -1247,6 +1224,8 @@ Conticious.MenuCategoryView = Ember.View.extend({
 
     actions: {
         toggleSortAndFilter: function() {
+
+
             if (this.get('sortAndFilterShowing')) {
                 var view = this;
                 $("#sortAndFilterArea").slideUp(function() {
@@ -1312,8 +1291,8 @@ Conticious.MenuCategoryView = Ember.View.extend({
     },
 
     isSelected: function() {
-        return this.get('category.id') === this.get('controller.controllers.category.model.id') && this.get('controller.controllers.category.model.isLoaded') === true;
-    }.property('controller.controllers.category.model.id', 'controller.controllers.category.model.isLoaded'),
+        return this.get('category.id') === this.get('controller.controllers.category.model.id');
+    }.property('controller.controllers.category.model.id'),
 
     /*isSelectedObserver: function() {
         var view = this;
@@ -1357,10 +1336,9 @@ Conticious.MenuCategoryView = Ember.View.extend({
         this.sortOrFilter();
     }.observes('selectedFilterColumn'),
 
-    /*subcategoriesObserver: function() {
+    subcategoriesObserver: function() {
         this.set('sortedSubcategories', this.get('category.subcategories'));
-    }.observes('category.subcategories').on('init'),*/
-
+    }.observes('category.subcategories').on('init'),
 
     sortOrFilter: function() {
         console.log('Sorting subcategories');

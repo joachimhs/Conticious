@@ -1,0 +1,21 @@
+<select {{action 'change' on='change'}} class="form-control">
+    {{#each sortedContent key="@index" as |item|}}
+        {{#if item.value}}
+            <option value="{{item.value}}" selected={{is-equal item selectedValue}}>
+                {{item.label}}
+            </option>
+        {{else}}
+            {{#if item.id}}
+                <option value="{{item.id}}" selected={{is-equal item selectedValue}}>
+                    {{item.id}}
+                </option>
+            {{else}}
+                <option value="{{item}}" selected={{is-equal item selectedValue}}>
+                    {{item}}
+                </option>
+            {{/if}}
+
+        {{/if}}
+
+    {{/each}}
+</select>

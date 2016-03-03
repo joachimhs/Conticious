@@ -1,0 +1,83 @@
+<table class="table subcategoryFields">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Value</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#each enrichedFields as |field|}}
+        <tr>
+            <td>{{field.name}}</td>
+            <td>
+                {{#if field.isTextfield}}
+                    {{input type="text" valueBinding="field.value"}}
+                {{/if}}
+
+                {{#if field.isTextarea}}
+                    {{textarea valueBinding="field.value"}} <br />
+                {{/if}}
+
+                {{#if field.isBoolean}}
+                    {{input type="checkbox" checkedBinding="field.value"}} <br />
+                {{/if}}
+
+                {{#if field.isArray}}
+                    {{input type="text" valueBinding="field.value"}} <br />
+                {{/if}}
+
+                {{#if field.isToOne}}
+                    {{my-select content=field.allRelations selectedValue=field.value optionValuePath="content.id" optionLabelPath="content.id" prompt="Select Subcategory"}}
+                {{/if}}
+
+                {{#if field.isToMany}}
+                    {{select-multiple items=field.allRelations addedItems=field.addedRelations model=field}}
+                {{/if}}
+            </td>
+            <td>
+                {{#if field.hasDirtyAttributes}}
+                    <button class="btn btn-primary" style="width: 75px;" {{action "saveSubcategoryField" field}}>Save</button>
+                    <button class="btn btn-default" style="width: 75px;" {{action "revertSubcategoryField" field}}>Revert</button>
+                {{/if}}
+
+                {{#if field.addedRelations.hasDirtyAttributes}}
+                    <button class="btn btn-primary" style="width: 75px;" {{action "saveSubcategoryField" field}}>Save</button>
+                    <button class="btn btn-default" style="width: 75px;" {{action "revertSubcategoryField" field}}>Revert</button>
+                {{/if}}
+            </td>
+        </tr>
+    {{/each}}
+    </tbody>
+</table>
+
+{{#if relatedCategoryFields}}
+    <h1>Add this subcategory to a relationship</h1>
+
+    <table class="table subcategoryFields">
+        <thead>
+        <tr>
+            <th>Related to Category</th>
+            <th>Through Field</th>
+            <th>Add to Subcategory</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#each relation in relatedCategoryFields}}
+            <tr>
+                <td>{{relation.relatedToCategory}}</td>
+                <td>{{relation.throughField}}</td>
+                <td>
+                    {{my-select classNames="input-medium" selectedValue=relation.selectedRelationId content=relation.relatedSubcategories optionLabelPath="content.name" optionValuePath="content.id"}}
+                </td>
+                <td>
+                    {{#if relation.selectedRelationId}}
+                        <button class="btn btn-primary" {{action "addSubcategoryToRelation" relation.selectedRelationId relation.throughField}}>Add to field</button>
+                    {{/if}}
+                </td>
+            </tr>
+        {{/each}}
+        </tbody>
+    </table>
+{{/if}}

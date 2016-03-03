@@ -1,0 +1,40 @@
+<div class="list-group-item subcategoryItem {{if isSelected 'active'}}" {{action "selectSubcategory" category subcategory}}>
+    <span style="margin-left: 18px;"></span> {{subcategory.name}}
+
+    {{#if isSelected}}
+        <span class="glyphicon glyphicon-edit pull-right tinyMarginTop blackText" {{action "doEditSubcategory"}}></span>
+    {{/if}}
+</div>
+
+{{#if isEditing}}
+    <div id="editSubcategoryArea" class="list-group-item text-left subcategoryEditArea">
+        <h4 class="text-center">Edit Subcategory</h4>
+
+      {{#if subcategory.deleteFirstStep}}
+          <table class="table">
+              <tr>
+                  <td><button class="btn btn-danger form-control" {{action "deleteSubcategoryConfirm" subcategory}}>Confirm Delete Subcategory</button></td>
+                  <td><button class="btn btn-default" {{action "finishEditSubcategory"}}>Cancel</button></td>
+              </tr>
+          </table>
+      {{else}}
+          <table class="table">
+              <tr>
+                  <td colspan="3">
+                    {{input type="text"valueBinding="newId" classNames="form-control" placeholder="New Subcategory ID"}}
+                  </td>
+              </tr>
+              <tr>
+                  <td><button class="btn btn-primary" {{action "renameSubcategory" subcategory}}>Save</button></td>
+                  <td><button class="btn btn-default" {{action "finishEditSubcategory"}}>Cancel</button></td>
+                  <td><button class="btn btn-danger" {{action "deleteSubcategoryFirstStep" subcategory}}>Delete Subcategory</button></td>
+              </tr>
+          </table>
+      {{/if}}
+
+
+
+    </div>
+{{/if}}
+
+

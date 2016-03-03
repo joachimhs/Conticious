@@ -18,8 +18,11 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
+import org.mozilla.universalchardet.UniversalDetector;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
 /**
@@ -165,7 +168,26 @@ public class ConticiousStormpath {
     private String postJsonContent(String url, String jsonContent) {
         String json = null;
 
+
+        try {
+            String encoding = guessEncoding(jsonContent);
+            byte[] jsonBytes = jsonContent.getBytes(encoding);
+            if (jsonBytes != null) {
+                jsonContent = new String(jsonBytes, "UTF-8");
+            }
+        } catch (UnsupportedEncodingException e) {
+            //Nothing to do. using string as-is
+        }
+
         logger.info("POSTING TO: " + url);
+
+        //very dirty fix for Norwegian characters...
+        jsonContent = jsonContent.replace("ø", "_oe_");
+        jsonContent = jsonContent.replace("æ", "_ae_");
+        jsonContent = jsonContent.replace("å", "_aa_");
+        jsonContent = jsonContent.replace("Ø", "_Oe_");
+        jsonContent = jsonContent.replace("Æ", "_Ae_");
+        jsonContent = jsonContent.replace("Å", "_Aa_");
 
         CloseableHttpClient httpclient = HttpClients.createDefault();
         try {
@@ -176,14 +198,15 @@ public class ConticiousStormpath {
                 httpPost.setEntity(requestEntity);
 
                 httpPost.setHeader("Authorization", "Basic " + this.base64String);
-                httpPost.setHeader("Content-Type", "application/json");
+                httpPost.setHeader("Content-Type", "application/json;charset=UTF-8");
                 httpPost.setHeader("Accept", "application/json");
+
 
                 for (Header header : httpPost.getAllHeaders()) {
                     logger.info("Req header " + header.getName() + " : " + header.getValue());
                 }
 
-                logger.info("\n" + EntityUtils.toString(httpPost.getEntity()));
+                logger.info("\n" + EntityUtils.toString(httpPost.getEntity(), "UTF-8"));
 
                 HttpResponse response = httpclient.execute(httpPost);
 
@@ -194,6 +217,7 @@ public class ConticiousStormpath {
                 for (Header header : response.getAllHeaders()) {
                     logger.info("Res header " + header.getName() + " : " + header.getValue());
                 }
+                logger.info(json);
             }
         } catch (ClientProtocolException e) {
             e.printStackTrace();
@@ -286,5 +310,24 @@ public class ConticiousStormpath {
         }
 
         return this.application;
+    }
+
+    public static String guessEncoding(String input) {
+        UniversalDetector detector = new UniversalDetector(null);
+        byte[] buf = new byte[4096];
+
+        detector.handleData(input.getBytes(), 0, input.getBytes().length-1);
+
+        detector.dataEnd();
+
+        String encoding = detector.getDetectedCharset();
+        if (encoding == null) {
+            encoding = "UTF-8";
+            logger.info("Bruker standard UTF-8 encoding");
+        } else {
+            logger.info("Gjetter " + encoding + " encoding");
+        }
+
+        return encoding;
     }
 }

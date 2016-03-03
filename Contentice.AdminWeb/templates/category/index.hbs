@@ -1,0 +1,103 @@
+{{#if showNewField}}
+    {{#if showNewFieldArea}}
+        <table class="table">
+        <table class="table">
+            <tr>
+                <th colspan="5" class="tableHeader">Add new Field</th>
+            </tr>
+            <tr>
+                <td>{{view Ember.TextField valueBinding="newFieldName" classNames="form-control" placeholder="Field Name"}}</td>
+                <td>{{view Ember.Select contentBinding="fieldTypes" valueBinding="newFieldType" prompt="Select a field type" classNames="form-control"}}</td>
+                <td>
+                    {{#if newFieldIsAssociation}}
+                        {{view Ember.Select contentBinding="controller.controllers.categories.model" value=field.relation optionValuePath="content.id" optionLabelPath="content.id" prompt="Select Category" classNames="form-control"}}
+                    {{/if}}
+                </td>
+                <td><label class="checkbox-inline">{{view Ember.Checkbox checkedBinding="newFieldRequired"}}Required</label></td>
+                <td style="text-align: right;">
+                    <button class="btn btn-primary" style="margin-right: 10px;" {{action "addNewField"}}>Add Field</button>
+                    <button class="btn btn-default" {{action "cancelNewField"}}>Cancel</button>
+                </td>
+            </tr>
+        </table>
+    {{/if}}
+    {{#if showNewSubcategoryArea}}
+        <table class="table">
+            <tr>
+                <th colspan="2" class="tableHeader">Add new Subcategory</th>
+            </tr>
+            <tr>
+                <td>{{view Ember.TextField valueBinding="newSubcategoryName" classNames="form-control" placeholder="Subcategory Name"}}</td>
+                <td style="text-align: right;">
+                    <button class="btn btn-primary" style="margin-right: 10px;" {{action "addNewSubcategory"}}>Add Subcategory</button>
+                    <button class="btn btn-default" {{action "cancelNewSubcategory"}}>Cancel</button>
+                </td>
+            </tr>
+        </table>
+    {{/if}}
+{{else}}
+    <div class="actionButtons">
+        <button class="btn btn-default" style="margin-right: 10px;" {{action "openNewField"}}>Add New Field</button>
+        <button class="btn btn-default" {{action "openNewSubcategory"}}>Add New Subcategory</button>
+    </div>
+{{/if}}
+
+<div style="padding-top: 15px;">
+
+</div>
+
+<table class="table">
+    <tr>
+        <th>Field Name</th>
+        <th>Field Type</th>
+        <th>Relationship</th>
+        <th>Required</th>
+        <th>Field Action</th>
+    </tr>
+    {{#each field in controllers.category.defaultFields}}
+        <tr>
+            <td>{{view Ember.TextField valueBinding="field.name" classNames="form-control"}}</td>
+            <td>
+                {{view Ember.Select contentBinding="controller.fieldTypes" valueBinding="field.type" prompt="Select a field type" classNames="form-control"}}
+            </td>
+
+
+            <td>
+                {{#if field.isToOne}}
+                    {{view Ember.Select contentBinding="controller.controllers.categories.model" value=field.relation optionValuePath="content.id" optionLabelPath="content.id" prompt="Select Category" classNames="form-control"}}
+                {{/if}}
+
+                {{#if field.isToMany}}
+                    {{view Ember.Select contentBinding="controller.controllers.categories.model" value=field.relation optionValuePath="content.id" optionLabelPath="content.id" prompt="Select Category" classNames="form-control"}}
+                {{/if}}
+            </td>
+
+            <td><label class="checkbox-inline">{{view Ember.Checkbox checkedBinding="field.required"}}Required</label></td>
+            <td>
+                {{#if field.hasDirtyAttributes}}
+                    <button class="btn btn-primary" {{action "saveCategoryField" field}} style="width: 75px;">Save</button>
+                    <button class="btn btn-default" {{action "revertCategoryField" field}} style="width: 75px;">Revert</button>
+                {{else}}
+                    <button class="btn btn-danger" {{action "deleteCategoryField" field}} style="width: 155px;">Delete</button>
+                {{/if}}
+            </td>
+        </tr>
+    {{/each}}
+</table>
+
+<h1>Category Settings</h1>
+
+{{controllers.category.public}} -
+<table class="table">
+    <tr>
+        <th>Settings Name</th>
+        <th>Settings Value</th>
+    </tr>
+    <tr>
+        <td>Public</td>
+        <td>{{view Ember.Checkbox checkedBinding="controllers.category.isPublic"}}</td>
+    </tr>
+</table>
+{{#if controllers.category.hasDirtyAttributes}}
+    <button class="btn btn-primary" {{action "saveCategory" controllers.category}}>Save Category Settings</button>
+{{/if}}

@@ -1,10 +1,10 @@
 <div>
-    {{view Ember.Select contentBinding="sortedItems" valueBinding="selectedValue" optionValuePath="content" optionLabelPath="content.id" prompt="Add Item"}}
+    {{view Ember.Select contentBinding="items" valueBinding="selectedValue" optionValuePath="content" optionLabelPath="content.id" prompt="Add Item"}}
     <button class="btn btn-primary btn-xs pull-right" {{action "addItem"}}>Add</button>
 </div>
 
 <div class="list-group">
     {{#each item in addedItems}}
-        {{select-multipleItem item=item droppedItem="droppedItem" deleteItem="deleteItem"}}
+        {{select-multipleItem item=item droppedItem="droppedItem"}}
     {{/each}}
 </div>

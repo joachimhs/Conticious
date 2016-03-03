@@ -1,0 +1,104 @@
+{{#if controllers.user.isAdminLoggedIn}}
+    <div class="wrap" style="margin-top: 25px;">
+
+        <div class="text-right">
+            <button class="btn btn-primary smallMarginBottom" {{action "addDomain"}}>Add Domain</button>
+        </div>
+
+        <div class="row">
+            {{#each domain in controller.settings.domains}}
+                <div class="col-md-6">
+                    <h3 class="text-center">{{domain.id}}</h3>
+                    <table class="table table-bordered">
+                        <tr>
+                            <td colspan="2">
+                                <h5 class="text-center">Domain Settings</h5>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Domain Name: {{pop-over dataToggle='popover' title="Application Domain Name" dataContent="This is the domain name the deployed application have. The domain name will be mapped to the correct web applicatio name, defined below."}}</td>
+                            <td>{{input type="text" value=domain.domainName class="form-control" placeholder="The Conticious domain name"}}</td>
+                        </tr>
+                        <tr>
+                            <td>Webapp Name: {{pop-over dataToggle='popover' title="Web App Name" dataContent="This variable defines the name of the webapp, as well as the directory into which the web-application and its documents is expected to be found."}}</td>
+                            <td>
+                                {{input type="text" value=domain.webappName class="form-control" placeholder="The hostname of the live site"}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Active: {{pop-over dataToggle='popover' title="Is your application active=" dataContent="When this checkbox is enabled, Conticious will host your web application."}}</td>
+                            <td>{{view Ember.Checkbox checkedBinding="domain.active"}}</td>
+                        </tr>
+                        <tr>
+                            <td>Minified: {{pop-over dataToggle='popover' title="Minify the JavaScript?" dataContent="Conticious will, by default, concatenate any scripts into a single file. Enabling this checkbox will also minify the scripts using JSMin."}}</td>
+                            <td>{{view Ember.Checkbox checkedBinding="domain.minified"}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <h5 class="text-center">File Upload Settings</h5>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>UploadURL: {{pop-over dataToggle='popover' title="Post Uploads to URL" dataContent="If you want to enable file uploading for your web application, specify the URL for your plugin here. If you would like to use the default upload handler, specify /json/admin/fileUpload."}}</td>
+                            <td>{{input type="text" value=domain.uploadUrl class="form-control" placeholder="URL to call when uploading files"}}</td>
+                        </tr>
+                        <tr>
+                            <td>UploadPath: {{pop-over dataToggle='popover' title="Upload files to" dataContent="Specify which directory inside your webapp you would like to uplaod your files to. If you specify 'uploads' here, the file will be uploaded to a directory named uploads inside your webapplications directory."}}</td>
+                            <td>{{input type="text" value=domain.uploadPath class="form-control" placeholder="Path to the uploaded files on the server"}}</td>
+                        </tr>
+                        <tr>
+                            <td>Add to Category: {{pop-over dataToggle='popover' title="Create a subcategory for" dataContent="Specify a Category that you would like to have a subcategory creted for each file uploaded. Conticious will automatically create this category if it does not exist when new files are uploaded. For each file uploaded, Conticious will create a subcategory with an ID equal to the name of the uploaded file."}}</td>
+                            <td>{{input type="text" value=domain.createCategory class="form-control" placeholder="Add href to uploaded file as a subcategory to this category"}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <h5 class="text-center">Post Processor</h5>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Post Processor: {{pop-over dataToggle='popover' title="Choose a Post Processor" dataContent="If your webapplication requires additional postprocessing to be performed on the HTTP responses before being sent to the server, you can choose which Post Processor that you would like to handle the request."}}</td>
+                            <td>
+                                {{#if postProcessors}}
+                                    {{view Ember.Select contentBinding="postProcessors" valueBinding="domain.postProcessor" optionValuePath="content" optionLabelPath="content.name" prompt="Select Post Processor"}}
+                                    {{#if domain.postProcessor}}
+                                        <div style="max-width: 300px;">All HTTP Responses will be sent through this post processor before exiting the server. This is true for both data and files.</div>
+                                    {{/if}}
+                                {{else}}
+                                        No Post Processors registered
+                                {{/if}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <h5 class="text-center">Actions</h5>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-center">
+                                <button class="btn btn-primary" {{action "saveChanges" domain}}>Save Changes to All Domains</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-center">
+                                <button class="btn btn-default" {{action "generateStatic" domain}}>Generate Static SEO Version</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-center">
+                                <button class="btn btn-danger" {{action "deleteDomain" domain}}>Delete Domain</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            {{/each}}
+        </div>
+
+        <div>
+            <button class="btn btn-primary" {{action "saveChanges"}}>Save Changes</button>
+        </div>
+    </div>
+{{else}}
+    <div class="wrap" style="margin-top: 25px;">
+        {{log-in uuidAdminToken=controllers.user.uuidAdminToken}}
+    </div>
+{{/if}}

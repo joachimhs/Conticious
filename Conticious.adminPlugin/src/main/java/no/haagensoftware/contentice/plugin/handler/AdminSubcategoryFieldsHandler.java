@@ -10,8 +10,9 @@ import no.haagensoftware.contentice.data.SubCategoryData;
 import no.haagensoftware.contentice.data.SubcategoryField;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
 import no.haagensoftware.contentice.plugin.admindata.SubcategoryFieldObject;
-import no.haagensoftware.contentice.util.ListToString;
 import org.apache.log4j.Logger;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -72,7 +73,7 @@ public class AdminSubcategoryFieldsHandler extends ContenticeHandler {
                     } else if (subcategoryFieldObject.getSubcategoryField().getType().equals("boolean")) {
                         subCategoryData.getKeyMap().put(subcategoryFieldObject.getSubcategoryField().getName(), new JsonPrimitive(Boolean.parseBoolean(subcategoryFieldObject.getSubcategoryField().getValue())));
                     } else if (subcategoryFieldObject.getSubcategoryField().getType().equals("toMany")) {
-                        List<String> values = subcategoryFieldObject.getSubcategoryField().getRelations();
+                        List<String> values = subcategoryFieldObject.getSubcategoryField().getAddedRelations();
 
                         JsonArray valueArray = new JsonArray();
 
@@ -127,75 +128,98 @@ public class AdminSubcategoryFieldsHandler extends ContenticeHandler {
             }*/
         } else if (isGet(fullHttpRequest)) {
             List<String> ids = getQueryStringIds();
+            String fieldId = getParameter("subcategoryField");
 
             if (ids != null && ids.size() > 0) {
-
-                JsonArray subcategoryFieldArray= new JsonArray();
+                JsonArray subcategoryFields = new JsonArray();
 
                 for (String id : ids) {
-                    String[] idParts = id.split("_");
-                    String categoryId = null;
-                    String subcategoryId = null;
-                    String fieldId = null;
-
-                    if (idParts.length == 3) {
-                        categoryId = idParts[0];
-                        subcategoryId = idParts[1];
-                        fieldId = idParts[2];
-                    } else if (idParts.length > 3) {
-                        categoryId = idParts[0];
-
-
-                        subcategoryId = "";
-                        boolean firstRun = true;
-                        for (int index = 1; index < idParts.length-1; index++) {
-                            if (firstRun) {
-                                firstRun = false;
-                                subcategoryId += idParts[index];
-                            } else {
-                                subcategoryId += "_" + idParts[index];
-                            }
-                        }
-
-                        fieldId = idParts[idParts.length-1];
-                    }
-
-
-                    if (categoryId != null && subcategoryId != null && fieldId != null) {
-                        CategoryData categoryData = getStorage().getCategory(getDomain().getWebappName(), categoryId);
-                        SubCategoryData subCategoryData = getStorage().getSubCategory(getDomain().getWebappName(), categoryId, subcategoryId);
-                        for (CategoryField cf :  categoryData.getDefaultFields()) {
-                            if (cf.getName().equals(fieldId)) {
-                                SubcategoryField subField = new SubcategoryField();
-                                subField.setId(subCategoryData.getId() + "_" + cf.getName());
-                                subField.setRequired(cf.getRequired());
-                                subField.setType(cf.getType());
-                                subField.setName(cf.getName());
-                                subField.setRelation(cf.getRelation());
-                                if (subCategoryData.getKeyMap().get(cf.getName()) != null) {
-                                    if (cf.getType().equals("array") || cf.getType().equals("toMany")) {
-                                        subField.setValue(subCategoryData.getKeyMap().get(cf.getName()).getAsJsonArray().toString());
-                                    } else {
-                                        subField.setValue(subCategoryData.getKeyMap().get(cf.getName()).getAsString());
-                                    }
-
-                                }
-
-                                subcategoryFieldArray.add(new Gson().toJsonTree(subField));
-                            }
-                        }
-                    }
-
-                    JsonObject toplevelObject = new JsonObject();
-                    toplevelObject.add("subcategoryFields", subcategoryFieldArray);
-                    returnJson = toplevelObject.toString();
+                    subcategoryFields.add(new Gson().toJsonTree(getSubcategoryField(id)));
                 }
+
+                JsonObject toplevelObject = new JsonObject();
+                toplevelObject.add("subcategoryFields", subcategoryFields);
+                returnJson = toplevelObject.toString();
+
             } else if (ids != null && ids.size() == 1) {
 
+            } else if (fieldId != null) {
+                JsonObject toplevelObject = new JsonObject();
+                toplevelObject.add("subcategoryField", new Gson().toJsonTree(getSubcategoryField(fieldId)));
+                returnJson = toplevelObject.toString();
             }
         }
 
 
         writeContentsToBuffer(channelHandlerContext, returnJson, "application/json");
+    }
+
+    private SubcategoryField getSubcategoryField(String id) {
+        SubcategoryField subcategoryField = new SubcategoryField();
+
+        String[] idParts = id.split("_");
+        String categoryId = null;
+        String subcategoryId = null;
+        String fieldId = null;
+
+        if (idParts.length == 3) {
+            categoryId = idParts[0];
+            subcategoryId = idParts[1];
+            fieldId = idParts[2];
+        } else if (idParts.length > 3) {
+            categoryId = idParts[0];
+
+
+            subcategoryId = "";
+            boolean firstRun = true;
+            for (int index = 1; index < idParts.length-1; index++) {
+                if (firstRun) {
+                    firstRun = false;
+                    subcategoryId += idParts[index];
+                } else {
+                    subcategoryId += "_" + idParts[index];
+                }
+            }
+
+            fieldId = idParts[idParts.length-1];
+        }
+
+
+        if (categoryId != null && subcategoryId != null && fieldId != null) {
+            CategoryData categoryData = getStorage().getCategory(getDomain().getWebappName(), categoryId);
+            SubCategoryData subCategoryData = getStorage().getSubCategory(getDomain().getWebappName(), categoryId, subcategoryId);
+            for (CategoryField cf :  categoryData.getDefaultFields()) {
+                if (cf.getName().equals(fieldId)) {
+                    SubcategoryField subField = new SubcategoryField();
+                    subField.setId(subCategoryData.getId() + "_" + cf.getName());
+                    subField.setRequired(cf.getRequired());
+                    subField.setType(cf.getType());
+                    subField.setName(cf.getName());
+                    subField.setRelation(cf.getRelation());
+                    JsonElement element = subCategoryData.getKeyMap().get(cf.getName());
+                    if (element != null && element.isJsonArray() && (cf.getType().equals("array") || cf.getType().equals("toMany"))) {
+                        JsonArray jsonArray = element.getAsJsonArray();
+
+                        List<String> relationsList = new ArrayList<>();
+                        for (int index = 0; index < jsonArray.size(); index++) {
+                            relationsList.add(jsonArray.get(index).getAsString());
+                        }
+                        subField.setAddedRelations(relationsList);
+                    }
+                    if (subCategoryData.getKeyMap().get(cf.getName()) != null) {
+                        if (cf.getType().equals("array") || cf.getType().equals("toMany")) {
+                            subField.setValue(subCategoryData.getKeyMap().get(cf.getName()).getAsJsonArray().toString());
+                        } else {
+                            subField.setValue(subCategoryData.getKeyMap().get(cf.getName()).getAsString());
+                        }
+
+                    }
+
+                    subcategoryField = subField;
+                }
+            }
+        }
+
+        return subcategoryField;
     }
 }

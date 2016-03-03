@@ -20,6 +20,7 @@ import java.util.Map;
 public class CategoryData {
     @Expose private String id;
     @Expose private List<SubCategoryData> subcategories = new ArrayList<>();
+    @Expose private Integer numberOfSubcategories = 0;
     @Expose private List<CategoryField> defaultFields = new ArrayList<>();
     @Expose private boolean isPublic = false;
 
@@ -37,6 +38,14 @@ public class CategoryData {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Integer getNumberOfSubcategories() {
+        return numberOfSubcategories;
+    }
+
+    public void setNumberOfSubcategories(Integer numberOfSubcategories) {
+        this.numberOfSubcategories = numberOfSubcategories;
     }
 
     public List<SubCategoryData> getSubcategories() {

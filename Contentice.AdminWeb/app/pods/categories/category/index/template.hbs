@@ -1,0 +1,102 @@
+{{#if showNewField}}
+    {{#if showNewFieldArea}}
+            <table class="table">
+                <tr>
+                    <th colspan="5" class="tableHeader">Add new Field</th>
+                </tr>
+                <tr>
+                    <td>{{input type="text" value=newFieldName classNames="form-control" placeholder="Field Name"}}</td>
+                    <td>{{my-select content=fieldTypes selectedValue=newFieldType prompt="Select a field type"}}</td>
+                    <td>
+                        {{#if newFieldIsAssociation}}
+                            {{my-select content=categoriesController.model selectedValue=field.relation optionValuePath="content.id" optionLabelPath="content.id" prompt="Select Category"}}
+                        {{/if}}
+                    </td>
+                    <td><label class="checkbox-inline">{{input type="checkbox" checkedBinding="newFieldRequired"}}Required</label></td>
+                    <td style="text-align: right;">
+                        <button class="btn btn-primary" style="margin-right: 10px;" {{action "addNewField"}}>Add Field</button>
+                        <button class="btn btn-default" {{action "cancelNewField"}}>Cancel</button>
+                    </td>
+                </tr>
+            </table>
+    {{/if}}
+    {{#if showNewSubcategoryArea}}
+            <table class="table">
+                <tr>
+                    <th colspan="2" class="tableHeader">Add new Subcategory</th>
+                </tr>
+                <tr>
+                    <td>{{input type="text" valueBinding="newSubcategoryName" classNames="form-control" placeholder="Subcategory Name"}}</td>
+                    <td style="text-align: right;">
+                        <button class="btn btn-primary" style="margin-right: 10px;" {{action "addNewSubcategory"}}>Add Subcategory</button>
+                        <button class="btn btn-default" {{action "cancelNewSubcategory"}}>Cancel</button>
+                    </td>
+                </tr>
+            </table>
+    {{/if}}
+{{else}}
+        <div class="actionButtons">
+            <button class="btn btn-default" style="margin-right: 10px;" {{action "openNewField"}}>Add New Field</button>
+            <button class="btn btn-default" {{action "openNewSubcategory"}}>Add New Subcategory</button>
+        </div>
+{{/if}}
+
+    <div style="padding-top: 15px;">
+
+    </div>
+
+    <table class="table">
+        <tr>
+            <th style="min-width: 200px">Field Name</th>
+            <th style="min-width: 200px">Field Type</th>
+            <th>Relationship</th>
+            <th>Required</th>
+            <th>Field Action</th>
+        </tr>
+        {{#each categoryController.model.category.sortedFields as |field|}}
+            <tr>
+                <td>{{input type="text" value=field.name classNames="form-control" size="50"}}</td>
+                <td>
+                    {{my-select content=fieldTypes selectedValue=field.type prompt="Select a field type"}}
+                </td>
+
+
+                <td>
+                    {{#if field.isToOne}}
+                        {{my-select content=categoriesController.model selectedValue=field.relation optionValuePath="content.id" optionLabelPath="content.id" prompt="Select Category"}}
+                    {{/if}}
+
+                    {{#if field.isToMany}}
+                        {{my-select content=categoriesController.model selectedValue=field.relation optionValuePath="content.id" optionLabelPath="content.id" prompt="Select Category"}}
+                    {{/if}}
+                </td>
+
+                <td><label class="checkbox-inline">{{input type="checkbox" checkedBinding="field.required"}}Required</label></td>
+                <td>
+                    {{#if field.hasDirtyAttributes}}
+                        <button class="btn btn-primary" {{action "saveCategoryField" field}} style="width: 75px;">Save</button>
+                        <button class="btn btn-default" {{action "revertCategoryField" field}} style="width: 75px;">Revert</button>
+                    {{else}}
+                        <button class="btn btn-danger" {{action "deleteCategoryField" field}} style="width: 155px;">Delete</button>
+                    {{/if}}
+                </td>
+            </tr>
+        {{/each}}
+    </table>
+
+    <h1>Category Settings</h1>
+
+{{categoriesController/category.public}} -
+    <table class="table">
+        <tr>
+            <th>Settings Name</th>
+            <th>Settings Value</th>
+        </tr>
+        <tr>
+            <td>Public</td>
+            <td>{{input type="checkbox" checkedBinding="categoriesController/category.isPublic"}}</td>
+        </tr>
+    </table>
+{{#if categoriesController/category.hasDirtyAttributes}}
+        <button class="btn btn-primary" {{action "saveCategory" categoriesController/category}}>Save Category Settings</button>
+{{/if}}

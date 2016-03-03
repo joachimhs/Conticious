@@ -42,7 +42,7 @@ public class ContenticePipelineInitializer extends ChannelInitializer<SocketChan
         logger.info("initChannelHandler");
         ChannelPipeline pipeline = ch.pipeline();
 
-        pipeline.addLast("codec", new HttpServerCodec());
+        pipeline.addLast("codec", new HttpServerCodec(4096, 32768, 32768));
 
         pipeline.addLast("aggregator", new HttpObjectAggregator(600 * 1024 * 1024));
         pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());

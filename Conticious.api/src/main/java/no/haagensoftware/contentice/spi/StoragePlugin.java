@@ -29,6 +29,8 @@ public abstract class StoragePlugin implements ConticiousPlugin {
 
     public abstract void setCategory(String host, String category, CategoryData categoryData);
 
+    public abstract Integer getNumberOfSubcategories(String host, String category);
+
     public abstract List<SubCategoryData> getSubCategories(String host, String category);
 
     public abstract SubCategoryData getSubCategory(String host, String category, String subCategory);

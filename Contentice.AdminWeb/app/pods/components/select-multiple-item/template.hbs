@@ -1,0 +1,6 @@
+{{#if item.id}}
+    {{item.id}}
+{{else}}
+    {{item}}
+{{/if}}
+<button class="btn btn-danger btn-xs pull-right" {{action "deleteItem" item}}>Delete</button>

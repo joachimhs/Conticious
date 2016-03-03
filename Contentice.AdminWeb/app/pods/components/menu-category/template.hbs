@@ -1,0 +1,92 @@
+<div class="list-group">
+
+    <div class="list-group-item categoryItem {{if isSelected 'active'}}" {{action "selectCategory" category}}>
+      {{#if isSelected}}
+          &#x25BC;
+      {{else}}
+          &#x25B6;
+      {{/if}}
+
+      {{category.id}}
+
+        <span class="pull-right">
+            <span class="badge menuBadge">
+              {{#if isSelected}}
+                {{#if category.isLoaded}}
+                  {{sortedSubcategories.length}} /
+                {{else}}
+                    0
+                {{/if}}
+              {{/if}}
+
+                {{category.numberOfSubcategories}}
+            </span>
+        </span>
+    </div>
+
+  {{#if isSelected}}
+      <div class="list-group-item text-right menuFilterItem">
+          <span class="glyphicon glyphicon-filter pointer" {{action "toggleSortAndFilter"}}></span>&nbsp;
+          <span class="glyphicon glyphicon-plus pointer" {{action "openNewSubcategory"}}></span>&nbsp;
+      </div>
+
+    {{#if showNewSubcategoryArea}}
+        <div id="showNewSubcategoryArea" class="list-group-item text-left menuFilterItem">
+            <h4 class="text-center">Add new Subcategory</h4>
+          {{input type="text" valueBinding="newSubcategoryName" classNames="form-control" placeholder="Subcategory Name"}}
+            <div style="margin-top: 5px;">
+                <button class="btn btn-primary" style="margin-right: 10px;" {{action "addNewSubcategory"}}>Add Subcategory</button>
+                <button class="btn btn-default" {{action "cancelNewSubcategory"}}>Cancel</button>
+            </div>
+        </div>
+    {{/if}}
+
+    {{#if sortAndFilterShowing}}
+        <div id="sortAndFilterArea" class="list-group-item menuFilterItem">
+            <h4 class="text-center">Sort and Filter</h4>
+
+            <div class="row">
+                <div class="col-sm-1">
+                    <i class="fa fa-sort-alpha-asc"></i>
+                </div>
+                <div class="col-sm-11">
+                    {{my-select
+                          content=pulldownFields
+                          selectedValue=selectedSortColumn
+                          optionValuePath="content.name"
+                          optionLabelPath="content.name"
+                          prompt="Sort by ID"
+                          class="smallBottomMargin"
+                      }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-1">
+                    <i class="fa fa-filter"></i>
+                </div>
+                <div class="col-sm-11">
+                    {{my-select
+                        content=pulldownFields
+                        selectedValue=selectedFilterColumn
+                        optionValuePath="content.name"
+                        optionLabelPath="content.name"
+                        prompt="Filter by ID"
+                        class="smallBottomMargin"
+                    }}
+                </div>
+            </div>
+
+          {{input type="text" value=selectedFilterString placeholder="Filter by text" class="form-control smallBottomMargin"}}
+        </div>
+    {{/if}}
+  {{/if}}
+</div>
+
+{{#if isSelected}}
+    <div class="list-group categoryList">
+      {{#each sortedSubcategories as |subcategory|}}
+        {{menu-subcategory category=category subcategory=subcategory selectedSubcategory=selectedSubcategory selectSubcategory="selectSubcategory"}}
+      {{/each}}
+    </div>
+{{/if}}

@@ -8,8 +8,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
-import no.haagensoftware.contentice.assembler.CategoryAssembler;
-import no.haagensoftware.contentice.assembler.SubCategoryAssembler;
 import no.haagensoftware.contentice.data.CategoryData;
 import no.haagensoftware.contentice.data.CategoryField;
 import no.haagensoftware.contentice.data.SubCategoryData;
@@ -24,6 +22,7 @@ import no.haagensoftware.hyrrokkin.serializer.RestSerializer;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -35,6 +34,7 @@ import java.util.List;
  */
 public class AdminCategoriesHandler extends ContenticeHandler {
     private Logger logger = Logger.getLogger(AdminCategoriesHandler.class.getName());
+    private static List<String> sideloadKeys = Arrays.asList("categoryField");
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
@@ -74,15 +74,13 @@ public class AdminCategoriesHandler extends ContenticeHandler {
         }
 
         for (CategoryData category : categories) {
-            for (SubCategoryData subcategoryData : getStorage().getSubCategories(getDomain().getWebappName(), category.getId())) {
-                category.addSubcategory(subcategoryData);
-            }
+            category.setNumberOfSubcategories(getStorage().getNumberOfSubcategories(getDomain().getWebappName(), category.getId()));
         }
 
         RestSerializer serializer = new RestSerializer();
         serializer.addPluralization("category", "categories");
         serializer.addPluralization("subcategory", "subcategories");
-        String topLevelObject =  serializer.serialize(categories, null).toString();//buildResponse(categories);
+        String topLevelObject =  serializer.serialize(categories, sideloadKeys).toString();//buildResponse(categories);
 
         writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json");
     }
@@ -115,7 +113,7 @@ public class AdminCategoriesHandler extends ContenticeHandler {
                             for (int index = 0; index < jsonArray.size(); index++) {
                                 relationsList.add(jsonArray.get(index).getAsString());
                             }
-                            subField.setRelations(relationsList);
+                            subField.setAddedRelations(relationsList);
                         }
                     }
                     if (subcategoryData.getKeyMap().get(cf.getName()) != null) {

@@ -6,7 +6,7 @@
         </div>
 
         <div class="row">
-            {{#each domain in controller.settings.domains}}
+            {{#each domain in controller.model.domains}}
                 <div class="col-md-6">
                     <h3 class="text-center">{{domain.id}}</h3>
                     <table class="table table-bordered">
@@ -49,24 +49,6 @@
                         <tr>
                             <td>Add to Category: {{pop-over dataToggle='popover' title="Create a subcategory for" dataContent="Specify a Category that you would like to have a subcategory creted for each file uploaded. Conticious will automatically create this category if it does not exist when new files are uploaded. For each file uploaded, Conticious will create a subcategory with an ID equal to the name of the uploaded file."}}</td>
                             <td>{{input type="text" value=domain.createCategory class="form-control" placeholder="Add href to uploaded file as a subcategory to this category"}}</td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
-                                <h5 class="text-center">Post Processor</h5>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Post Processor: {{pop-over dataToggle='popover' title="Choose a Post Processor" dataContent="If your webapplication requires additional postprocessing to be performed on the HTTP responses before being sent to the server, you can choose which Post Processor that you would like to handle the request."}}</td>
-                            <td>
-                                {{#if postProcessors}}
-                                    {{view Ember.Select contentBinding="postProcessors" valueBinding="domain.postProcessor" optionValuePath="content" optionLabelPath="content.name" prompt="Select Post Processor"}}
-                                    {{#if domain.postProcessor}}
-                                        <div style="max-width: 300px;">All HTTP Responses will be sent through this post processor before exiting the server. This is true for both data and files.</div>
-                                    {{/if}}
-                                {{else}}
-                                        No Post Processors registered
-                                {{/if}}
-                            </td>
                         </tr>
                         <tr>
                             <td colspan="2">

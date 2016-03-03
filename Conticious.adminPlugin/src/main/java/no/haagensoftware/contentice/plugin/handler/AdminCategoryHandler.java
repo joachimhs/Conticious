@@ -99,10 +99,11 @@ public class AdminCategoryHandler extends ContenticeHandler  {
                 write404ToBuffer(channelHandlerContext);
             } else {
                 //JsonObject topLevelObject = convertCategoryToJson(getDomain().getWebappName(), categoryData);
-                for (SubCategoryData subcategoryData : getStorage().getSubCategories(getDomain().getWebappName(), categoryData.getId())) {
+                /*for (SubCategoryData subcategoryData : getStorage().getSubCategories(getDomain().getWebappName(), categoryData.getId())) {
                     categoryData.addSubcategory(subcategoryData);
-                }
+                }*/
 
+                categoryData.setNumberOfSubcategories(getStorage().getNumberOfSubcategories(getDomain().getWebappName(), categoryData.getId()));
 
                 RestSerializer serializer = new RestSerializer();
                 serializer.addPluralization("category", "categories");
@@ -130,7 +131,7 @@ public class AdminCategoryHandler extends ContenticeHandler  {
                 subField.setType(cf.getType());
                 subField.setName(cf.getName());
                 subField.setRelation(cf.getRelation());
-                if (subcategoryData.getKeyMap().get(cf.getName()) != null) {
+                if (subcategoryData.getKeyMap().get(cf.getName()) != null && subcategoryData.getKeyMap().get(cf.getName()).isJsonPrimitive()) {
                     subField.setValue(subcategoryData.getKeyMap().get(cf.getName()).getAsString());
                 }
 

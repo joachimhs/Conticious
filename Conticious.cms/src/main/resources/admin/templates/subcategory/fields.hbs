@@ -1,83 +1,49 @@
 <table class="table subcategoryFields">
-    <thead>
     <tr>
         <th>Name</th>
         <th>Value</th>
         <th>Actions</th>
     </tr>
-    </thead>
-    <tbody>
-    {{#each field in fields}}
-        <tr>
-            <td>{{field.name}}</td>
-            <td>
-                {{#if field.isTextfield}}
-                    {{view Ember.TextField valueBinding="field.value"}}
-                {{/if}}
 
-                {{#if field.isTextarea}}
-                    {{view Ember.TextArea valueBinding="field.value"}} <br />
-                {{/if}}
+{{#each field in fields}}
+    <tr>
+        <td>{{field.name}}</td>
+        <td>
+            {{#if field.isTextfield}}
+                {{view Ember.TextField valueBinding="field.value"}}
+            {{/if}}
 
-                {{#if field.isBoolean}}
-                    {{view Ember.Checkbox checkedBinding="field.value"}} <br />
-                {{/if}}
+            {{#if field.isTextarea}}
+                {{view Ember.TextArea valueBinding="field.value"}} <br />
+            {{/if}}
 
-                {{#if field.isArray}}
-                    {{view Ember.TextField valueBinding="field.value"}} <br />
-                {{/if}}
+            {{#if field.isBoolean}}
+                {{view Ember.Checkbox checkedBinding="field.value"}} <br />
+            {{/if}}
 
-                {{#if field.isToOne}}
-                    {{view Ember.Select contentBinding="field.relation.sortedSubcategories" valueBinding="field.value" optionValuePath="content.id" optionLabelPath="content.id" prompt="Select Subcategory" classNames="form-control"}}
-                {{/if}}
+            {{#if field.isArray}}
+                {{view Ember.TextField valueBinding="field.value"}} <br />
+            {{/if}}
 
-                {{#if field.isToMany}}
-                    {{select-multiple items=field.relation.subcategories addedItems=field.relations model=field}}
-                {{/if}}
-            </td>
-            <td>
-                {{#if field.isDirty}}
-                    <button class="btn btn-primary" style="width: 75px;" {{action "saveSubcategoryField" field}}>Save</button>
-                    <button class="btn btn-default" style="width: 75px;" {{action "revertSubcategoryField" field}}>Revert</button>
-                {{/if}}
+            {{#if field.isToOne}}
+                {{view Ember.Select contentBinding="field.relation.subcategories" valueBinding="field.value" optionValuePath="content.id" optionLabelPath="content.id" prompt="Select Subcategory" classNames="form-control"}}
+            {{/if}}
 
-                {{#if field.relations.isDirty}}
-                    <button class="btn btn-primary" style="width: 75px;" {{action "saveSubcategoryField" field}}>Save</button>
-                    <button class="btn btn-default" style="width: 75px;" {{action "revertSubcategoryField" field}}>Revert</button>
-                {{/if}}
-            </td>
-        </tr>
-    {{/each}}
-    </tbody>
+            {{#if field.isToMany}}
+                {{select-multiple items=field.relation.subcategories addedItems=field.addedRelations model=field}}
+            {{/if}}
+        </td>
+        <td>
+            {{#if field.isDirty}}
+                <button class="btn btn-primary" style="width: 75px;" {{action "saveSubcategoryField" field}}>Save</button>
+                <button class="btn btn-default" style="width: 75px;" {{action "revertSubcategoryField" field}}>Revert</button>
+            {{/if}}
+
+            {{#if field.addedRelations.isDirty}}
+                <button class="btn btn-primary" style="width: 75px;" {{action "saveSubcategoryField" field}}>Save</button>
+                <button class="btn btn-default" style="width: 75px;" {{action "revertSubcategoryField" field}}>Revert</button>
+            {{/if}}
+        </td>
+    </tr>
+{{/each}}
 </table>
-
-{{#if relatedCategoryFields}}
-    <h1>Add this subcategory to a relationship</h1>
-
-    <table class="table subcategoryFields">
-        <thead>
-        <tr>
-            <th>Related to Category</th>
-            <th>Through Field</th>
-            <th>Add to Subcategory</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        {{#each relation in relatedCategoryFields}}
-            <tr>
-                <td>{{relation.relatedToCategory}}</td>
-                <td>{{relation.throughField}}</td>
-                <td>
-                    {{view Ember.Select classNames="input-medium form-control" valueBinding="relation.selectedRelationId" contentBinding="relation.relatedSubcategories" optionLabelPath="content.name" optionValuePath="content.id"}}
-                </td>
-                <td>
-                    {{#if relation.selectedRelationId}}
-                        <button class="btn btn-primary" {{action "addSubcategoryToRelation" relation.selectedRelationId relation.throughField}}>Add to field</button>
-                    {{/if}}
-                </td>
-            </tr>
-        {{/each}}
-        </tbody>
-    </table>
-{{/if}}
