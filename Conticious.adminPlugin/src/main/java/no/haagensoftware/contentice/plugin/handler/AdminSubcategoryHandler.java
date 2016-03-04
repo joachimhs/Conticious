@@ -101,7 +101,7 @@ public class AdminSubcategoryHandler extends ContenticeHandler {
         CategoryData categoryData = getStorage().getCategory(getDomain().getWebappName(), category);
 
         if (haveDeleted) {
-            writeOKToBuffer(channelHandlerContext);
+            writeNoContentToBuffer(channelHandlerContext);
         }  else if (subCategoryData == null) {
             write404ToBuffer(channelHandlerContext);
         } else {

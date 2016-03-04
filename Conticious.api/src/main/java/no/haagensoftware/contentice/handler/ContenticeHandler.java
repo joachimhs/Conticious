@@ -22,6 +22,7 @@ import static io.netty.handler.codec.http.HttpHeaders.Names.CONNECTION;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
 import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
@@ -200,6 +201,15 @@ public abstract class ContenticeHandler extends CommonConticiousInboundHandler {
 
     public void writeOKToBuffer(ChannelHandlerContext ctx) {
         HttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, OK, Unpooled.copiedBuffer("", CharsetUtil.UTF_8));
+        ctx.write(response);
+        ctx.flush();
+
+        ChannelFuture lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
+        lastContentFuture.addListener(ChannelFutureListener.CLOSE);
+    }
+
+    public void writeNoContentToBuffer(ChannelHandlerContext ctx) {
+        HttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, NO_CONTENT, Unpooled.copiedBuffer("", CharsetUtil.UTF_8));
         ctx.write(response);
         ctx.flush();
 

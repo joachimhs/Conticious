@@ -86,18 +86,6 @@ export default Ember.Controller.extend({
       this.set('model', this.store.findAll('category'));
     },
 
-    doEditSubcategory: function() {
-      console.log('editing subcategory: ' + this.get('subcategoryController.model.id'));
-      if (this.get('subcategoryController.model')) {
-        this.set('subcategoryController.model.isEditing', true);
-
-        Ember.run.schedule("afterRender", function() {
-          $("#editSubcategoryArea").hide();
-          $("#editSubcategoryArea").slideDown();
-        });
-      }
-    },
-
     finishEditSubcategory: function() {
       console.log('finishing subcategory editing... ' + this.get('newId'));
       if (this.get('subcategoryController.model')) {
@@ -126,11 +114,10 @@ export default Ember.Controller.extend({
       controller.reloadCategories();
     },
 
-    renameSubcategory: function(subcategory) {
+    renameSubcategory: function(category, subcategory, newId) {
       var self = this;
-      console.log(this.get('newId'));
 
-      var newId = this.get('categoryController.model.id') + "_" + this.get('newId');
+      var newId = category.get('id') + "_" + newId;
       var oldId = subcategory.get('id');
 
       console.log("Renaming " + oldId + " to " + newId);
@@ -142,12 +129,21 @@ export default Ember.Controller.extend({
         url: url,
         data: "",
         success: function() {
-          self.transitionToRoute("categories");
-          self.reloadCategories();
+          subcategory.set('isEditing', false);
+          self.transitionToRoute("categories.category", category.get('id'));
+          self.reloadSubcategories();
         },
         dataType: "json"
       });
+    },
 
+    deleteSubcategory: function(category, subcategory) {
+      subcategory.destroyRecord().then(function() {
+        console.log('reloading subcategories');
+        this.reloadSubcategories();
+      });
+
+      this.transitionToRoute("categories.category", category.get('id'));
     },
 
     createSubcateogry(category, newSubcategoryName) {
@@ -167,23 +163,19 @@ export default Ember.Controller.extend({
           self.get('categoryController').set('model.subcategories', self.store.query('subcategory', {category: self.get('categoryController.model.category.id')}));
         });
       });
-    },
+    }
+  },
 
-    reloadCategories: function() {
-      console.log('reloadCategories');
-      console.log(this.get('model'));
+  reloadCategories: function() {
+    console.log('reloadCategories');
 
-      this.store.findAll('category');
+    this.store.findAll('category', { reload: true });
+  },
 
-      this.get('model').forEach(function(category) {
-        console.log('category: ' + category.get('id'));
-        if (category.get('id') === 'uploads') {
-          category.reload();
-        }
-      });
-
-      //this.store.find('category', 'uploads').reload();
-    },
+  reloadSubcategories: function() {
+    console.log('reloadSubcategories');
+    this.get('categoryController').reloadSubcategories();
+    //this.store.query('subcategory', {category: categoryId})
   },
 
   subcategories: function() {

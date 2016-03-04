@@ -9,9 +9,9 @@ export default DS.Model.extend({
     addedRelations: DS.attr('raw'),//('subcategory'),
 
     addedRelationsObserver: function() {
-        console.log('-----');
-        console.log(this.get('addedRelations.length'));
-        console.log('-----');
+        //console.log('-----');
+        //console.log(this.get('addedRelations.length'));
+        //console.log('-----');
     }.observes('addedRelations.length').on('init'),
 
     isTextfield: function() {

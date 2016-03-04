@@ -13,7 +13,7 @@
       {{#if subcategory.deleteFirstStep}}
           <table class="table">
               <tr>
-                  <td><button class="btn btn-danger form-control" {{action "deleteSubcategoryConfirm" subcategory}}>Confirm Delete Subcategory</button></td>
+                  <td><button class="btn btn-danger form-control" {{action "deleteSubcategoryConfirm" category subcategory}}>Confirm Delete Subcategory</button></td>
                   <td><button class="btn btn-default" {{action "finishEditSubcategory"}}>Cancel</button></td>
               </tr>
           </table>
@@ -21,11 +21,11 @@
           <table class="table">
               <tr>
                   <td colspan="3">
-                    {{input type="text"valueBinding="newId" classNames="form-control" placeholder="New Subcategory ID"}}
+                    {{input type="text" valueBinding="newId" classNames="form-control" placeholder="New Subcategory ID"}}
                   </td>
               </tr>
               <tr>
-                  <td><button class="btn btn-primary" {{action "renameSubcategory" subcategory}}>Save</button></td>
+                  <td><button class="btn btn-primary" {{action "renameSubcategory" category subcategory}}>Rename</button></td>
                   <td><button class="btn btn-default" {{action "finishEditSubcategory"}}>Cancel</button></td>
                   <td><button class="btn btn-danger" {{action "deleteSubcategoryFirstStep" subcategory}}>Delete Subcategory</button></td>
               </tr>

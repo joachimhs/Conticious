@@ -86,7 +86,14 @@
 {{#if isSelected}}
     <div class="list-group categoryList">
       {{#each sortedSubcategories as |subcategory|}}
-        {{menu-subcategory category=category subcategory=subcategory selectedSubcategory=selectedSubcategory selectSubcategory="selectSubcategory"}}
+        {{menu-subcategory
+            category=category
+            subcategory=subcategory
+            selectedSubcategory=selectedSubcategory
+            selectSubcategory="selectSubcategory"
+            renameSubcategory="renameSubcategory"
+            deleteSubcategory="deleteSubcategory"
+        }}
       {{/each}}
     </div>
 {{/if}}

@@ -13,6 +13,14 @@ export default Ember.Component.extend({
   sortedSubcategories: Ember.computed.sort('filteredSubcategories', 'sortColumn'),
 
   actions: {
+    renameSubcategory: function(category, subcategory, newId) {
+      this.sendAction("renameSubcategory", category, subcategory, newId);
+    },
+
+    deleteSubcategory: function(category, subcategory) {
+      this.sendAction('deleteSubcategory', category, subcategory);
+    },
+
     selectSubcategory: function(category, subcategory) {
       console.log('menu-category selectSubcategory: ' + category + " :: " + subcategory);
 

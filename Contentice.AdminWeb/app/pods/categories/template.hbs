@@ -49,7 +49,17 @@
                 </div>
 
               {{#each sortedCategories as |category|}}
-                {{menu-category category=category subcategories=subcategories selectedCategory=categoryController.model.category selectedSubcategory=subcategoryController.model selectCategory="selectCategory" selectSubcategory="selectSubcategory" createSubcateogry="createSubcateogry"}}
+                {{menu-category
+                    category=category
+                    subcategories=subcategories
+                    selectedCategory=categoryController.model.category
+                    selectedSubcategory=subcategoryController.model
+                    selectCategory="selectCategory"
+                    selectSubcategory="selectSubcategory"
+                    createSubcateogry="createSubcateogry"
+                    renameSubcategory="renameSubcategory"
+                    deleteSubcategory="deleteSubcategory"
+                }}
               {{/each}}
 
 
