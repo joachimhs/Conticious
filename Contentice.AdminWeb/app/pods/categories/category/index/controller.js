@@ -28,10 +28,11 @@ export default Ember.Controller.extend({
                     required: newFieldRequired
                 });
 
-                category.get('defaultFields').pushObject(newField);
+                //category.get('defaultFields').pushObject(newField);
 
                 newField.save().then(function(data) {
                     console.log('new field saved. saving category');
+                    category.get('defaultFields').pushObject(newField);
                     category.save();
                 });
             }

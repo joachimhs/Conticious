@@ -40,7 +40,7 @@ public abstract class PostProcessorPlugin implements ConticiousPlugin {
         dependantPluginsList.add(plugin);
     }
 
-    public String postProcess(String input, String url, String queryString, String contentType) {
+    public String postProcess(String input, String originalUrl, String filePath, String queryString, String contentType) {
         return input;
     }
 

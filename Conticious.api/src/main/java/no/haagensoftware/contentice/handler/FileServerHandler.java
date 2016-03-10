@@ -6,6 +6,7 @@ import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
 import no.haagensoftware.contentice.data.Domain;
 import no.haagensoftware.contentice.util.ContentTypeUtil;
+import no.haagensoftware.contentice.util.IntegerParser;
 import no.haagensoftware.conticious.scriptcache.ScriptCache;
 import no.haagensoftware.conticious.scriptcache.ScriptFile;
 import no.haagensoftware.conticious.scriptcache.ScriptHash;
@@ -48,6 +49,10 @@ public class FileServerHandler extends ContenticeHandler {
     public FileServerHandler() {
         if (System.getProperty("no.haagensoftware.contentice.webappDir") != null && System.getProperty("no.haagensoftware.contentice.webappDir").length() > 3) {
             rootPath = System.getProperty("no.haagensoftware.contentice.webappDir");
+        }
+
+        if (System.getProperty("no.kodegenet.cacheSeconds") != null) {
+            maxCacheSeconds = IntegerParser.parseIntegerFromString(System.getProperty("no.kodegenet.cacheSeconds"), 0);
         }
     }
 
@@ -164,10 +169,12 @@ public class FileServerHandler extends ContenticeHandler {
 
             Domain domain = getDomain();
 
-            if (domain == null && originalPath.startsWith("/admin")) {
+            if (originalPath.startsWith("/admin")) {
                 webappName = "admin";
+                isAdmin = true;
             } else if (domain != null) {
                 webappName = domain.getWebappName();
+                isAdmin = false;
             }
 
             if (webappName == null) {
@@ -201,51 +208,43 @@ public class FileServerHandler extends ContenticeHandler {
                 logger.info("original path: " + originalPath);
                 logger.info("static path: " + staticPath);
 
-                if (getPostProcessorPlugin() != null && ContentTypeUtil.getContentType(path).contains("text/html"))  {
-                    String postProcessedContent = getPostProcessorPlugin().postProcess(getFileContent(path), path, getQueryString(getUri(fullHttpRequest)), ContentTypeUtil.getContentType(path));
-                    writeContentsToBuffer(channelHandlerContext, postProcessedContent, ContentTypeUtil.getContentType(path));
-                } else {
-                    writeFileToBuffer(channelHandlerContext, path, ContentTypeUtil.getContentType(path));
-                }
-
-/*                if (path.endsWith(".html")) {
+                if (path.endsWith(".html")) {
                     ScriptCache cache = ScriptHash.getScriptCache(path);
                     if (cache == null || cache.isExpired()) {
                         //If file is not cached, or cache is expired, update the cache.
                         logger.info("Updating index.html from filesystem path: " + path);
-                        cache = updateScriptCacheForPath(getDomain().getWebappName(), path);
-                    }
+                        cache = updateScriptCacheForPath(getDomain().getWebappName(), path, isAdmin);
 
-                    String htmlContents = cache.getHtmlContents();
+                        //if static file exists, add noscript tag
+                        if (staticFile.exists() && staticFile.isFile()) {
+                            logger.info("Adding noscript tag");
+                            Document htmlDocument = Jsoup.parse(cache.getHtmlContents(), "UTF-8");
+                            Document staticDocument = parseHtmlPage(staticFile.getAbsolutePath());
 
-                    //Add static contents inside a NOSCRIPT tag
-                    if (path.endsWith(".html") && staticFile.exists() && staticFile.isFile()) {
-                        logger.info("Adding noscript tag");
+                            Element noscript = htmlDocument.body().appendElement("noscript");
 
-                        Document htmlDocument = Jsoup.parse(htmlContents, "UTF-8");
-                        Document staticDocument = parseHtmlPage(staticFile.getAbsolutePath());
+                            for (Element element : staticDocument.getElementsByTag("body").get(0).children()) {
+                                noscript.appendChild(element);
+                            }
 
-                        logger.info(htmlDocument.toString());
-                        logger.info("\n\n---\n\n");
-
-                        Element noscript = htmlDocument.body().appendElement("noscript");
-
-                        for (Element element : staticDocument.getElementsByTag("body").get(0).children()) {
-                            noscript.appendChild(element);
+                            cache.setHtmlContents(htmlDocument.toString());
                         }
 
-                        htmlContents = htmlDocument.toString();
+                        //If post processor plugin exists, post process it
+                        if (getPostProcessorPlugin() != null && ContentTypeUtil.getContentType(path).contains("text/html"))  {
+                            String postProcessedContent = getPostProcessorPlugin().postProcess(cache.getHtmlContents(), originalPath, path, getQueryString(getUri(fullHttpRequest)), ContentTypeUtil.getContentType(path));
+                            cache.setHtmlContents(postProcessedContent);
+                        }
                     }
-
-                    writeContentsToBuffer(channelHandlerContext, htmlContents, ContentTypeUtil.getContentType(path));
+                    writeContentsToBuffer(channelHandlerContext, cache.getHtmlContents(), ContentTypeUtil.getContentType(path));
                 } else {
                     writeFileToBuffer(channelHandlerContext, path, ContentTypeUtil.getContentType(path));
-                }*/
+                }
             }
         }
     }
 
-    private ScriptCache updateScriptCacheForPath(String host, String path) throws IOException {
+    private ScriptCache updateScriptCacheForPath(String host, String path, boolean isAdmin) throws IOException {
         Long before = System.currentTimeMillis();
         List<ScriptFile> scriptPathList = new ArrayList<ScriptFile>();
 
@@ -268,6 +267,8 @@ public class FileServerHandler extends ContenticeHandler {
 
                     if (minifiedScriptFile != null && minifiedScriptFile.isFile()) {
                         fileContent = getFileContent(minifiedScriptFile.getAbsolutePath());
+                    } else if (isAdmin){
+                        fileContent = getFileContent(rootPath + File.separatorChar + scriptSrc);
                     } else {
                         fileContent = getFileContent(rootPath + File.separatorChar +  host + File.separatorChar + scriptSrc);
                     }
