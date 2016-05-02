@@ -142,6 +142,31 @@ public class ConticiousStormpath {
         return authenticatedAccount;
     }
 
+    public StormpathAccount authenticateUser(String username, String password, String groupId) {
+        StormpathAccount authenticatedAccount = null;
+
+        if (base64String != null && application != null && application.getLoginAttempts() != null && application.getLoginAttempts().getHref() != null) {
+            JsonObject spRequest = new JsonObject();
+            spRequest.addProperty("type", "basic");
+            spRequest.addProperty("value", base64EncodeString(username + ":" + password));
+
+            JsonObject accountStore = new JsonObject();
+            accountStore.addProperty("href", "https://api.stormpath.com/v1/groups/" + groupId);
+
+            spRequest.add("accountStore", accountStore);
+
+            String jsonReturn = postJsonContent(application.getLoginAttempts().getHref(), spRequest.toString());
+            StormpathAccountObject spAccount = new Gson().fromJson(jsonReturn, StormpathAccountObject.class);
+
+            if (spAccount != null && spAccount.getAccount() != null && spAccount.getAccount().getHref() != null) {
+                String realAccountJson = fetchJsonContent(spAccount.getAccount().getHref());
+                authenticatedAccount = new Gson().fromJson(realAccountJson, StormpathAccount.class);
+            }
+        }
+
+        return authenticatedAccount;
+    }
+
     public StormpathAccount authenticateFacebookUser(ProviderDataObject providerDataObject) {
         StormpathAccount authenticatedAccount = null;
 

@@ -2,9 +2,9 @@
 
     <div class="list-group-item categoryItem {{if isSelected 'active'}}" {{action "selectCategory" category}}>
       {{#if isSelected}}
-          &#x25BC;
+          <i class="fa fa-caret-down"></i>
       {{else}}
-          &#x25B6;
+          <i class="fa fa-caret-right"></i>
       {{/if}}
 
       {{category.id}}
@@ -26,8 +26,8 @@
 
   {{#if isSelected}}
       <div class="list-group-item text-right menuFilterItem">
-          <span class="glyphicon glyphicon-filter pointer" {{action "toggleSortAndFilter"}}></span>&nbsp;
-          <span class="glyphicon glyphicon-plus pointer" {{action "openNewSubcategory"}}></span>&nbsp;
+          <span class="glyphicon glyphicon-filter pointer" {{action "toggleSortAndFilter"}}></span>
+          <span class="glyphicon glyphicon-plus pointer" {{action "openNewSubcategory"}}></span>
       </div>
 
     {{#if showNewSubcategoryArea}}

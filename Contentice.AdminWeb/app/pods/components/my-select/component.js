@@ -69,7 +69,12 @@ export default Ember.Component.extend({
             console.log('selectedValue: ' + selectedValue);
 
             if (typeof content.objectAt === 'function') {
-                selectedValue = content.objectAt(selectedIndex).get('id');
+                if (typeof content.objectAt(selectedIndex).get === 'function') {
+                    selectedValue = content.objectAt(selectedIndex).get('id');
+                } else {
+                    selectedValue = content.objectAt(selectedIndex);
+                }
+
             }
 
             if (!selectedValue  && typeof content.objectAt === 'function') {

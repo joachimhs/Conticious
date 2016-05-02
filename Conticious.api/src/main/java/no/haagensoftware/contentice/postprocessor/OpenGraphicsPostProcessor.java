@@ -40,6 +40,7 @@ public class OpenGraphicsPostProcessor extends PostProcessorPlugin {
 
                 if (ogData.getValueForKey("image") != null) {
                     headElement.appendElement("meta").attr("property", "og:image").attr("content", ogData.getValueForKey("image"));
+                    headElement.appendElement("meta").attr("property", "og:image:url").attr("content", ogData.getValueForKey("image"));
                     headElement.appendElement("meta").attr("property", "twitter:image").attr("content", ogData.getValueForKey("image"));
                     headElement.appendElement("meta").attr("property", "twitter:card").attr("content", "summary_large_image");
                 }

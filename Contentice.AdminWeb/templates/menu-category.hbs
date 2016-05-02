@@ -1,11 +1,6 @@
 <div class="list-group">
-
     <div class="list-group-item categoryItem" {{action "selectCategory" category}}>
-        {{#if view.isSelected}}
-            &#x25BC;
-        {{else}}
-            &#x25B6;
-        {{/if}}
+
 
         {{category.id}}
 
@@ -22,8 +17,8 @@
 
     {{#if view.isSelected}}
         <div class="list-group-item text-right menuFilterItem">
-            <span class="glyphicon glyphicon-filter pointer" {{action "toggleSortAndFilter" target="view"}}></span>&nbsp;
-            <span class="glyphicon glyphicon-plus pointer" {{action "openNewSubcategory" target="view"}}></span>&nbsp;
+            <span class="glyphicon glyphicon-filter pointer" {{action "toggleSortAndFilter" target="view"}}></span>
+            <span class="glyphicon glyphicon-plus pointer" {{action "openNewSubcategory" target="view"}}></span>
         </div>
 
         {{#if view.showNewSubcategoryArea}}
