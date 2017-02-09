@@ -1,6 +1,8 @@
 import Ember from 'ember';
+import DraggableMixin from '../../../mixins/draggable-mixin'
+import DroppableMixin from '../../../mixins/droppable-mixin'
 
-export default Ember.Component.extend({
+export default Ember.Component.extend(DraggableMixin, DroppableMixin, {
     classNames: ['list-group-item'],
 
     actions: {
@@ -37,9 +39,7 @@ export default Ember.Component.extend({
 
         event.preventDefault();
 
-        console.log("Dragging over: " + this.get('item') + " :: " + event);
-
-
+        console.log("Dragging over: " + this.get('isDragOver') + " item: " + this.get('item') + " :: " + event + " top: " + this.get('isDragOverTop') + " bottom: " + this.get('isDragOverBottom'));
     },
 
     drop: function(event) {
@@ -55,8 +55,6 @@ export default Ember.Component.extend({
         }
 
         console.log("y: " + y + " elemHeight: " + elemHeight);
-
-
 
         var dragData = JSON.parse( event.dataTransfer.getData('application/json') );
 

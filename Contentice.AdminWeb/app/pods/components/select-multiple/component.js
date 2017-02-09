@@ -44,7 +44,7 @@ export default Ember.Component.extend({
         },
 
         droppedItem: function(draggedId, droppedItem, droppedTop) {
-            if (draggedId === droppedItem.get('id')) {
+            if (draggedId === droppedItem) {
                 return;
             }
 
@@ -53,12 +53,14 @@ export default Ember.Component.extend({
             var droppedIndex = null;
 
             for (var index = 0; index < this.get('addedItems.length'); index++) {
-                if (this.get('addedItems').objectAt(index).get('id') === draggedId) {
+                var droppedId = this.get('addedItems').objectAt(index);
+                console.log('droppedId: ' + droppedId + " draggedId: " + draggedId.id);
+                if (droppedId === draggedId.id) {
                     draggedIndex = index;
                     draggedItem = this.get('addedItems').objectAt(index);
                 }
 
-                if (this.get('addedItems').objectAt(index).get('id') === droppedItem.get('id')) {
+                if (droppedId === droppedItem) {
                     droppedIndex = index;
                 }
             }
@@ -68,11 +70,19 @@ export default Ember.Component.extend({
                     droppedIndex++;
                 }
 
+                if (droppedIndex > this.get('addedItems.length')) {
+                    console.log('dragging to bottom');
+                    droppedIndex = this.get('addedItems.length') - 1;
+                }
+
                 if (draggedIndex === (droppedIndex - 1)) {
                     //nothing
                 } else {
+                    console.log('draggedIndex: ' + draggedIndex);
+                    console.log('droppedIndex: ' + droppedIndex);
+                    console.log('draggedItem: ' + draggedItem);
                     this.get('addedItems').removeAt(draggedIndex);
-                    this.get('addedItems').insertAt(droppedIndex, draggedItem);
+                    this.get('addedItems').insertAt(droppedIndex-1, draggedItem);
                     this.get('model').send('becomeDirty');
                 }
             }

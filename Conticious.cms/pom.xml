@@ -231,6 +231,12 @@
                     <artifactId>conticious-stormpath</artifactId>
                     <version>${project.version}</version>
                 </dependency>
+
+                <dependency>
+                    <groupId>no.haagensoftware</groupId>
+                    <artifactId>conticious-nexmo</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
             </dependencies>
         </profile>
     </profiles>

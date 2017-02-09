@@ -17,6 +17,10 @@ export default Ember.Component.extend({
       this.sendAction("renameSubcategory", category, subcategory, newId);
     },
 
+    copySubcategory: function(category, subcategory, newId) {
+      this.sendAction("copySubcategory", category, subcategory, newId);
+    },
+
     deleteSubcategory: function(category, subcategory) {
       this.sendAction('deleteSubcategory', category, subcategory);
     },
@@ -68,7 +72,6 @@ export default Ember.Component.extend({
 
       if (newSubcategoryName) {
         this.sendAction('createSubcateogry', category, newSubcategoryName);
-
       }
 
       this.hideAddSubcategory();
@@ -116,6 +119,7 @@ export default Ember.Component.extend({
 
   selectedSortColumnObserver: function() {
     console.log('New Sort Columnn: ' + this.get('selectedSortColumn'));
+
     this.sortOrFilter();
   }.observes('selectedSortColumn'),
 
@@ -158,7 +162,20 @@ export default Ember.Component.extend({
     console.log('Sorting subcategories');
     var columnToSortBy = this.get('selectedSortColumn');
     var columnToFilterBy = this.get('selectedFilterColumn');
+
+    console.log("sortOrFilter columnToFilterBy: '" + columnToFilterBy + "'");
+
+    if (columnToFilterBy.indexOf(this.get('category.id') > 0)) {
+      columnToFilterBy = columnToFilterBy.substr(this.get('category.id.length') + 1);
+    }
+
+    if (!columnToFilterBy) {
+      columnToFilterBy = 'id';
+    }
+
     var columnFilter = this.get('selectedFilterString');
+
+    console.log("sortOrFilter column: '" + columnToFilterBy + "'");
 
     var subcategories = [];
     var sortProp = 'id';

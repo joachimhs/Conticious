@@ -40,6 +40,7 @@ public class AdminRoutesPlugin extends RouterPlugin {
         routeMap.put("/json/admin/categoryFields/{categoryField}", AdminCategoryFieldsHandler.class);
 
         routeMap.put("/json/admin/renameSubcategory/{oldSubcategory}/{newSubcategory}", AdminRenameSubcategoryHandler.class);
+        routeMap.put("/json/admin/copySubcategory/{oldSubcategory}/{newSubcategory}", AdminCopySubcategoryHandler.class);
 
         routeMap.put("/json/admin/subcategoryFields", AdminSubcategoryFieldsHandler.class);
         routeMap.put("/json/admin/subcategoryFields/{subcategoryField}", AdminSubcategoryFieldsHandler.class);
@@ -101,6 +102,7 @@ public class AdminRoutesPlugin extends RouterPlugin {
         pluralMap.put("prototypeCategory", "prototypeCategories");
         pluralMap.put("campaignSettingsCategory", "campaignSettingsCategories");
         pluralMap.put("figur", "figurer");
+        pluralMap.put("sms", "smses");
 
         return pluralMap;
     }

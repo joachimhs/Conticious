@@ -6,6 +6,10 @@ export default Ember.Component.extend({
       this.sendAction('renameSubcategory', category, subcategory, this.get('newId'));
     },
 
+    copySubcategory: function(category, subcategory) {
+      this.sendAction('copySubcategory', category, subcategory, this.get('newId'));
+    },
+
     selectSubcategory: function(category, subcategory) {
       console.log('menu-subcategory selectSubcategory: ' + category + " :: " + subcategory);
       /*subcategory.get('fields').forEach(function(field) {

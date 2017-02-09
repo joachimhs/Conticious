@@ -130,8 +130,35 @@ export default Ember.Controller.extend({
         data: "",
         success: function() {
           subcategory.set('isEditing', false);
-          self.transitionToRoute("categories.category", category.get('id'));
+
+          //self.transitionToRoute("categories.category", category.get('id'));
           self.reloadSubcategories();
+          self.transitionToRoute("categories.category.subcategory", category.get('id'), newId);
+        },
+        dataType: "json"
+      });
+    },
+
+    copySubcategory: function(category, subcategory, newId) {
+      var self = this;
+
+      var newId = category.get('id') + "_" + newId;
+      var oldId = subcategory.get('id');
+
+      console.log("Renaming " + oldId + " to " + newId);
+
+      var url = "/json/admin/copySubcategory/" + oldId + "/" + newId;
+
+      $.ajax({
+        type: "POST",
+        url: url,
+        data: "",
+        success: function() {
+          subcategory.set('isEditing', false);
+
+          //self.transitionToRoute("categories.category", category.get('id'));
+          self.reloadSubcategories();
+          self.transitionToRoute("categories.category.subcategory", category.get('id'), newId);
         },
         dataType: "json"
       });
@@ -161,6 +188,7 @@ export default Ember.Controller.extend({
           newSubcategory.reload();
 
           self.get('categoryController').set('model.subcategories', self.store.query('subcategory', {category: self.get('categoryController.model.category.id')}));
+          self.transitionToRoute("categories.category.subcategory", category.get('id'), newSubcategory.get('id'));
         });
       });
     }
