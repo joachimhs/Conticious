@@ -10,40 +10,40 @@ export default Ember.Component.extend({
   newSubcategoryName: null,
   isExpanded: false,
   sortColumn: ['sortValue:asc'],
-  sortedSubcategories: Ember.computed.sort('filteredSubcategories', 'sortColumn'),
+
 
   actions: {
-    renameSubcategory: function(category, subcategory, newId) {
+    renameSubcategory: function (category, subcategory, newId) {
       this.sendAction("renameSubcategory", category, subcategory, newId);
     },
 
-    copySubcategory: function(category, subcategory, newId) {
+    copySubcategory: function (category, subcategory, newId) {
       this.sendAction("copySubcategory", category, subcategory, newId);
     },
 
-    deleteSubcategory: function(category, subcategory) {
+    deleteSubcategory: function (category, subcategory) {
       this.sendAction('deleteSubcategory', category, subcategory);
     },
 
-    selectSubcategory: function(category, subcategory) {
+    selectSubcategory: function (category, subcategory) {
       console.log('menu-category selectSubcategory: ' + category + " :: " + subcategory);
 
       this.sendAction('selectSubcategory', category, subcategory);
     },
 
-    selectCategory: function(category) {
+    selectCategory: function (category) {
       this.sendAction("selectCategory", category);
     },
 
-    toggleSortAndFilter: function() {
+    toggleSortAndFilter: function () {
       if (this.get('sortAndFilterShowing')) {
         var view = this;
-        $("#sortAndFilterArea").slideUp(function() {
+        $("#sortAndFilterArea").slideUp(function () {
           view.set('sortAndFilterShowing', false);
         });
       } else {
         this.set('sortAndFilterShowing', true);
-        Ember.run.schedule("afterRender", function() {
+        Ember.run.schedule("afterRender", function () {
           $("#sortAndFilterArea").hide();
           $("#sortAndFilterArea").slideDown();
         });
@@ -52,21 +52,21 @@ export default Ember.Component.extend({
       console.log('toggleSortAndFilter: ' + this.get('sortAndFilterShowing'));
     },
 
-    openNewSubcategory: function() {
+    openNewSubcategory: function () {
       if (!this.get('showNewSubcategoryArea')) {
         this.set('showNewSubcategoryArea', true);
-        Ember.run.schedule("afterRender", function() {
+        Ember.run.schedule("afterRender", function () {
           $("#showNewSubcategoryArea").hide();
           $("#showNewSubcategoryArea").slideDown();
         });
       }
     },
 
-    cancelNewSubcategory: function() {
+    cancelNewSubcategory: function () {
       this.hideAddSubcategory();
     },
 
-    addNewSubcategory: function() {
+    addNewSubcategory: function () {
       var category = this.get('category');
       var newSubcategoryName = this.get('newSubcategoryName');
 
@@ -78,15 +78,15 @@ export default Ember.Component.extend({
     }
   },
 
-  hideAddSubcategory: function() {
+  hideAddSubcategory: function () {
     var view = this;
-    $("#showNewSubcategoryArea").slideUp(function() {
+    $("#showNewSubcategoryArea").slideUp(function () {
       view.set('showNewSubcategoryArea', false);
       view.set('newSubcategoryName', null);
     });
   },
 
-  isSelected: function() {
+  isSelected: function () {
     return this.get('category.id') === this.get('selectedCategory.id');
   }.property('selectedCategory.id', 'category.id'),
 
@@ -113,31 +113,33 @@ export default Ember.Component.extend({
    }
    }.observes('isSelected'),*/
 
-  subcategoryId: function() {
+  subcategoryId: function () {
     return this.get('elementId') + "_subcategoryArea";
   }.property('elementId'),
 
-  selectedSortColumnObserver: function() {
+  selectedSortColumnObserver: function () {
     console.log('New Sort Columnn: ' + this.get('selectedSortColumn'));
 
-    this.sortOrFilter();
+    Ember.run.debounce(this, this.sortOrFilter, 200);
   }.observes('selectedSortColumn'),
 
-  selectedFilterStringObserver: function() {
+  selectedFilterStringObserver: function () {
     console.log('New Filter String: ' + this.get('selectedFilterString'));
-    this.sortOrFilter();
+
+    Ember.run.debounce(this, this.sortOrFilter, 200);
   }.observes('selectedFilterString'),
 
-  selectedFilterColumnObserver: function() {
+  selectedFilterColumnObserver: function () {
     console.log('New Filter Column: ' + this.get('selectedFilterColumn'));
-    this.sortOrFilter();
+
+    Ember.run.debounce(this, this.sortOrFilter, 200);
   }.observes('selectedFilterColumn'),
 
-  subcategpriesObserver: function() {
-    this.sortOrFilter();
+  subcategpriesObserver: function () {
+    Ember.run.debounce(this, this.sortOrFilter, 200);
   }.observes('category.id', 'subcategories.length', 'subcategories.@each.id').on('init'),
 
-  pulldownFields: function() {
+  pulldownFields: function () {
     var defaultFields = this.get('category.defaultFields');
     var fields = Ember.A();
 
@@ -149,8 +151,8 @@ export default Ember.Component.extend({
     if (defaultFields) {
       defaultFields.forEach(function (df) {
         fields.pushObject(Ember.Object.create({
-            id: df.get('id'),
-            name: df.get('name')
+          id: df.get('id'),
+          name: df.get('name')
         }));
       })
     }
@@ -158,8 +160,8 @@ export default Ember.Component.extend({
     return fields;
   }.property('category.defaultFields.@each.id'),
 
-  sortOrFilter: function() {
-    console.log('Sorting subcategories');
+  sortOrFilter: function () {
+    console.log('Sorting subcategories for: ' + this.get('category.id'));
     var columnToSortBy = this.get('selectedSortColumn');
     var columnToFilterBy = this.get('selectedFilterColumn');
 
@@ -184,10 +186,13 @@ export default Ember.Component.extend({
       sortProp = "sortValue";
     }
 
-    this.get('subcategories').forEach(function(subcat) {
+    for (var sindex = 0; sindex < this.get('subcategories.length'); sindex++) {
+
+      var subcat = this.get('subcategories').objectAt(sindex);
       var showColumn = true;
 
-      subcat.get('fields').forEach(function(field) {
+      for (var index = 0; index < subcat.get('fields.length'); index++) {
+        var field = subcat.get('fields').objectAt(index);
         if (field.get('name') === columnToSortBy) {
           subcat.set('sortValue', field.get('value'));
         } else if (columnToSortBy === 'id') {
@@ -201,7 +206,7 @@ export default Ember.Component.extend({
         } else if (columnToFilterBy === null && columnFilter) {
           showColumn = subcat.get('id').indexOf(columnFilter) > -1;
         }
-      });
+      }
 
       if (!columnToSortBy) {
         subcat.set('sortValue', subcat.get('id'));
@@ -210,11 +215,16 @@ export default Ember.Component.extend({
       if (showColumn) {
         subcategories.push(subcat);
       }
-    });
+    }
 
     this.set('numSubcategoriesShown', subcategories.get('length'));
     this.set('filteredSubcategories', subcategories);
 
+  //sortedSubcategories: Ember.computed.sort('filteredSubcategories', 'sortColumn'),
+    var sortedSubcategories = subcategories.sort(function(a,b) {
+      return a.get('sortValue') - b.get('sortValue');
+    });
 
+    this.set('sortedSubcategories', sortedSubcategories);
   }
 });

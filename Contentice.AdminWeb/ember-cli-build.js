@@ -70,7 +70,10 @@ module.exports = function (defaults) {
 
     app.import('bower_components/summernote/dist/summernote.js');
     app.import('bower_components/summernote/dist/summernote.css');
-    app.import('bower_components/summernote/dist/summernote-bs3.css');
+    app.import('bower_components/summernote/dist/font/summernote.woff');
+    app.import('bower_components/summernote/dist/font/summernote.ttf');
+    app.import('bower_components/summernote/dist/font/summernote.eot');
+//    app.import('bower_components/summernote/dist/summernote-bs3.css');
 
     app.import('bower_components/bootstrap/dist/js/bootstrap.js');
 

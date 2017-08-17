@@ -16,7 +16,7 @@ export default Ember.Component.extend({
     }),
     selectedValue: null,
 
-    didInitAttrs(attrs) {
+    init(attrs) {
         this._super(...arguments);
         this.populateSelect();
     },

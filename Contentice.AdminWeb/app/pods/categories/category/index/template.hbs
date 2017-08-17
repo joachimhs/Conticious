@@ -86,7 +86,7 @@
 
     <h1>Category Settings</h1>
 
-{{categoriesController/category.public}} -
+{{categoriesController.category.public}} -
     <table class="table">
         <tr>
             <th>Settings Name</th>
@@ -94,9 +94,9 @@
         </tr>
         <tr>
             <td>Public</td>
-            <td>{{input type="checkbox" checkedBinding="categoriesController/category.isPublic"}}</td>
+            <td>{{input type="checkbox" checkedBinding="categoriesController.category.isPublic"}}</td>
         </tr>
     </table>
-{{#if categoriesController/category.hasDirtyAttributes}}
-        <button class="btn btn-primary" {{action "saveCategory" categoriesController/category}}>Save Category Settings</button>
+{{#if categoriesController.category.hasDirtyAttributes}}
+        <button class="btn btn-primary" {{action "saveCategory" categoriesController.category}}>Save Category Settings</button>
 {{/if}}

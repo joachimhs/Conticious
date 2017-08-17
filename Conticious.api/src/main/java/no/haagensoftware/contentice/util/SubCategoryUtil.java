@@ -71,6 +71,9 @@ public class SubCategoryUtil {
     }
 
     public static <T> T convertSubcategoryToObject(String cateogry, SubCategoryData sd, Class<T> clazz) {
+        if (sd == null) {
+            return null;
+        }
         if (sd.getId() != null && sd.getId().startsWith(cateogry)) {
             sd.setId(sd.getId().substring(cateogry.length()+1));
         }

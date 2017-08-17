@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>conticious-stormpath</artifactId>
+    <artifactId>conticious-hlokk</artifactId>
 
     <profiles>
         <profile>

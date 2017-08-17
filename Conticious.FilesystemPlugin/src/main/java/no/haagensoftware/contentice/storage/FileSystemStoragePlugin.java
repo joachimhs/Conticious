@@ -32,6 +32,11 @@ public class FileSystemStoragePlugin extends StoragePlugin {
     private String documentsDirectory;
 
     @Override
+    public void setup() {
+
+    }
+
+    @Override
     public List<String> getPluginDependencies() {
         return new ArrayList<>();
     }
@@ -49,7 +54,7 @@ public class FileSystemStoragePlugin extends StoragePlugin {
         } else {
             File documentsDirectory = new File(docDirectory);
             if (!documentsDirectory.exists() && !documentsDirectory.isDirectory()) {
-                throw new RuntimeException(docDirectory + " does not exist or is not a directory Contentice have access to");
+                throw new RuntimeException(docDirectory + " does not exist or is not a directory Conticious have access to");
             }
         }
 
@@ -81,33 +86,7 @@ public class FileSystemStoragePlugin extends StoragePlugin {
                     if (json != null) {
                         JsonElement jsonElement = new JsonParser().parse(json);
                         if (jsonElement.isJsonArray()) {
-                            List<CategoryField> defaultFields = new ArrayList<>();
-
-                            for (JsonElement elem : jsonElement.getAsJsonArray()) {
-                                if (elem.isJsonObject()) {
-                                    JsonObject elemObj = elem.getAsJsonObject();
-
-                                    String fieldId = categoryData.getId() + "_" + elemObj.getAsJsonPrimitive("name").getAsString();
-                                    if (elemObj.has("id")) {
-                                        fieldId = elemObj.get("id").getAsString();
-                                    }
-                                    if (elemObj.has("name") && elemObj.has("type") && elemObj.has("required")) {
-                                        CategoryField newField = new CategoryField(
-                                                fieldId,
-                                                elemObj.get("name").getAsString(),
-                                                elemObj.get("type").getAsString(),
-                                                elemObj.get("required").getAsBoolean()
-                                        );
-
-                                        if (elemObj.has("relation")) {
-                                            newField.setRelation(elemObj.get("relation").getAsString());
-                                        }
-
-                                        defaultFields.add(newField);
-                                    }
-                                }
-                            }
-                            categoryData.setDefaultFields(defaultFields);
+                            categoryData.setDefaultFields(JsonUtil.convertJsonToDefaultFields(jsonElement, categoryData.getId()));
                         }
                     }
 
@@ -164,11 +143,7 @@ public class FileSystemStoragePlugin extends StoragePlugin {
             Path jsonPath = FileSystems.getDefault().getPath(docDir + File.separatorChar + category + ".json");
             Path settingsJsonPath = FileSystems.getDefault().getPath(docDir + File.separatorChar + category + "_settings.json");
 
-            JsonArray fieldArray = new JsonArray();
-            for (CategoryField cf : categoryData.getDefaultFields()) {
-                fieldArray.add(new Gson().toJsonTree(cf));
-            }
-            String jsonContent =  fieldArray.toString();
+            String jsonContent =  JsonUtil.convertCategoryFieldsToJsonString(categoryData.getDefaultFields());
 
             JsonUtil.writeJsonToFile(jsonPath, jsonContent);
 
@@ -279,44 +254,23 @@ public class FileSystemStoragePlugin extends StoragePlugin {
         String docDir = documentsDirectory + File.separatorChar + host;
         String jsonContent = JsonUtil.getFileContents(docDir + File.separatorChar + category + File.separatorChar + subCategory.getName() + ".json");
 
-        return buildKeysMapFromJsonObject(jsonContent);
+        return JsonUtil.buildKeysMapFromJsonObject(jsonContent);
     }
 
-    private Map<String, JsonElement> buildKeysMapFromJsonObject(String jsonContent) {
-        Map<String, JsonElement> keysMap = new HashMap<>();
 
-        if (jsonContent != null) {
-            JsonElement jsonElement = new JsonParser().parse(jsonContent);
-            if (jsonElement.isJsonObject()) {
-                extractJsonObject(keysMap, jsonElement);
-            }
-        }
-
-        return keysMap;
-    }
 
     private Map<String, JsonElement> buildKeysMapFromJsonArray(String jsonContent) {
         Map<String, JsonElement> keysMap = new HashMap<>();
 
         JsonElement jsonElement = new JsonParser().parse(jsonContent);
         if (jsonElement.isJsonObject()) {
-            extractJsonObject(keysMap, jsonElement);
+            JsonUtil.extractJsonObject(keysMap, jsonElement);
         }
 
         return keysMap;
     }
 
-    private void extractJsonObject(Map<String, JsonElement> keysMap, JsonElement jsonElement) {
-        JsonObject jsonObject = jsonElement.getAsJsonObject();
-        Set<Map.Entry<String, JsonElement>> entrySet = jsonObject.entrySet();
-        for (Map.Entry<String, JsonElement> entry : entrySet) {
-            if (entry.getValue().isJsonArray()) {
-                keysMap.put(entry.getKey(), entry.getValue().getAsJsonArray());
-            } else {
-                keysMap.put(entry.getKey(), entry.getValue());
-            }
-        }
-    }
+
 
     @Override
     public SubCategoryData getSubCategory(String host, String category, String subCategory) {
@@ -369,7 +323,7 @@ public class FileSystemStoragePlugin extends StoragePlugin {
             markdownWriter.write(markdownContent, 0, markdownContent.length());
             markdownWriter.flush();
 
-            String jsonContent = convertKeyMapToJson(subCategoryData.getKeyMap());
+            String jsonContent = JsonUtil.convertKeyMapToJson(subCategoryData.getKeyMap());
             if (jsonContent.length() > 2) {
                 jsonWriter = Files.newBufferedWriter(jsonPath, Charset.forName("utf-8"));
                 jsonWriter.write(jsonContent, 0, jsonContent.length());
@@ -397,15 +351,6 @@ public class FileSystemStoragePlugin extends StoragePlugin {
         }
     }
 
-    private String convertKeyMapToJson(Map<String, JsonElement> keyMap) {
-        JsonObject jsonObject = new JsonObject();
-
-        for (String key : keyMap.keySet()) {
-            jsonObject.add(key, keyMap.get(key));
-        }
-
-        return jsonObject.toString();
-    }
 
     @Override
     public void deleteSubcategory(String host, String category, String subCategory) {

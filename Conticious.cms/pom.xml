@@ -40,6 +40,30 @@
         </dependency>
 
         <dependency>
+            <groupId>no.haagensoftware</groupId>
+            <artifactId>conticious-kodegenet-plugin</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>no.haagensoftware</groupId>
+            <artifactId>conticious-teknologihuset-plugin</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>no.haagensoftware</groupId>
+            <artifactId>conticious-spira-plugin</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>no.haagensoftware</groupId>
+            <artifactId>conticious-hlokk</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>htmlunit</groupId>
             <artifactId>htmlunit</artifactId>
             <version>1.14</version>
@@ -203,6 +227,24 @@
 
                 <dependency>
                     <groupId>no.haagensoftware</groupId>
+                    <artifactId>conticious-spira-plugin</artifactId>
+                    <version>1.0</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>no.haagensoftware</groupId>
+                    <artifactId>conticious-hlokk</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+
+                <!--dependency>
+                    <groupId>no.haagensoftware</groupId>
+                    <artifactId>conticious-kodegenet-plugin</artifactId>
+                    <version>1.0</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>no.haagensoftware</groupId>
                     <artifactId>conticious-emberfest-plugin</artifactId>
                     <version>2.0</version>
 
@@ -236,9 +278,38 @@
                     <groupId>no.haagensoftware</groupId>
                     <artifactId>conticious-nexmo</artifactId>
                     <version>${project.version}</version>
+                </dependency-->
+            </dependencies>
+        </profile>
+        <profile>
+            <id>localCassandra</id>
+            <activation>
+                <property>
+                    <name>env</name>
+                    <value>local</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>no.haagensoftware</groupId>
+                    <artifactId>conticious-admin-plugin</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>no.haagensoftware</groupId>
+                    <artifactId>conticious-data-plugin</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>no.haagensoftware</groupId>
+                    <artifactId>conticious-cassandra-storage-plugin</artifactId>
+                    <version>${project.version}</version>
                 </dependency>
             </dependencies>
         </profile>
+
     </profiles>
 
 

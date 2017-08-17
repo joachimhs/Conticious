@@ -59,7 +59,7 @@
             <artifactId>gson</artifactId>
         </dependency>
         <dependency>
-            <groupId>juniversalchardet</groupId>
+            <groupId>com.googlecode.juniversalchardet</groupId>
             <artifactId>juniversalchardet</artifactId>
             <version>1.0.3</version>
         </dependency>

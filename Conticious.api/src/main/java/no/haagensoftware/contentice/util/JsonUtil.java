@@ -1,5 +1,8 @@
 package no.haagensoftware.contentice.util;
 
+import com.google.gson.*;
+import no.haagensoftware.contentice.data.CategoryField;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -8,6 +11,7 @@ import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.*;
 
 /**
  * Created by jhsmbp on 18/04/14.
@@ -58,5 +62,79 @@ public class JsonUtil {
         }
 
         return returnString;
+    }
+
+    public static List<CategoryField> convertJsonToDefaultFields(JsonElement jsonElement, String categoryId) {
+        List<CategoryField> defaultFields = new ArrayList<>();
+
+        for (JsonElement elem : jsonElement.getAsJsonArray()) {
+            if (elem.isJsonObject()) {
+                JsonObject elemObj = elem.getAsJsonObject();
+
+                String fieldId = categoryId + "_" + elemObj.getAsJsonPrimitive("name").getAsString();
+                if (elemObj.has("id")) {
+                    fieldId = elemObj.get("id").getAsString();
+                }
+                if (elemObj.has("name") && elemObj.has("type") && elemObj.has("required")) {
+                    CategoryField newField = new CategoryField(
+                            fieldId,
+                            elemObj.get("name").getAsString(),
+                            elemObj.get("type").getAsString(),
+                            elemObj.get("required").getAsBoolean()
+                    );
+
+                    if (elemObj.has("relation")) {
+                        newField.setRelation(elemObj.get("relation").getAsString());
+                    }
+
+                    defaultFields.add(newField);
+                }
+            }
+        }
+
+        return defaultFields;
+    }
+
+    public static String convertCategoryFieldsToJsonString(List<CategoryField> categoryFields) {
+        JsonArray fieldArray = new JsonArray();
+        for (CategoryField cf : categoryFields) {
+            fieldArray.add(new Gson().toJsonTree(cf));
+        }
+        return fieldArray.toString();
+    }
+
+    public static String convertKeyMapToJson(Map<String, JsonElement> keyMap) {
+        JsonObject jsonObject = new JsonObject();
+
+        for (String key : keyMap.keySet()) {
+            jsonObject.add(key, keyMap.get(key));
+        }
+
+        return jsonObject.toString();
+    }
+
+    public static Map<String, JsonElement> buildKeysMapFromJsonObject(String jsonContent) {
+        Map<String, JsonElement> keysMap = new HashMap<>();
+
+        if (jsonContent != null) {
+            JsonElement jsonElement = new JsonParser().parse(jsonContent);
+            if (jsonElement.isJsonObject()) {
+                extractJsonObject(keysMap, jsonElement);
+            }
+        }
+
+        return keysMap;
+    }
+
+    public static void extractJsonObject(Map<String, JsonElement> keysMap, JsonElement jsonElement) {
+        JsonObject jsonObject = jsonElement.getAsJsonObject();
+        Set<Map.Entry<String, JsonElement>> entrySet = jsonObject.entrySet();
+        for (Map.Entry<String, JsonElement> entry : entrySet) {
+            if (entry.getValue().isJsonArray()) {
+                keysMap.put(entry.getKey(), entry.getValue().getAsJsonArray());
+            } else {
+                keysMap.put(entry.getKey(), entry.getValue());
+            }
+        }
     }
 }

@@ -23,6 +23,14 @@ public abstract class StoragePlugin implements ConticiousPlugin {
         dependantPluginsList.add(plugin);
     }
 
+    /**
+     * This method will get called when the storage plugin is loaded into the application this
+     * happens only if the plugin is located inside the Conticious plugin-directory AND the application
+     * has explicitly set this plugin as the storage plugin it will use. This will ensure
+     * that only "active" storage plugins gets initialized.
+     */
+    public abstract void setup();
+
     public abstract List<CategoryData> getCategories(String host);
 
     public abstract CategoryData getCategory(String host, String category);

@@ -75,12 +75,13 @@ public class Main {
 
             if (plugin.getPluginName().equals(System.getProperty("no.haagensoftware.contentice.storage.plugin"))) {
                 specifiedStoragePlugin = (StoragePlugin)plugin;
+
             }
 
         }
 
         for (ConticiousPlugin plugin : loadedPlugins.values()) {
-            //add storage plugin to all non storage plugins
+            //add storage plugin to all other non-storage plugins
             if (!(plugin instanceof StoragePlugin)) {
                 plugin.addPlugin(specifiedStoragePlugin);
             }

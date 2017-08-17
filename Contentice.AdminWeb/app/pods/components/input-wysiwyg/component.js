@@ -32,7 +32,7 @@ export default Ember.Component.extend({
         });
 
         var content = this.get('content');
-        this.$('textarea').code(content);
+        //this.$('textarea').summernote('code', content);
         var placeholder = this.get("placeholder");
         if(placeholder){
             Ember.$('[contentEditable=true]').attr("data-placeholder", placeholder);
@@ -63,7 +63,7 @@ export default Ember.Component.extend({
 
         if (!hasFocus) {
             var content = this.get('content');
-            Ember.$('.wysiwyg-editor textarea').code(content);
+            Ember.$('.wysiwyg-editor textarea').summernote('code', content);
         }
     }.observes('content').on('init')
 });
