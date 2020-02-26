@@ -41,20 +41,26 @@
 
         <dependency>
             <groupId>no.haagensoftware</groupId>
-            <artifactId>conticious-kodegenet-plugin</artifactId>
-            <version>1.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>no.haagensoftware</groupId>
             <artifactId>conticious-teknologihuset-plugin</artifactId>
             <version>1.0</version>
         </dependency>
 
         <dependency>
-            <groupId>no.haagensoftware</groupId>
-            <artifactId>conticious-spira-plugin</artifactId>
-            <version>1.0</version>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>13</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>13</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>13</version>
         </dependency>
 
         <dependency>

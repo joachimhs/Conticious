@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -66,30 +65,15 @@ public class ClassPathUtil {
      * Add URL to CLASSPATH
      *
      * @param url URL
-     * @throws IOException IOException
      */
-    public static void addURL(URL url) throws IOException {
+    public static void addURL(URL url) {
         if (url.toString().endsWith(".jar") && !pluginsAdded.contains(url.toExternalForm())) {
             logger.info("Adding Plugin from URL: " + url.toExternalForm());
-            URLClassLoader sysLoader = (URLClassLoader) Thread.currentThread().getContextClassLoader();//ClassLoader.getSystemClassLoader().getSystemClassLoader();
-            URL urls[] = sysLoader.getURLs();
-            for (int i = 0; i < urls.length; i++) {
-                if (urls[i].toString().equalsIgnoreCase(url.toString())) {
-                    logger.info("URL " + url + " is already in the CLASSPATH");
-                    return;
-                }
-            }
-            Class<URLClassLoader> sysclass = URLClassLoader.class;
-            try {
-                Method method = sysclass.getDeclaredMethod("addURL", parameters);
-                method.setAccessible(true);
-                method.invoke(sysLoader, new Object[]{url});
-
-                pluginsAdded.add(url.toExternalForm());
-            } catch (Throwable t) {
-                t.printStackTrace();
-                logger.error("Error, could not add URL to system classloader");
-            }
+            final ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
+            final URLClassLoader newCL = new URLClassLoader(new URL[]{url}, oldCL);
+            Thread.currentThread().setContextClassLoader(newCL);
+            pluginsAdded.add(url.toExternalForm());
+            logger.info("Plugin added: " + url.toExternalForm());
         } else {
             logger.info("plugin is not a JAR file, or is already added: " + url.toExternalForm());
         }

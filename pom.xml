@@ -18,7 +18,7 @@
         <module>Conticious.api</module>
         <module>Conticious.cms</module>
         <module>Conticious.FilesystemPlugin</module>
-        <module>Conticious.AdminPlugin</module>
+        <module>Conticious.adminPlugin</module>
         <module>Conticious.dataPlugin</module>
         <module>Conticious.HlokkPlugin</module>
         <module>Conticious.StormpathPlugin</module>
