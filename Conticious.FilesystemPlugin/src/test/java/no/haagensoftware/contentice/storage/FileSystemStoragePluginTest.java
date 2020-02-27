@@ -75,6 +75,7 @@ public class FileSystemStoragePluginTest {
         Assert.assertEquals("Expecting 0 Categories inside the document directory", 0, categories.size());
     }
 
+    @Ignore
     @Test
     public void verifyGetSubcategories() {
         plugin.setCategory(HOST, "pages", new CategoryData("Pages"));
