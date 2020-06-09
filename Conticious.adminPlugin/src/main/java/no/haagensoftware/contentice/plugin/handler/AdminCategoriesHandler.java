@@ -59,7 +59,7 @@ public class AdminCategoriesHandler extends ContenticeHandler {
     private void handleRequest(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
         logger.info("reading CategoriesHandler and writing contents to buffer");
 
-        List<CategoryData> categories = getStorage().getCategories(getDomain().getWebappName());
+        List<CategoryData> categories = getStorage().getCategories(getDomain().getDocumentsName());
         logger.info("Got " + categories.size() + " categories");
 
         if (isPost(fullHttpRequest)) {
@@ -69,12 +69,12 @@ public class AdminCategoriesHandler extends ContenticeHandler {
             if (adminCategory != null && adminCategory.getCategory() != null) {
                 logger.info("Category: " + adminCategory.getCategory().getId());
 
-                getStorage().setCategory(getDomain().getWebappName(), adminCategory.getCategory().getId(), adminCategory.getCategory());
+                getStorage().setCategory(getDomain().getDocumentsName(), adminCategory.getCategory().getId(), adminCategory.getCategory());
             }
         }
 
         for (CategoryData category : categories) {
-            category.setNumberOfSubcategories(getStorage().getNumberOfSubcategories(getDomain().getWebappName(), category.getId()));
+            category.setNumberOfSubcategories(getStorage().getNumberOfSubcategories(getDomain().getDocumentsName(), category.getId()));
         }
 
         RestSerializer serializer = new RestSerializer();
@@ -93,7 +93,7 @@ public class AdminCategoriesHandler extends ContenticeHandler {
         JsonArray subcategoryFieldArray= new JsonArray();
 
         for (CategoryData category : categories) {
-            for (SubCategoryData subcategoryData : getStorage().getSubCategories(getDomain().getWebappName(), category.getId())) {
+            for (SubCategoryData subcategoryData : getStorage().getSubCategories(getDomain().getDocumentsName(), category.getId())) {
                 category.addSubcategory(subcategoryData);
                 subCategoriesArray.add(AdminSubCategoryAssembler.buildAdminJsonFromSubCategoryData(subcategoryData, category));
 

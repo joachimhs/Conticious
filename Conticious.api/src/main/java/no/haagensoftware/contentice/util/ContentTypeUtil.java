@@ -16,6 +16,7 @@ public class ContentTypeUtil {
 		contentTypeHash.put("jpeg", "image/jpeg");
 		contentTypeHash.put("JPG", "image/jpeg");
 		contentTypeHash.put("JPEG", "image/jpeg");
+		contentTypeHash.put("mp4", "video/mp4");
 		contentTypeHash.put("css", "text/css; charset=UTF-8");
 		contentTypeHash.put("CSS", "text/css; charset=UTF-8");
 		contentTypeHash.put("json", "text/json; charset=UTF-8");

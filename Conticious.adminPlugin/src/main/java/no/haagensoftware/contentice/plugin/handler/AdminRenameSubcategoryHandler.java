@@ -1,6 +1,5 @@
 package no.haagensoftware.contentice.plugin.handler;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.netty.channel.ChannelHandlerContext;
@@ -70,7 +69,7 @@ public class AdminRenameSubcategoryHandler extends ContenticeHandler {
             }
 
             if (fromCategory != null && fromSubcategory != null && toCategory != null && toSubcategory != null) {
-                SubCategoryData fromSubcatData = getStorage().getSubCategory(getDomain().getWebappName(), fromCategory, fromSubcategory);
+                SubCategoryData fromSubcatData = getStorage().getSubCategory(getDomain().getDocumentsName(), fromCategory, fromSubcategory);
                 fromSubcatData.getId();
 
                 SubCategoryData toSubcatData = new SubCategoryData(renameSubcategoryTo);
@@ -82,12 +81,12 @@ public class AdminRenameSubcategoryHandler extends ContenticeHandler {
                     toSubcatData.getKeyMap().put(key, jsonElement);
                 }
 
-                getStorage().deleteSubcategory(getDomain().getWebappName(), fromCategory, fromSubcategory);
-                getStorage().setSubCategory(getDomain().getWebappName(), toCategory, toSubcategory, toSubcatData);
+                getStorage().deleteSubcategory(getDomain().getDocumentsName(), fromCategory, fromSubcategory);
+                getStorage().setSubCategory(getDomain().getDocumentsName(), toCategory, toSubcategory, toSubcatData);
                 logger.info("DONE");
             }
 
-            //getStorage().getSubCategory(getDomain().getWebappName(), "", "");
+            //getStorage().getSubCategory(getDomain().getDocumentsName(), "", "");
 
             writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json");
         }

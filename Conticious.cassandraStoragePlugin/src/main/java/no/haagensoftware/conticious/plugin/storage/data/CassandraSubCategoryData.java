@@ -12,6 +12,7 @@ import no.haagensoftware.contentice.util.JsonUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by joachimhaagenskeie on 19/02/2017.
@@ -19,26 +20,45 @@ import java.util.List;
 @Table(keyspace = "conticious", name ="subcategories")
 public class CassandraSubCategoryData {
     @PartitionKey private String id;
-    @ClusteringColumn private String host;
+    @ClusteringColumn(value = 0) private String category;
+    @ClusteringColumn(value = 1) private String host;
 
     private String name;
     private String fieldsjson;
     private String markdowncontent;
 
-    public CassandraSubCategoryData() {
+    private CassandraSubCategoryData() {
 
     }
 
-    public CassandraSubCategoryData(SubCategoryData subCategoryData, String host) {
+    public CassandraSubCategoryData(String name, String category, String host) {
+        this.id = name;
+        this.name = name;
+        this.category = category;
+        this.host = host;
+    }
+
+    public CassandraSubCategoryData(SubCategoryData subCategoryData, String category, String host) {
         this();
 
         if (subCategoryData != null) {
             this.id = subCategoryData.getId();
+            this.category = category;
             this.name = subCategoryData.getName();
             this.host = host;
             this.fieldsjson = JsonUtil.convertKeyMapToJson(subCategoryData.getKeyMap());
             this.markdowncontent = subCategoryData.getContent();
         }
+    }
+
+    @Transient
+    public void setKeyMap(Map<String, JsonElement> keyMap) {
+        this.fieldsjson = JsonUtil.convertKeyMapToJson(keyMap);
+    }
+
+    @Transient
+    public Map<String, JsonElement> getKeyMap() {
+        return JsonUtil.buildKeysMapFromJsonObject(this.getFieldsjson());
     }
 
     public String getName() {
@@ -55,6 +75,14 @@ public class CassandraSubCategoryData {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public String getHost() {

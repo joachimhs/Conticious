@@ -34,16 +34,19 @@ public class CassandraCategoryDao {
                 "PRIMARY KEY (name, host)" +
                 ");");
 
-        session.execute("CREATE INDEX IF NOT EXISTS host_idx ON conticious.categories(host);");
+        session.execute("CREATE INDEX IF NOT EXISTS categories_host_idx ON conticious.categories(host);");
 
         session.execute("CREATE TABLE IF NOT EXISTS conticious.subcategories (" +
                 "id text, " +
+                "category text, " +
                 "host text, " +
                 "name text, " +
                 "fieldsjson text, " +
                 "markdowncontent text, " +
-                "PRIMARY KEY (id, host)" +
+                "PRIMARY KEY (id, category, host)" +
                 ");");
+
+        session.execute("CREATE INDEX IF NOT EXISTS subcategories_host_idx ON conticious.subcategories(host);");
     }
 
     public List<CassandraCategoryData> getCategories(String host) {
@@ -76,25 +79,27 @@ public class CassandraCategoryDao {
     public List<CassandraSubCategoryData> getSubcategories(String category, String host) {
         List<CassandraSubCategoryData> cassandraSubCategoryDatas = new ArrayList<>();
 
-        CassandraCategoryData ccd = this.getCategory(category, host);
-        for (String subcategoryId : ccd.getSubcategories()) {
-            cassandraSubCategoryDatas.add(this.getSubcategory(subcategoryId, host));
+        CassandraAccessor categoryAccessor = new MappingManager(session).createAccessor(CassandraAccessor.class);
+        Result<CassandraSubCategoryData> categoryDataResult = categoryAccessor.getSubCategories(category, host);
+
+        for (CassandraSubCategoryData scd : categoryDataResult.all()) {
+            cassandraSubCategoryDatas.add(scd);
         }
 
         return cassandraSubCategoryDatas;
     }
 
-    public CassandraSubCategoryData getSubcategory(String subcategory, String host) {
+    public CassandraSubCategoryData getSubcategory(String subcategory, String category, String host) {
         CassandraSubCategoryData subcat = null;
 
         Mapper<CassandraSubCategoryData> mapper = new MappingManager(session).mapper(CassandraSubCategoryData.class);
-        subcat = mapper.get(subcategory, host);
+        subcat = mapper.get(subcategory, category, host);
 
         return subcat;
     }
 
-    public void persistSubcategory(SubCategoryData subCategoryData, String host) {
+    public void persistSubcategory(SubCategoryData subCategoryData, String category, String host) {
         Mapper<CassandraSubCategoryData> mapper = new MappingManager(session).mapper(CassandraSubCategoryData.class);
-        mapper.save(new CassandraSubCategoryData(subCategoryData, host));
+        mapper.save(new CassandraSubCategoryData(subCategoryData, category, host));
     }
 }

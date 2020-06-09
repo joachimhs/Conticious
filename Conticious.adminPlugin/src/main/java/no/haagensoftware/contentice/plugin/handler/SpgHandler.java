@@ -1,7 +1,6 @@
 package no.haagensoftware.contentice.plugin.handler;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -15,7 +14,6 @@ import no.haagensoftware.contentice.util.PhantomJsExecutor;
 import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.util.ArrayList;
 
 /**
  * Created by jhsmbp on 04/05/14.
@@ -71,11 +69,11 @@ public class SpgHandler extends ContenticeHandler {
             }
 
             String phantomReturn = PhantomJsExecutor.executePhantomJs(
-                "http://" + foundDomain.getWebappName(),
-                System.getProperty("no.haagensoftware.contentice.webappDir") + File.separatorChar + foundDomain.getWebappName() + File.separatorChar + "static",
-                System.getProperty("no.haagensoftware.contentice.webappDir") + File.separatorChar + foundDomain.getWebappName() + File.separatorChar + "Sitemap.xml",
-                foundDomain.getWebappName(),
-                foundDomain.getWebappName()
+                "http://" + foundDomain.getDocumentsName(),
+                System.getProperty("no.haagensoftware.contentice.webappDir") + File.separatorChar + foundDomain.getDocumentsName() + File.separatorChar + "static",
+                System.getProperty("no.haagensoftware.contentice.webappDir") + File.separatorChar + foundDomain.getDocumentsName() + File.separatorChar + "Sitemap.xml",
+                foundDomain.getDocumentsName(),
+                foundDomain.getDocumentsName()
             );
             logger.info(phantomReturn);
         }

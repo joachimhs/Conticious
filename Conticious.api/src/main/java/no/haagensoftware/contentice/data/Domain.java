@@ -7,6 +7,7 @@ public class Domain {
     private String id;
     private String domainName;
     private String webappName;
+    private String documentsName;
 
     //file upload
     private String uploadUrl;
@@ -32,6 +33,14 @@ public class Domain {
 
     public void setDomainName(String domainName) {
         this.domainName = domainName;
+    }
+
+    public String getDocumentsName() {
+        return documentsName;
+    }
+
+    public void setDocumentsName(String webappName) {
+        this.documentsName = webappName;
     }
 
     public String getWebappName() {

@@ -6,16 +6,12 @@ import com.google.gson.JsonObject;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.CharsetUtil;
-import no.haagensoftware.contentice.assembler.CategoryAssembler;
 import no.haagensoftware.contentice.data.CategoryData;
 import no.haagensoftware.contentice.data.CategoryField;
 import no.haagensoftware.contentice.data.SubCategoryData;
 import no.haagensoftware.contentice.data.SubcategoryField;
 import no.haagensoftware.contentice.data.auth.Session;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
-import no.haagensoftware.contentice.handler.ContenticeParameterMap;
-import no.haagensoftware.contentice.plugin.admindata.AdminCategoryObject;
 import no.haagensoftware.contentice.plugin.admindata.AdminCategoryObjectWithIds;
 import no.haagensoftware.contentice.plugin.assembler.AdminCategoryAssembler;
 import no.haagensoftware.contentice.plugin.assembler.AdminSubCategoryAssembler;
@@ -23,9 +19,7 @@ import no.haagensoftware.contentice.spi.AuthenticationPlugin;
 import no.haagensoftware.hyrrokkin.serializer.RestSerializer;
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.List;
 
 /**
@@ -70,7 +64,7 @@ public class AdminCategoryHandler extends ContenticeHandler  {
         logger.info("reading CategoryHandler and writing contents to buffer");
 
         String category = getParameter("category");
-        CategoryData categoryData = getStorage().getCategory(getDomain().getWebappName(), category);
+        CategoryData categoryData = getStorage().getCategory(getDomain().getDocumentsName(), category);
 
         if (isPost(fullHttpRequest)) {
             logger.info("POSTING CATEGORY: " + category);
@@ -81,29 +75,29 @@ public class AdminCategoryHandler extends ContenticeHandler  {
             logger.info(messageContent);
 
             AdminCategoryObjectWithIds adminCategory = new Gson().fromJson(messageContent, AdminCategoryObjectWithIds.class);
-            CategoryData storedCategory = getStorage().getCategory(getDomain().getWebappName(), category);
+            CategoryData storedCategory = getStorage().getCategory(getDomain().getDocumentsName(), category);
 
             if (adminCategory != null && adminCategory.getCategory() != null && storedCategory != null) {
                 logger.info("Category: " + adminCategory.getCategory().getId());
 
                 storedCategory.setPublic(adminCategory.getCategory().isPublic());
 
-                getStorage().setCategory(getDomain().getWebappName(), storedCategory.getId(), storedCategory);
+                getStorage().setCategory(getDomain().getDocumentsName(), storedCategory.getId(), storedCategory);
             }
 
-            JsonObject topLevelObject = convertCategoryToJson(getDomain().getWebappName(), storedCategory);
+            JsonObject topLevelObject = convertCategoryToJson(getDomain().getDocumentsName(), storedCategory);
             writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json");
 
         } else if (isGet(fullHttpRequest)) {
             if (categoryData == null) {
                 write404ToBuffer(channelHandlerContext);
             } else {
-                //JsonObject topLevelObject = convertCategoryToJson(getDomain().getWebappName(), categoryData);
-                /*for (SubCategoryData subcategoryData : getStorage().getSubCategories(getDomain().getWebappName(), categoryData.getId())) {
+                //JsonObject topLevelObject = convertCategoryToJson(getDomain().getDocumentsName(), categoryData);
+                /*for (SubCategoryData subcategoryData : getStorage().getSubCategories(getDomain().getDocumentsName(), categoryData.getId())) {
                     categoryData.addSubcategory(subcategoryData);
                 }*/
 
-                categoryData.setNumberOfSubcategories(getStorage().getNumberOfSubcategories(getDomain().getWebappName(), categoryData.getId()));
+                categoryData.setNumberOfSubcategories(getStorage().getNumberOfSubcategories(getDomain().getDocumentsName(), categoryData.getId()));
 
                 RestSerializer serializer = new RestSerializer();
                 serializer.addPluralization("category", "categories");

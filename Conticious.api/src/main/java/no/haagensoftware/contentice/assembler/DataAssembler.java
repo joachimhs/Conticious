@@ -33,11 +33,13 @@ public class DataAssembler {
 
     private static JsonObject buildJson(SubCategoryData subCategoryData, String category, String appendToId) {
         JsonObject subCategoryObject = new JsonObject();
+
         if (subCategoryData != null) {
             subCategoryObject.addProperty("id", appendToId + subCategoryData.getName());
             subCategoryObject.addProperty("name", subCategoryData.getName());
             subCategoryObject.addProperty("category", category);
             subCategoryObject.addProperty("content", subCategoryData.getContent());
+
 
             for (String key : subCategoryData.getKeyMap().keySet()) {
                 JsonElement element = subCategoryData.getKeyMap().get(key);
@@ -48,6 +50,9 @@ public class DataAssembler {
                     for (int index = 0; index < array.size(); index++) {
                         JsonElement currElement = array.get(index);
                         if (currElement.isJsonPrimitive() && currElement.getAsString().startsWith(key) && currElement.getAsString().contains("_")) {
+                            String currVal = currElement.getAsString().substring(currElement.getAsString().indexOf("_") + 1);
+                            newArray.add(new JsonPrimitive(currVal));
+                        } else if (currElement.isJsonPrimitive() && currElement.getAsString().startsWith(category) && currElement.getAsString().contains("_")) {
                             String currVal = currElement.getAsString().substring(currElement.getAsString().indexOf("_") + 1);
                             newArray.add(new JsonPrimitive(currVal));
                         }

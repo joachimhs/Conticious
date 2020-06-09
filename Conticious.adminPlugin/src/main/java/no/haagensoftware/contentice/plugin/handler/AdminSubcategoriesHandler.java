@@ -69,9 +69,9 @@ public class AdminSubcategoriesHandler extends ContenticeHandler {
 
                 logger.info("Category: " + adminSubcategory.getSubcategory().getId());
 
-                getStorage().setSubCategory(getDomain().getWebappName(), category, adminSubcategory.getSubcategory().getName(), adminSubcategory.getSubcategory());
+                getStorage().setSubCategory(getDomain().getDocumentsName(), category, adminSubcategory.getSubcategory().getName(), adminSubcategory.getSubcategory());
 
-                CategoryData categoryData = getStorage().getCategory(getDomain().getWebappName(), category);
+                CategoryData categoryData = getStorage().getCategory(getDomain().getDocumentsName(), category);
                 topLevelObject.add("subcategory", AdminSubCategoryAssembler.buildAdminJsonFromSubCategoryData(adminSubcategory.getSubcategory(), categoryData));
 
                 JsonArray subcategoryFieldArray= new JsonArray();
@@ -95,8 +95,8 @@ public class AdminSubcategoriesHandler extends ContenticeHandler {
 
         } else {
             //Always return the updated subcategories
-            List<SubCategoryData> subCategories = getStorage().getSubCategories(getDomain().getWebappName(), category);
-            CategoryData categoryData = getStorage().getCategory(getDomain().getWebappName(), category);
+            List<SubCategoryData> subCategories = getStorage().getSubCategories(getDomain().getDocumentsName(), category);
+            CategoryData categoryData = getStorage().getCategory(getDomain().getDocumentsName(), category);
 
             if (subCategories == null) {
                 write404ToBuffer(channelHandlerContext);
@@ -114,6 +114,8 @@ public class AdminSubcategoriesHandler extends ContenticeHandler {
                         subField.setType(cf.getType());
                         subField.setName(cf.getName());
                         subField.setRelation(cf.getRelation());
+                        subField.setCategory(categoryData.getId());
+                        subField.setSubcategory(subCategory.getId());
                         JsonElement element = subCategory.getKeyMap().get(cf.getName());
                         if (element != null && element.isJsonArray() && (cf.getType().equals("array") || cf.getType().equals("toMany"))) {
                             JsonArray jsonArray = element.getAsJsonArray();

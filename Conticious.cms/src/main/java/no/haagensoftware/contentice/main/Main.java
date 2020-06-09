@@ -75,6 +75,7 @@ public class Main {
 
             if (plugin.getPluginName().equals(System.getProperty("no.haagensoftware.contentice.storage.plugin"))) {
                 specifiedStoragePlugin = (StoragePlugin)plugin;
+                specifiedStoragePlugin.setup();
 
             }
 

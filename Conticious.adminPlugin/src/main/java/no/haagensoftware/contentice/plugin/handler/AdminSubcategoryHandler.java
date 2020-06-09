@@ -6,7 +6,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
-import no.haagensoftware.contentice.assembler.SubCategoryAssembler;
 import no.haagensoftware.contentice.data.CategoryData;
 import no.haagensoftware.contentice.data.SubCategoryData;
 import no.haagensoftware.contentice.data.auth.Session;
@@ -83,7 +82,7 @@ public class AdminSubcategoryHandler extends ContenticeHandler {
             if (adminSubcategory != null && adminSubcategory.getSubcategory() != null) {
                 logger.info("Subcategory: " + adminSubcategory.getSubcategory().getId());
 
-                getStorage().setSubCategory(getDomain().getWebappName(), category, adminSubcategory.getSubcategory().getName(), adminSubcategory.getSubcategory());
+                getStorage().setSubCategory(getDomain().getDocumentsName(), category, adminSubcategory.getSubcategory().getName(), adminSubcategory.getSubcategory());
             }
         } else if (isDelete(fullHttpRequest)) {
             if (category == null) {
@@ -92,13 +91,13 @@ public class AdminSubcategoryHandler extends ContenticeHandler {
             }
 
             if (category != null && subcategory != null) {
-                getStorage().deleteSubcategory(getDomain().getWebappName(), category, subcategory);
+                getStorage().deleteSubcategory(getDomain().getDocumentsName(), category, subcategory);
                 haveDeleted = true;
             }
         }
 
-        SubCategoryData subCategoryData = getStorage().getSubCategory(getDomain().getWebappName(), category, subcategory);
-        CategoryData categoryData = getStorage().getCategory(getDomain().getWebappName(), category);
+        SubCategoryData subCategoryData = getStorage().getSubCategory(getDomain().getDocumentsName(), category, subcategory);
+        CategoryData categoryData = getStorage().getCategory(getDomain().getDocumentsName(), category);
 
         if (haveDeleted) {
             writeNoContentToBuffer(channelHandlerContext);

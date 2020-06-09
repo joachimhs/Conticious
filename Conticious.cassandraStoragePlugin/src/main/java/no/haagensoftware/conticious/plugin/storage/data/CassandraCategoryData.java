@@ -79,6 +79,10 @@ public class CassandraCategoryData {
         this.subcategories = subcategories;
     }
 
+    public void addSubcategory(String id) {
+        subcategories.add(id);
+    }
+
     @Transient
     public CategoryData toCategoryData() {
         CategoryData cd = new CategoryData();

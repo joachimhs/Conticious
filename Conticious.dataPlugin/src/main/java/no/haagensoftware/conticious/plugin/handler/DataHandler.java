@@ -27,7 +27,7 @@ public class DataHandler extends ContenticeHandler {
         String subcategory = getParameter("subcategory");
 
         if (category != null) {
-            CategoryData categoryData = getStorage().getCategory(getDomain().getWebappName(), category);
+            CategoryData categoryData = getStorage().getCategory(getDomain().getDocumentsName(), category);
 
             List<String> ids = getQueryStringIds();
 
@@ -36,7 +36,7 @@ public class DataHandler extends ContenticeHandler {
 
                 String categoryName = getPluginResolver().getPluralFor(category);
 
-                List<SubCategoryData> subCategoryDataList = getStorage().getSubCategories(getDomain().getWebappName(), category);
+                List<SubCategoryData> subCategoryDataList = getStorage().getSubCategories(getDomain().getDocumentsName(), category);
                 jsonReturn = DataAssembler.buildJsonFromSubCategoryData(categoryName, true, "", subCategoryDataList.toArray(new SubCategoryData[subCategoryDataList.size()])).toString();
             } else if (isGet(fullHttpRequest) && category != null && subcategory == null && ids.size() > 0 && categoryData != null && categoryData.isPublic()) {
                 //Get subcategories with ids for category
@@ -48,7 +48,7 @@ public class DataHandler extends ContenticeHandler {
                     if (id.startsWith(category)) {
                         appendToId = category + "_";
                     }
-                    SubCategoryData subCategoryData = getStorage().getSubCategory(getDomain().getWebappName(), category, id);
+                    SubCategoryData subCategoryData = getStorage().getSubCategory(getDomain().getDocumentsName(), category, id);
                     if (subCategoryData != null) {
                         subCategoryDataList.add(subCategoryData);
                     }
@@ -65,7 +65,7 @@ public class DataHandler extends ContenticeHandler {
                     appendToId = category + "_";
                 }
 
-                SubCategoryData subCategoryData = getStorage().getSubCategory(getDomain().getWebappName(), category, subcategory);
+                SubCategoryData subCategoryData = getStorage().getSubCategory(getDomain().getDocumentsName(), category, subcategory);
                 if (subCategoryData != null) {
                     jsonReturn = DataAssembler.buildJsonFromSubCategoryData(categoryName, false  , appendToId, subCategoryData).toString();
                 }

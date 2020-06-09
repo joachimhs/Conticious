@@ -72,7 +72,7 @@ public class AdminCopySubcategoryHandler extends ContenticeHandler {
             logger.info("copy subcat to: " + toCategory + " // " + toSubcategory);
 
             if (fromCategory != null && fromSubcategory != null && toCategory != null && toSubcategory != null) {
-                SubCategoryData fromSubcatData = getStorage().getSubCategory(getDomain().getWebappName(), fromCategory, fromSubcategory);
+                SubCategoryData fromSubcatData = getStorage().getSubCategory(getDomain().getDocumentsName(), fromCategory, fromSubcategory);
                 fromSubcatData.getId();
 
                 SubCategoryData toSubcatData = new SubCategoryData(renameSubcategoryTo);
@@ -84,11 +84,11 @@ public class AdminCopySubcategoryHandler extends ContenticeHandler {
                     toSubcatData.getKeyMap().put(key, jsonElement);
                 }
 
-                getStorage().setSubCategory(getDomain().getWebappName(), toCategory, toSubcategory, toSubcatData);
+                getStorage().setSubCategory(getDomain().getDocumentsName(), toCategory, toSubcategory, toSubcatData);
                 logger.info("DONE");
             }
 
-            //getStorage().getSubCategory(getDomain().getWebappName(), "", "");
+            //getStorage().getSubCategory(getDomain().getDocumentsName(), "", "");
 
             writeContentsToBuffer(channelHandlerContext, topLevelObject.toString(), "application/json");
         }

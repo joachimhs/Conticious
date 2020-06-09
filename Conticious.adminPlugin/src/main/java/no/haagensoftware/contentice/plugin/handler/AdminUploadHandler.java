@@ -46,11 +46,11 @@ public class AdminUploadHandler extends ContenticeHandler {
                     jsonReturn.addProperty("filename", newFilename);
 
                     if (getDomain().getCreateCategory() != null) {
-                        CategoryData categoryData = getStorage().getCategory(getDomain().getWebappName(), getDomain().getCreateCategory());
+                        CategoryData categoryData = getStorage().getCategory(getDomain().getDocumentsName(), getDomain().getCreateCategory());
                         if (categoryData == null) {
                             categoryData = new CategoryData();
                             categoryData.setId(getDomain().getCreateCategory());
-                            getStorage().setCategory(getDomain().getWebappName(), categoryData.getId(), categoryData);
+                            getStorage().setCategory(getDomain().getDocumentsName(), categoryData.getId(), categoryData);
                         }
 
                         boolean categoryHasHref = false;
@@ -70,14 +70,14 @@ public class AdminUploadHandler extends ContenticeHandler {
                             cf.setType("textfield");
 
                             categoryData.getDefaultFields().add(cf);
-                            getStorage().setCategory(getDomain().getWebappName(), categoryData.getId(), categoryData);
+                            getStorage().setCategory(getDomain().getDocumentsName(), categoryData.getId(), categoryData);
                         }
 
                         SubCategoryData sc = new SubCategoryData();
                         sc.setId(newFilename);
                         sc.getKeyMap().put("href", new JsonPrimitive(getDomain().getUploadPath() + "/" + newFilename));
 
-                        getStorage().setSubCategory(getDomain().getWebappName(), getDomain().getCreateCategory(), sc.getId(), sc);
+                        getStorage().setSubCategory(getDomain().getDocumentsName(), getDomain().getCreateCategory(), sc.getId(), sc);
                     }
 
                 }
@@ -120,13 +120,13 @@ public class AdminUploadHandler extends ContenticeHandler {
 
                 // example of reading chunk by chunk (minimize memory usage due to
                 // Factory)
-                String uploadPath = System.getProperty("no.haagensoftware.contentice.webappDir") + "/" + getDomain().getWebappName() + getDomain().getUploadPath();
+                String uploadPath = System.getProperty("no.haagensoftware.contentice.webappDir") + "/" + getDomain().getDocumentsName() + getDomain().getUploadPath();
                 newFilename = ImageUploadProcessor.storeUpload(decoder, uploadPath);
 
                 SubCategoryData subCategoryData = new SubCategoryData();
                 subCategoryData.setId(newFilename);
                 subCategoryData.getKeyMap().put("filename", new JsonPrimitive(newFilename));
-                getStorage().setSubCategory(getDomain().getWebappName(), "uploads", newFilename, subCategoryData);
+                getStorage().setSubCategory(getDomain().getDocumentsName(), "uploads", newFilename, subCategoryData);
             }
         }
 

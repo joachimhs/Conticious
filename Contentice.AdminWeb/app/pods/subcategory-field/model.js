@@ -6,6 +6,8 @@ export default DS.Model.extend({
     required: DS.attr('boolean'),
     value: DS.attr('string'),
     relation: DS.belongsTo('category'),
+    category: DS.attr('string'),
+    subcategory: DS.attr('string'),
     addedRelations: DS.attr('raw'),//('subcategory'),
 
     addedRelationsObserver: function() {

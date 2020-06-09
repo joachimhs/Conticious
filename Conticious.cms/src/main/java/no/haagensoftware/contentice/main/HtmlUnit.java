@@ -1,14 +1,7 @@
 package no.haagensoftware.contentice.main;
 
-import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.scene.Scene;
-import javafx.scene.control.TextArea;
-import javafx.scene.web.WebEngine;
-import javafx.stage.Stage;
+
 import no.haagensoftware.contentice.util.FileUtil;
-import org.w3c.dom.Document;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,22 +14,7 @@ import java.io.InputStreamReader;
 public class HtmlUnit {
     private String docString = null;
 
-    public void start(Stage stage) {
 
-        /*Process process = Runtime.getRuntime().exec("/usr/local/phantomjs/bin/phantomjs myscript.js");
-        int exitStatus = process.waitFor();
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader (process.getInputStream()));
-
-        String currentLine=null;
-        StringBuilder stringBuilder = new StringBuilder(exitStatus==0?"SUCCESS:":"ERROR:");
-        currentLine= bufferedReader.readLine();
-        while(currentLine !=null)
-        {
-            stringBuilder.append(currentLine);
-            currentLine = bufferedReader.readLine();
-        }
-        System.out.println(stringBuilder.toString());*/
-    }
 
     public static void main(String[] args) throws IOException, InterruptedException {
         File phantomScript = FileUtil.getFileForResource("phantomscript.js");

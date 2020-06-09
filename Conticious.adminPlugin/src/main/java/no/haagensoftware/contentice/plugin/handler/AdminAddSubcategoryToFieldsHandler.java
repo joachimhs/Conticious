@@ -3,16 +3,9 @@ package no.haagensoftware.contentice.plugin.handler;
 import com.google.gson.*;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.util.CharsetUtil;
-import no.haagensoftware.contentice.data.CategoryData;
-import no.haagensoftware.contentice.data.CategoryField;
 import no.haagensoftware.contentice.data.SubCategoryData;
-import no.haagensoftware.contentice.data.SubcategoryField;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
-import no.haagensoftware.contentice.plugin.admindata.SubcategoryFieldObject;
 import org.apache.log4j.Logger;
-
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -62,8 +55,8 @@ public class AdminAddSubcategoryToFieldsHandler extends ContenticeHandler {
             logger.info("subcategoryToId: " + subcategoryToId);
             logger.info("fieldName: " + fieldName);
 
-            SubCategoryData subCategoryDataToAdd = getStorage().getSubCategory(getDomain().getWebappName(), categoryFromId, subcategoryFromId);
-            SubCategoryData subCategoryDataToAddTo = getStorage().getSubCategory(getDomain().getWebappName(), categoryToId, subcategoryToId);
+            SubCategoryData subCategoryDataToAdd = getStorage().getSubCategory(getDomain().getDocumentsName(), categoryFromId, subcategoryFromId);
+            SubCategoryData subCategoryDataToAddTo = getStorage().getSubCategory(getDomain().getDocumentsName(), categoryToId, subcategoryToId);
 
             if (subCategoryDataToAdd != null && subCategoryDataToAddTo != null) {
                 JsonElement fieldElement = subCategoryDataToAddTo.getKeyMap().get(fieldName);
@@ -75,7 +68,7 @@ public class AdminAddSubcategoryToFieldsHandler extends ContenticeHandler {
                 if (fieldElement.isJsonArray()) {
                     fieldElement.getAsJsonArray().add(new JsonPrimitive(subcategoryIdToAdd));
 
-                    getStorage().setSubCategory(getDomain().getWebappName(), categoryToId, subcategoryToId, subCategoryDataToAddTo);
+                    getStorage().setSubCategory(getDomain().getDocumentsName(), categoryToId, subcategoryToId, subCategoryDataToAddTo);
                 }
             }
 

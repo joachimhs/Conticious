@@ -97,7 +97,7 @@ public class CassandraStoragePlugin extends StoragePlugin {
         cd1.setNumberOfSubcategories(0);
 
         SubCategoryData scd1 = new SubCategoryData();
-        scd1.setId("category1_subcategory1");
+        scd1.setId("subcategory1");
         scd1.setName("subcategory1");
         scd1.setContent("Markdown Content");
 
@@ -107,19 +107,43 @@ public class CassandraStoragePlugin extends StoragePlugin {
         keyMap.put("TestProp3", new JsonPrimitive(123));
 
         scd1.setKeyMap(keyMap);
+
         cd1.addSubcategory(scd1);
 
+        SubCategoryData scd2 = new SubCategoryData();
+        scd2.setId("subcategory2");
+        scd2.setName("subcategory2");
+        scd2.setContent("Markdown Content 2");
+
+        Map<String, JsonElement> keyMap2 = new HashMap<>();
+        keyMap2.put("TestProp3", new JsonPrimitive("testVal"));
+        keyMap2.put("TestProp4", new JsonPrimitive(true));
+        keyMap2.put("TestProp5", new JsonPrimitive(123));
+
+        scd2.setKeyMap(keyMap2);
+
+        cd1.addSubcategory(scd2);
+
         plugin.setCategory("mywebsite.com", "category1", cd1);
-        plugin.setSubCategory("mywebsite.com", "category1", "category1_subcategory!", scd1);
+        plugin.setSubCategory("mywebsite.com", cd1.getId(), scd1.getId(), scd1);
+        plugin.setSubCategory("mywebsite.com", cd1.getId(), scd2.getId(), scd2);
+
+        plugin.setCategory("mywebsite2.com", "category1", cd1);
+        plugin.setSubCategory("mywebsite2.com", cd1.getId(), scd1.getId(), scd1);
+        plugin.setSubCategory("mywebsite2.com", cd1.getId(), scd2.getId(), scd2);
 
         List<CategoryData> categoryDataList = plugin.getCategories("mywebsite.com");
         System.out.println(new Gson().toJson(categoryDataList));
+
+        List<SubCategoryData> subcategoryDataList = plugin.getSubCategories("mywebsite2.com", "category1");
+        System.out.println(new Gson().toJson(subcategoryDataList));
+        System.out.println(new Gson().toJson(plugin.getSubCategories("mywebsite.com", "category1")));
 
     }
 
     @Override
     public List<String> getPluginDependencies() {
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
@@ -139,6 +163,7 @@ public class CassandraStoragePlugin extends StoragePlugin {
                 cd.addSubcategory(this.getSubCategory(host, cassandraCategoryData.getName(), subCatId));
             }
 
+            cd.setNumberOfSubcategories(cd.getSubcategories().size());
             categoryDataList.add(cd);
         }
 
@@ -168,7 +193,7 @@ public class CassandraStoragePlugin extends StoragePlugin {
     public Integer getNumberOfSubcategories(String host, String category) {
         int num = 0;
 
-        CassandraCategoryData ccd = cassandraCategoryDao.getCategory(host, category);
+        CassandraCategoryData ccd = cassandraCategoryDao.getCategory(category, host);
         if (ccd != null) {
             num = ccd.getSubcategories() != null ? ccd.getSubcategories().size() : 0;
         }
@@ -189,13 +214,18 @@ public class CassandraStoragePlugin extends StoragePlugin {
 
     @Override
     public SubCategoryData getSubCategory(String host, String category, String subCategory) {
-        return cassandraCategoryDao.getSubcategory(subCategory, host).toSubCategoryData();
+        CassandraSubCategoryData cscd = cassandraCategoryDao.getSubcategory(subCategory, category, host);
+        if (cscd != null) {
+            return cscd.toSubCategoryData();
+        }
+
+        return null;
     }
 
 
     @Override
     public void setSubCategory(String host, String category, String subCategory, SubCategoryData subCategoryData) {
-        cassandraCategoryDao.persistSubcategory(subCategoryData, host);
+        cassandraCategoryDao.persistSubcategory(subCategoryData, category, host);
     }
 
     @Override

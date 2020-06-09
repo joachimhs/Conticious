@@ -22,12 +22,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>8</source>
+                    <target>8</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
-
 
         </plugins>
     </build>
@@ -41,26 +40,20 @@
 
         <dependency>
             <groupId>no.haagensoftware</groupId>
-            <artifactId>conticious-kodegenet-plugin</artifactId>
-            <version>1.0</version>
+            <artifactId>conticious-cassandra-storage-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>no.haagensoftware</groupId>
+            <artifactId>conticious-filesystem-plugin</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>no.haagensoftware</groupId>
             <artifactId>conticious-teknologihuset-plugin</artifactId>
             <version>1.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>no.haagensoftware</groupId>
-            <artifactId>conticious-spira-plugin</artifactId>
-            <version>1.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>no.haagensoftware</groupId>
-            <artifactId>conticious-hlokk</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -196,8 +189,7 @@
             <id>local</id>
             <activation>
                 <property>
-                    <name>env</name>
-                    <value>local</value>
+                    <name>idea.maven.embedder.version</name>
                 </property>
             </activation>
             <dependencies>

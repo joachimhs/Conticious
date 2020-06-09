@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import no.haagensoftware.contentice.assembler.SubCategoryAssembler;
-import no.haagensoftware.contentice.data.CategoryData;
 import no.haagensoftware.contentice.data.SubCategoryData;
 import no.haagensoftware.contentice.handler.ContenticeHandler;
 
@@ -28,7 +27,7 @@ public class SubCategoriesHandler extends ContenticeHandler {
 
         String category = getParameter("category");
 
-        List<SubCategoryData> subCategories = getStorage().getSubCategories(getDomain().getWebappName(), category);
+        List<SubCategoryData> subCategories = getStorage().getSubCategories(getDomain().getDocumentsName(), category);
 
         if (subCategories == null) {
             write404ToBuffer(channelHandlerContext);

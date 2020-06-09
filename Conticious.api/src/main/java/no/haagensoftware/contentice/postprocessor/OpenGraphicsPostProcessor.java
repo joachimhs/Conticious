@@ -20,7 +20,7 @@ public class OpenGraphicsPostProcessor extends PostProcessorPlugin {
     public String postProcess(String input, String originalUrl, String filePath, String queryString, String contentType) {
         String output = input;
         if (contentType.contains("text/html") && filePath.endsWith(".html")) {
-            SubCategoryData ogData = getStorage().getSubCategory(getDomain().getWebappName(), "openGraphics", originalUrl.replace("/", "_"));
+            SubCategoryData ogData = getStorage().getSubCategory(getDomain().getDocumentsName(), "openGraphics", originalUrl.replace("/", "_"));
 
             if (ogData != null) {
                 Document htmlDocument = Jsoup.parse(input, "UTF-8");
