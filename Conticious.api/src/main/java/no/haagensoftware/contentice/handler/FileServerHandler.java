@@ -16,7 +16,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
@@ -41,7 +40,6 @@ public class FileServerHandler extends ContenticeHandler {
     private int cacheMaxAge = -1;
     private boolean fromClasspath = false;
     private boolean isAdmin = false;
-    private MimetypesFileTypeMap fileTypeMap = new MimetypesFileTypeMap();
 
     private int maxCacheSeconds = 0;
 

@@ -40,20 +40,15 @@
 
         <dependency>
             <groupId>no.haagensoftware</groupId>
-            <artifactId>conticious-cassandra-storage-plugin</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>no.haagensoftware</groupId>
             <artifactId>conticious-filesystem-plugin</artifactId>
             <version>${project.version}</version>
         </dependency>
 
+
         <dependency>
             <groupId>no.haagensoftware</groupId>
-            <artifactId>conticious-teknologihuset-plugin</artifactId>
-            <version>1.0</version>
+            <artifactId>conticious-skaperiet-plugin</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -213,18 +208,6 @@
 
                 <dependency>
                     <groupId>no.haagensoftware</groupId>
-                    <artifactId>conticious-kodegenet-plugin</artifactId>
-                    <version>1.0</version>
-                </dependency>
-
-                <dependency>
-                    <groupId>no.haagensoftware</groupId>
-                    <artifactId>conticious-spira-plugin</artifactId>
-                    <version>1.0</version>
-                </dependency>
-
-                <dependency>
-                    <groupId>no.haagensoftware</groupId>
                     <artifactId>conticious-hlokk</artifactId>
                     <version>${project.version}</version>
                 </dependency>
@@ -291,12 +274,6 @@
                 <dependency>
                     <groupId>no.haagensoftware</groupId>
                     <artifactId>conticious-data-plugin</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-
-                <dependency>
-                    <groupId>no.haagensoftware</groupId>
-                    <artifactId>conticious-cassandra-storage-plugin</artifactId>
                     <version>${project.version}</version>
                 </dependency>
             </dependencies>
