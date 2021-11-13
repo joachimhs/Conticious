@@ -10,6 +10,9 @@ public class HlokkUser {
     private String username;
     private Long generatedTimestamp;
 
+    public HlokkUser() {
+    }
+
     public HlokkUser(String token, String username) {
         this.token = token;
         this.username = username;

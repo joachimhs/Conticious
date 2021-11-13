@@ -1,7 +1,7 @@
 package no.kodegenet.conticious.plugin.hlokk;
 
-import no.haagensoftware.contentice.util.RandomString;
 import no.kodegenet.conticious.plugin.hlokk.data.HlokkUser;
+import no.kodegenet.conticious.plugin.hlokk.util.RandomString;
 
 import java.util.*;
 
